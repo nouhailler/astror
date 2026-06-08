@@ -1,0 +1,188 @@
+import { useState } from 'react'
+import { IcRocket, IcMoon, IcStar, IcBell } from './icons'
+import { ScreenHeader, IconBtn, SettingsBtn, HeaderTools, SectionTitle, DataRow, Stat, Sheet, useCountdown } from './ui'
+import { SUN_MOON, CONDITIONS, ALERTS, EVENTS } from './data'
+
+function Moon({ illum = 73, size = 116 }) {
+  const p = illum / 100
+  const lit = '#e9e3d0'
+  const ex = Math.abs(p - 0.5) * 2 * size
+  const gibbous = p > 0.5
+  return (
+    <div style={{ width: size, height: size, borderRadius: '50%', position: 'relative',
+      overflow: 'hidden', background: '#0d1326',
+      boxShadow: '0 0 40px rgba(233,227,208,.18), inset 0 0 18px rgba(0,0,0,.5)' }}>
+      <div style={{ position: 'absolute', right: 0, top: 0, width: '50%', height: '100%', background: lit }} />
+      <div style={{ position: 'absolute', left: '50%', top: 0, height: '100%', width: ex,
+        transform: 'translateX(-50%)', borderRadius: '50%', background: gibbous ? lit : '#0d1326' }} />
+      <div style={{ position: 'absolute', inset: 0, borderRadius: '50%', mixBlendMode: 'multiply',
+        background: 'radial-gradient(circle at 66% 34%, rgba(120,110,90,.35) 0 7%, transparent 9%), radial-gradient(circle at 78% 60%, rgba(120,110,90,.28) 0 5%, transparent 7%), radial-gradient(circle at 60% 72%, rgba(120,110,90,.25) 0 4%, transparent 6%)' }} />
+      <div style={{ position: 'absolute', inset: 0, borderRadius: '50%', boxShadow: 'inset -10px -8px 22px rgba(0,0,0,.45)' }} />
+    </div>
+  )
+}
+
+const ALERT_ICON = {
+  iss: <IcRocket size={18} />, conj: <IcMoon size={18} />, iri: <IcStar size={18} />,
+}
+
+function CondBar({ label, value, level, max = 5 }) {
+  return (
+    <div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 7 }}>
+        <span className="meta" style={{ textTransform: 'uppercase', letterSpacing: '.1em' }}>{label}</span>
+        <span style={{ fontSize: 12.5, color: 'var(--text)', fontWeight: 500 }}>{value}</span>
+      </div>
+      <div style={{ display: 'flex', gap: 4 }}>
+        {Array.from({ length: max }).map((_, i) => (
+          <span key={i} style={{ flex: 1, height: 5, borderRadius: 99,
+            background: i < level ? 'linear-gradient(90deg,var(--gold-3),var(--gold-2))' : 'var(--surface-3)' }} />
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function EventRow({ e, onClick }) {
+  const cd = useCountdown(e.date)
+  const d = new Date(e.date)
+  const day = d.toLocaleDateString('fr-FR', { day: '2-digit' })
+  const mon = d.toLocaleDateString('fr-FR', { month: 'short' }).replace('.', '')
+  return (
+    <button onClick={onClick} className="press" style={{ width: '100%', display: 'flex', alignItems: 'center',
+      gap: 14, padding: '14px 15px', background: 'none', border: 0, borderBottom: '1px solid var(--line)',
+      textAlign: 'left', cursor: 'pointer' }}>
+      <span style={{ width: 48, textAlign: 'center', flexShrink: 0 }}>
+        <span className="data" style={{ display: 'block', fontSize: 22, fontWeight: 500, color: 'var(--text)', lineHeight: 1 }}>{day}</span>
+        <span className="meta" style={{ textTransform: 'uppercase', fontSize: 9.5 }}>{mon}</span>
+      </span>
+      <span style={{ width: 1, height: 34, background: 'var(--line-2)', flexShrink: 0 }} />
+      <span style={{ flex: 1, minWidth: 0 }}>
+        <span className="h-card" style={{ fontSize: 14.5 }}>{e.label}</span>
+        <span style={{ display: 'flex', gap: 8, marginTop: 4, alignItems: 'center' }}>
+          <span className="meta" style={{ color: 'var(--gold)' }}>{e.kind}</span>
+          <span style={{ width: 3, height: 3, borderRadius: 9, background: 'var(--faint)' }} />
+          <span className="meta">{e.zhr}</span>
+        </span>
+      </span>
+      <span style={{ textAlign: 'right', flexShrink: 0 }}>
+        <span className="meta" style={{ display: 'block', fontSize: 9 }}>DANS</span>
+        <span className="data" style={{ fontSize: 13, color: 'var(--text)' }}>{cd}</span>
+      </span>
+    </button>
+  )
+}
+
+export default function EphScreen() {
+  const m = SUN_MOON, c = CONDITIONS
+  const [evt, setEvt] = useState(null)
+
+  return (
+    <div className="screen pad-b">
+      <ScreenHeader eyebrow="7 juin 2026 · Paris" title="Éphémérides"
+        right={<HeaderTools><IconBtn badge><IcBell size={19} /></IconBtn><SettingsBtn /></HeaderTools>} />
+
+      <div className="pad">
+        <div className="card enter" style={{ padding: 18, display: 'flex', gap: 18, alignItems: 'center' }}>
+          <Moon illum={m.moonIllum} />
+          <div style={{ flex: 1 }}>
+            <div className="eyebrow" style={{ marginBottom: 6 }}>Lune</div>
+            <div className="h-sec" style={{ fontSize: 19, marginBottom: 2 }}>{m.moonPhase}</div>
+            <div className="body tight" style={{ fontSize: 12.5 }}>{m.moonIllum}% illuminée · {m.moonAge} j</div>
+            <div style={{ display: 'flex', gap: 16, marginTop: 12 }}>
+              <div>
+                <div className="meta" style={{ fontSize: 9 }}>LEVER</div>
+                <div className="data" style={{ fontSize: 14, color: 'var(--gold)' }}>{m.moonrise}</div>
+              </div>
+              <div>
+                <div className="meta" style={{ fontSize: 9 }}>COUCHER</div>
+                <div className="data" style={{ fontSize: 14, color: 'var(--gold)' }}>{m.moonset}</div>
+              </div>
+              <div>
+                <div className="meta" style={{ fontSize: 9 }}>DISTANCE</div>
+                <div className="data" style={{ fontSize: 14, color: 'var(--text)' }}>{m.lunarDist}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="card-2" style={{ marginTop: 12, padding: '4px 16px' }}>
+          <DataRow k="Lever du Soleil" v={m.sunrise} accent />
+          <DataRow k="Coucher du Soleil" v={m.sunset} accent />
+          <DataRow k="Aube astronomique" v={m.dawnAstro} />
+          <DataRow k="Crépuscule astronomique" v={m.duskAstro} />
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '11px 0' }}>
+            <span style={{ fontSize: 13, color: 'var(--dim)' }}>Nuit noire</span>
+            <span className="data" style={{ fontSize: 13.5, color: 'var(--text)', fontWeight: 500 }}>{m.nightLen}</span>
+          </div>
+        </div>
+      </div>
+
+      <div className="pad">
+        <SectionTitle action="Gérer">Alertes</SectionTitle>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          {ALERTS.map(a => (
+            <div key={a.id} className="card" style={{ padding: 14, display: 'flex', gap: 13 }}>
+              <span style={{ width: 38, height: 38, borderRadius: 11, flexShrink: 0, display: 'flex',
+                alignItems: 'center', justifyContent: 'center', color: 'var(--gold)',
+                background: 'var(--gold-soft)', border: '1px solid var(--gold-line)' }}>
+                {ALERT_ICON[a.icon]}
+              </span>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <span className="h-card">{a.title}</span>
+                  {a.live && <span className="tag live"><span className="dot pulse" style={{ background: 'var(--good)' }} /> EN DIRECT</span>}
+                </div>
+                <div className="meta" style={{ color: 'var(--gold)', margin: '4px 0 6px' }}>{a.when}</div>
+                <div className="body tight" style={{ fontSize: 12.5 }}>{a.detail}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="pad">
+        <SectionTitle action="Tout voir">Calendrier céleste</SectionTitle>
+        <div className="card-2" style={{ overflow: 'hidden' }}>
+          {[...EVENTS].sort((a, b) => new Date(a.date) - new Date(b.date)).map(e => (
+            <EventRow key={e.id} e={e} onClick={() => setEvt(e)} />
+          ))}
+        </div>
+      </div>
+
+      <div className="pad">
+        <SectionTitle>Conditions d'observation</SectionTitle>
+        <div className="card" style={{ padding: 18 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '18px 20px' }}>
+            <CondBar label="Seeing" value={c.seeing} level={c.seeingVal} />
+            <CondBar label="Transparence" value={c.transparency} level={c.transVal} />
+          </div>
+          <hr className="hair" style={{ margin: '18px 0' }} />
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <Stat label="Bortle" value={c.bortle} sub="périurbain" />
+            <Stat label="Nuages" value={c.clouds} unit="%" />
+            <Stat label="Humidité" value={c.humidity} unit="%" />
+            <Stat label="Temp." value={c.temp} unit="°C" />
+          </div>
+        </div>
+      </div>
+
+      <Sheet open={!!evt} onClose={() => setEvt(null)}>
+        {evt && (
+          <div>
+            <div className="tag" style={{ marginBottom: 10 }}>{evt.kind}</div>
+            <div className="h-sec" style={{ fontSize: 25, marginBottom: 6 }}>{evt.label}</div>
+            <div className="meta" style={{ color: 'var(--gold)', marginBottom: 16 }}>
+              {new Date(evt.date).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+            </div>
+            <p className="body serif-body" style={{ fontSize: 15, lineHeight: 1.6 }}>{evt.detail}</p>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 24px', marginTop: 8 }}>
+              <DataRow k="Type" v={evt.kind} />
+              <DataRow k="Intensité / durée" v={evt.zhr} accent />
+            </div>
+          </div>
+        )}
+      </Sheet>
+    </div>
+  )
+}
