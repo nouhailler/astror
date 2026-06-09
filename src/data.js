@@ -154,22 +154,27 @@ export const NEWS = [
 ]
 
 export const CONFERENCES = [
-  { id:'c1', name:'European Astronomical Society — EAS 2026', place:'Cracovie, Pologne', date:'22–26 juin 2026', topic:'Réunion annuelle européenne' },
-  { id:'c2', name:'COSPAR Scientific Assembly', place:'Florence, Italie', date:'18–26 juil. 2026', topic:'Recherche spatiale' },
-  { id:'c3', name:'IAU — General Assembly', place:'Le Cap, Afrique du Sud', date:'3–14 août 2027', topic:'Union astronomique internationale' },
-  { id:'c4', name:'Rencontres du Ciel et de l\'Espace', place:'Cité des sciences, Paris', date:'7–8 nov. 2026', topic:'Grand public & amateurs' },
+  { id:'c1', name:'European Astronomical Society — EAS 2026', place:'Cracovie, Pologne', date:'22–26 juin 2026', topic:'Réunion annuelle européenne', url:'https://eas.unige.ch/EAS2026/' },
+  { id:'c2', name:'COSPAR Scientific Assembly', place:'Florence, Italie', date:'18–26 juil. 2026', topic:'Recherche spatiale', url:'https://cosparhq.cnes.fr/' },
+  { id:'c3', name:'IAU — General Assembly', place:'Le Cap, Afrique du Sud', date:'3–14 août 2027', topic:'Union astronomique internationale', url:'https://www.iau.org/' },
+  { id:'c4', name:'Rencontres du Ciel et de l\'Espace', place:'Cité des sciences, Paris', date:'7–8 nov. 2026', topic:'Grand public & amateurs', url:'https://www.cite-sciences.fr/' },
 ]
 
 export const PEOPLE = [
   { id:'p1', name:'Adam Riess', role:'Prix Nobel 2011', field:'Tension de Hubble',
+    wikiUrl:'https://fr.wikipedia.org/wiki/Adam_Riess',
     note:'Codécouvreur de l\'accélération de l\'expansion. Mène l\'équipe SH0ES, au cœur du débat sur H₀.' },
   { id:'p2', name:'Brian Schmidt', role:'Prix Nobel 2011', field:'Énergie noire',
+    wikiUrl:'https://fr.wikipedia.org/wiki/Brian_Schmidt',
     note:'Codirigea le High-z Supernova Search qui révéla l\'expansion accélérée de l\'univers.' },
   { id:'p3', name:'Andrea Ghez', role:'Prix Nobel 2020', field:'Trou noir galactique',
+    wikiUrl:'https://fr.wikipedia.org/wiki/Andrea_Ghez',
     note:'A démontré la présence de Sgr A* au centre de la Voie lactée par le suivi des étoiles.' },
   { id:'p4', name:'Jocelyn Bell Burnell', role:'Découverte des pulsars', field:'Astrophysique',
+    wikiUrl:'https://fr.wikipedia.org/wiki/Jocelyn_Bell_Burnell',
     note:'Détecta le premier pulsar en 1967, ouvrant l\'étude des étoiles à neutrons.' },
   { id:'p5', name:'Françoise Combes', role:'Collège de France', field:'Dynamique des galaxies',
+    wikiUrl:'https://fr.wikipedia.org/wiki/Françoise_Combes',
     note:'Spécialiste de la matière noire et de la formation des galaxies ; médaille d\'or du CNRS.' },
 ]
 

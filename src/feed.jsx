@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { IcRocket, IcEye, IcPlus, IcTrash, IcChevron, IcCheck } from './icons'
 import { ScreenHeader, SettingsBtn, HeaderTools, Sheet } from './ui'
 import { CONFERENCES, PEOPLE, BOOKS, PHOTO_SITES } from './data'
@@ -25,6 +25,7 @@ const FEED_FORMS = {
     { k: 'org',    label: 'Organisation', ph: 'SpaceX, ESA, NASA…' },
     { k: 'cat',    label: 'Catégorie', ph: 'Lancement, Mission, Science…' },
     { k: 'when',   label: 'Date', ph: '12 juin 2026' },
+    { k: 'url',    label: 'Lien de l\'article', ph: 'https://…' },
     { k: 'tag',    label: 'Statut', type: 'chips', opts: ['à venir', 'proche', 'trajet', 'publié'], def: 'à venir' },
     { k: 'detail', label: 'Description', type: 'area', ph: 'Résumé en une ou deux phrases.' },
   ],
@@ -33,9 +34,10 @@ const FEED_FORMS = {
     { k: 'place', label: 'Lieu', ph: 'Cracovie, Pologne' },
     { k: 'date',  label: 'Dates', ph: '22–26 juin 2026' },
     { k: 'topic', label: 'Thème', ph: 'Réunion annuelle européenne' },
+    { k: 'url',   label: 'Site web', ph: 'https://…' },
   ],
   people: [
-    { k: 'name',  label: 'Nom', ph: 'Adam Riess', req: true },
+    { k: 'name',  label: 'Nom', ph: 'Commencez à taper (3 car. min)…', req: true, type: 'person-combo' },
     { k: 'role',  label: 'Titre / distinction', ph: 'Prix Nobel 2011' },
     { k: 'field', label: 'Domaine', ph: 'Tension de Hubble' },
     { k: 'note',  label: 'Biographie', type: 'area', ph: 'Quelques phrases sur ses travaux.' },
@@ -53,6 +55,14 @@ function feedLoad() { try { return JSON.parse(localStorage.getItem(FEED_STORE)) 
 function feedSave(adds) { try { localStorage.setItem(FEED_STORE, JSON.stringify(adds)) } catch (e) {} }
 
 const TAG_STYLE = { 'à venir': 'tag', proche: 'tag', trajet: 'tag neutral', publié: 'tag neutral' }
+
+const WIKI_LINK_STYLE = {
+  display: 'inline-flex', alignItems: 'center', gap: 5, marginTop: 16,
+  padding: '6px 13px', borderRadius: 99,
+  background: 'rgba(217,179,108,.07)', border: '1px solid rgba(217,179,108,.25)',
+  color: 'var(--gold)', fontSize: 11.5, fontFamily: 'var(--mono)',
+  textTransform: 'uppercase', letterSpacing: '.07em', textDecoration: 'none',
+}
 
 function DelBtn({ onClick }) {
   return (
@@ -86,6 +96,87 @@ function IcArrowUpR({ size = 22 }) {
   )
 }
 
+// Combobox avec auto-complétion Wikipédia pour les personnalités
+function PersonCombobox({ value, onChange, onSelect }) {
+  const [open, setOpen] = useState(false)
+  const [suggestions, setSuggestions] = useState([])
+  const [busy, setBusy] = useState(false)
+  const debounce = useRef(null)
+
+  const search = (q) => {
+    onChange(q)
+    clearTimeout(debounce.current)
+    if (q.length < 3) { setSuggestions([]); setOpen(false); return }
+    debounce.current = setTimeout(async () => {
+      try {
+        const res = await fetch(
+          `https://fr.wikipedia.org/w/api.php?action=opensearch&search=${encodeURIComponent(q)}&limit=7&namespace=0&format=json&origin=*`
+        )
+        const [, titles, descs] = await res.json()
+        setSuggestions(titles.map((t, i) => ({ title: t, desc: descs[i] || '' })))
+        setOpen(true)
+      } catch {}
+    }, 320)
+  }
+
+  const pick = async (item) => {
+    setOpen(false)
+    setBusy(true)
+    try {
+      const res = await fetch(
+        `https://fr.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(item.title)}`
+      )
+      const d = await res.json()
+      onSelect({
+        name: d.title || item.title,
+        role: d.description || '',
+        note: (d.extract || '').replace(/<[^>]+>/g, '').slice(0, 280),
+        wikiUrl: d.content_urls?.desktop?.page
+          || `https://fr.wikipedia.org/wiki/${encodeURIComponent(item.title)}`,
+      })
+    } catch {
+      onChange(item.title)
+    }
+    setBusy(false)
+  }
+
+  return (
+    <div style={{ position: 'relative' }}>
+      <div style={{ position: 'relative' }}>
+        <input className="input" value={value}
+          placeholder="Commencez à taper un nom (3 car. min)…"
+          onChange={e => search(e.target.value)}
+          onBlur={() => setTimeout(() => setOpen(false), 160)}
+          autoComplete="off" />
+        {busy && (
+          <div style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', display: 'flex', gap: 3 }}>
+            {[0, 1, 2].map(i => (
+              <span key={i} style={{ width: 4, height: 4, borderRadius: '50%', background: 'var(--gold)',
+                animation: 'pulse 1.2s ease-in-out infinite', animationDelay: `${i * 0.18}s` }} />
+            ))}
+          </div>
+        )}
+      </div>
+      {open && suggestions.length > 0 && (
+        <div style={{ position: 'absolute', top: 'calc(100% + 4px)', left: 0, right: 0, zIndex: 200,
+          background: 'var(--surface-2)', border: '1px solid var(--line-2)', borderRadius: 12,
+          overflow: 'hidden', boxShadow: '0 8px 24px rgba(0,0,0,.5)' }}>
+          {suggestions.map((s, i) => (
+            <button key={s.title} onMouseDown={() => pick(s)} style={{
+              width: '100%', textAlign: 'left', padding: '10px 14px', background: 'none', border: 0,
+              borderBottom: i < suggestions.length - 1 ? '1px solid var(--line)' : 0,
+              cursor: 'pointer', display: 'block',
+            }}>
+              <div className="h-card" style={{ fontSize: 13.5 }}>{s.title}</div>
+              {s.desc && <div className="meta" style={{ marginTop: 2, color: 'var(--faint)' }}>{s.desc}</div>}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
 function NewsView({ items, onPick, onDelete }) {
   return (
     <div className="enter pad" style={{ display: 'flex', flexDirection: 'column', gap: 11, marginTop: 8 }}>
@@ -104,7 +195,7 @@ function NewsView({ items, onPick, onDelete }) {
               {n.tag && <span className={TAG_STYLE[n.tag] || 'tag neutral'}>{n.tag}</span>}
             </div>
             <div className="h-card" style={{ fontSize: 16, marginBottom: 5 }}>{n.title}</div>
-            {n.detail && <div className="body tight" style={{ fontSize: 12.5, marginBottom: 9 }}>{n.detail}</div>}
+            {n.detail && <div className="body tight" style={{ fontSize: 12.5, marginBottom: 9 }}>{n.detail.slice(0, 160)}{n.detail.length > 160 ? '…' : ''}</div>}
             {n.when && (
               <div className="meta" style={{ display: 'flex', alignItems: 'center', gap: 6, color: 'var(--gold)' }}>
                 <IcCal size={13} /> {n.when}
@@ -137,6 +228,16 @@ function ConfView({ items, onDelete }) {
             )}
             {(c.place || c.topic) && <div className="body tight" style={{ fontSize: 12 }}>{[c.place, c.topic].filter(Boolean).join(' · ')}</div>}
           </div>
+          {c.url && (
+            <a href={c.url} target="_blank" rel="noopener noreferrer"
+              onClick={e => e.stopPropagation()}
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center',
+                width: 32, height: 32, borderRadius: 9, flexShrink: 0, alignSelf: 'center',
+                color: 'var(--gold)', background: 'var(--gold-soft)', border: '1px solid var(--gold-line)',
+                textDecoration: 'none' }}>
+              <IcArrowUpR size={15} />
+            </a>
+          )}
         </div>
       ))}
     </div>
@@ -241,11 +342,13 @@ function AddSheet({ seg, open, onClose, onAdd }) {
   const reqField = fields.find(f => f.req)
   const valid = !reqField || (form[reqField.k] || '').trim().length > 0
   const set = (k, v) => setForm(prev => ({ ...prev, [k]: v }))
+  const setAll = (obj) => setForm(prev => ({ ...prev, ...obj }))
 
   const submit = () => {
     if (!valid) return
     const clean = {}
     fields.forEach(f => { const v = (form[f.k] || '').trim(); if (v) clean[f.k] = v })
+    if (form.wikiUrl) clean.wikiUrl = form.wikiUrl
     onAdd(seg, clean)
     onClose()
   }
@@ -260,7 +363,13 @@ function AddSheet({ seg, open, onClose, onAdd }) {
             {fields.map(f => (
               <div key={f.k}>
                 <label className="field-label">{f.label}{f.req && <span style={{ color: 'var(--gold)' }}> *</span>}</label>
-                {f.type === 'area' ? (
+                {f.type === 'person-combo' ? (
+                  <PersonCombobox
+                    value={form[f.k] || ''}
+                    onChange={v => set(f.k, v)}
+                    onSelect={data => setAll({ name: data.name, role: data.role, note: data.note, wikiUrl: data.wikiUrl })}
+                  />
+                ) : f.type === 'area' ? (
                   <textarea className="textarea" placeholder={f.ph} value={form[f.k] || ''}
                     onChange={e => set(f.k, e.target.value)} />
                 ) : f.type === 'chips' ? (
@@ -346,6 +455,7 @@ export default function FeedScreen() {
 
       <AddSheet seg={seg} open={adding} onClose={() => setAdding(false)} onAdd={addItem} />
 
+      {/* Sheet actualité */}
       <Sheet open={!!news} onClose={() => setNews(null)}>
         {news && (
           <div>
@@ -356,11 +466,17 @@ export default function FeedScreen() {
                 <IcCal size={14} /> {news.when}
               </div>
             )}
-            {news.detail && <p className="body serif-body" style={{ fontSize: 15, lineHeight: 1.62 }}>{news.detail}</p>}
+            {news.detail && <p className="body serif-body" style={{ fontSize: 15, lineHeight: 1.62, marginBottom: 16 }}>{news.detail}</p>}
+            {news.url && (
+              <a href={news.url} target="_blank" rel="noopener noreferrer" style={WIKI_LINK_STYLE}>
+                Lire l'article complet →
+              </a>
+            )}
           </div>
         )}
       </Sheet>
 
+      {/* Sheet personnalité */}
       <Sheet open={!!person} onClose={() => setPerson(null)}>
         {person && (
           <div>
@@ -377,7 +493,13 @@ export default function FeedScreen() {
               </div>
             </div>
             {person.field && <div className="tag" style={{ marginBottom: 16 }}>{person.field}</div>}
-            {person.note && <p className="body serif-body" style={{ fontSize: 15, lineHeight: 1.62 }}>{person.note}</p>}
+            {person.note && <p className="body serif-body" style={{ fontSize: 15, lineHeight: 1.62, marginBottom: 4 }}>{person.note}</p>}
+            <a
+              href={person.wikiUrl || `https://fr.wikipedia.org/wiki/${encodeURIComponent(person.name)}`}
+              target="_blank" rel="noopener noreferrer"
+              style={WIKI_LINK_STYLE}>
+              Voir sur Wikipédia →
+            </a>
           </div>
         )}
       </Sheet>
