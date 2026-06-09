@@ -208,38 +208,101 @@ function NewsView({ items, onPick, onDelete }) {
   )
 }
 
-function ConfView({ items, onDelete }) {
+const CONF_PALETTES = [
+  ['#163350','#09192c'], ['#251442','#110824'], ['#163328','#091914'],
+  ['#38200e','#1e1007'], ['#1a2c40','#0a1620'], ['#271340','#120820'],
+]
+
+function confAcronym(name) {
+  const m = name.match(/[—–-]\s*([A-Z]{2,8})\b/) || name.match(/\b([A-Z]{2,8})\s*[—–-]/)
+  if (m) return m[1]
+  return name.split(/[\s—–/]+/).filter(w => /^[A-Z]/.test(w) && w.length > 1).map(w => w[0]).join('').slice(0, 5) || name.slice(0, 4).toUpperCase()
+}
+
+function confYear(date) {
+  const m = (date || '').match(/\b(20\d{2})\b/)
+  return m ? m[1] : ''
+}
+
+function ConfPoster({ name, date, size = 'full' }) {
+  const [c1, c2] = CONF_PALETTES[titleHash(name) % CONF_PALETTES.length]
+  const acronym = confAcronym(name)
+  const year = confYear(date)
+  const isSmall = size === 'small'
   return (
-    <div className="enter pad" style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 8 }}>
-      {items.map(c => (
-        <div key={c.id} style={{ position: 'relative', display: 'flex', gap: 13, padding: '15px 15px',
-          background: 'linear-gradient(180deg,var(--surface-2),var(--surface-1))', border: '1px solid var(--line)',
-          borderRadius: 'var(--r-m)' }}>
-          {c._user && <DelBtn onClick={() => onDelete(c.id)} />}
-          <span style={{ width: 38, height: 38, borderRadius: 11, flexShrink: 0, display: 'flex',
-            alignItems: 'center', justifyContent: 'center', color: 'var(--gold)', background: 'var(--gold-soft)',
-            border: '1px solid var(--gold-line)' }}><IcMic size={18} /></span>
-          <div style={{ flex: 1, minWidth: 0, paddingRight: c._user ? 24 : 0 }}>
-            <div className="h-card" style={{ fontSize: 14.5, lineHeight: 1.25 }}>{c.name}</div>
-            {c.date && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, margin: '5px 0 3px' }}>
-                <span className="meta" style={{ color: 'var(--gold)', whiteSpace: 'nowrap' }}>{c.date}</span>
-              </div>
+    <div style={{ width: '100%', height: isSmall ? 64 : 96, borderRadius: isSmall ? 8 : 12,
+      position: 'relative', overflow: 'hidden',
+      background: `linear-gradient(145deg, ${c1}, ${c2})`,
+      boxShadow: isSmall ? '0 2px 8px rgba(0,0,0,.4)' : '0 4px 16px rgba(0,0,0,.5)',
+      border: '1px solid rgba(150,180,235,0.10)' }}>
+      <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column',
+        alignItems: 'center', justifyContent: 'center', gap: 2 }}>
+        <span style={{ fontFamily: 'var(--mono)', fontSize: isSmall ? 18 : 26, fontWeight: 700,
+          color: '#eef2fb', letterSpacing: '.06em', lineHeight: 1 }}>{acronym}</span>
+        {year && <span style={{ fontFamily: 'var(--mono)', fontSize: isSmall ? 9 : 11,
+          color: 'var(--gold)', letterSpacing: '.14em' }}>{year}</span>}
+      </div>
+      <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 3,
+        background: 'rgba(217,179,108,0.35)' }} />
+    </div>
+  )
+}
+
+function ConfView({ items, onDelete }) {
+  const [conf, setConf] = useState(null)
+
+  return (
+    <div className="enter pad" style={{ marginTop: 8 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+        {items.map(c => (
+          <div key={c.id} style={{ position: 'relative' }}>
+            {c._user && (
+              <button className="del-btn press" title="Supprimer"
+                onClick={e => { e.stopPropagation(); onDelete(c.id) }}
+                style={{ position: 'absolute', top: 6, right: 6, zIndex: 2 }}>
+                <IcTrash size={13} />
+              </button>
             )}
-            {(c.place || c.topic) && <div className="body tight" style={{ fontSize: 12 }}>{[c.place, c.topic].filter(Boolean).join(' · ')}</div>}
+            <button onClick={() => setConf(c)} className="press"
+              style={{ width: '100%', background: 'none', border: 'none', cursor: 'pointer',
+                textAlign: 'left', padding: 0, display: 'flex', flexDirection: 'column' }}>
+              <ConfPoster name={c.name} date={c.date} />
+              <div style={{ marginTop: 9, paddingBottom: 2 }}>
+                <div className="h-card" style={{ fontSize: 12, lineHeight: 1.3, marginBottom: 4,
+                  display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                  {c.name}
+                </div>
+                {c.date && <div className="meta" style={{ fontSize: 10.5, color: 'var(--gold)', marginBottom: 2 }}>{c.date}</div>}
+                {c.place && <div className="meta" style={{ fontSize: 10.5, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.place}</div>}
+              </div>
+            </button>
           </div>
-          {c.url && (
-            <a href={c.url} target="_blank" rel="noopener noreferrer"
-              onClick={e => e.stopPropagation()}
-              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center',
-                width: 32, height: 32, borderRadius: 9, flexShrink: 0, alignSelf: 'center',
-                color: 'var(--gold)', background: 'var(--gold-soft)', border: '1px solid var(--gold-line)',
-                textDecoration: 'none' }}>
-              <IcArrowUpR size={15} />
-            </a>
-          )}
-        </div>
-      ))}
+        ))}
+      </div>
+
+      <Sheet open={!!conf} onClose={() => setConf(null)}>
+        {conf && (
+          <div>
+            <ConfPoster name={conf.name} date={conf.date} />
+            <div style={{ marginTop: 18, marginBottom: 6 }}>
+              <div className="h-sec" style={{ fontSize: 22, lineHeight: 1.2, marginBottom: 10 }}>{conf.name}</div>
+              {conf.date && (
+                <div className="meta" style={{ color: 'var(--gold)', fontSize: 13, marginBottom: 5,
+                  display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <IcCal size={13} /> {conf.date}
+                </div>
+              )}
+              {conf.place && <div className="meta" style={{ fontSize: 13, marginBottom: 5 }}>{conf.place}</div>}
+              {conf.topic && <div className="tag" style={{ marginTop: 10 }}>{conf.topic}</div>}
+            </div>
+            {conf.url && (
+              <a href={conf.url} target="_blank" rel="noopener noreferrer" style={{ ...WIKI_LINK_STYLE, marginTop: 18 }}>
+                Site officiel <IcArrowUpR size={13} />
+              </a>
+            )}
+          </div>
+        )}
+      </Sheet>
     </div>
   )
 }
