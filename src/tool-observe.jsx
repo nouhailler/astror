@@ -253,7 +253,7 @@ export default function ObservePage({ onBack }) {
         </div>
       )}
 
-      <ObsAddSheet open={adding} onClose={() => setAdding(false)} onAdd={addSession} loc={profile.location} gear={(profile.gear || [])[0]} />
+      <ObsAddSheet open={adding} onClose={() => setAdding(false)} onAdd={addSession} loc={profile.location?.city || profile.location || 'Ma position'} gear={(profile.gear || [])[0]} />
     </ToolPage>
   )
 }

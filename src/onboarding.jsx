@@ -7,37 +7,58 @@ import {
 const ONB_STORE = 'astror_profile_v1'
 const ONB_FLAG  = 'astror_onboarded_v1'
 
+export const ONB_LOCATION_COORDS = {
+  'Paris':     { lat: 48.8566, lng: 2.3522 },
+  'Lyon':      { lat: 45.7640, lng: 4.8357 },
+  'Marseille': { lat: 43.2965, lng: 5.3698 },
+  'Toulouse':  { lat: 43.6047, lng: 1.4442 },
+  'Bordeaux':  { lat: 44.8378, lng: -0.5792 },
+  'Nantes':    { lat: 47.2184, lng: -1.5536 },
+}
+
 export const DEFAULT_PROFILE = {
-  location: 'Paris, FR',
+  location: { city: 'Paris', lat: 48.8566, lng: 2.3522 },
   level: 'Amateur',
   interests: ['Planètes', 'Ciel profond'],
   gear: ['Jumelles'],
   alerts: { iss: true, conj: true, meteor: true, eclipse: false },
 }
 
-export function onbLoad() {
-  try { return Object.assign({}, DEFAULT_PROFILE, JSON.parse(localStorage.getItem(ONB_STORE)) || {}) }
-  catch (e) { return { ...DEFAULT_PROFILE } }
+function migrateLocation(loc) {
+  if (!loc) return DEFAULT_PROFILE.location
+  if (typeof loc === 'object' && loc.lat != null) return loc
+  const city = String(loc).replace(', FR', '').trim()
+  const coords = ONB_LOCATION_COORDS[city]
+  return coords ? { city, ...coords } : { city, lat: 48.8566, lng: 2.3522 }
 }
-export function onbSave(p) { try { localStorage.setItem(ONB_STORE, JSON.stringify(p)) } catch (e) {} }
-export function onbWasSeen() { try { return !!localStorage.getItem(ONB_FLAG) } catch (e) { return false } }
-export function onbMarkSeen() { try { localStorage.setItem(ONB_FLAG, '1') } catch (e) {} }
 
-export const ONB_LOCATIONS = ['Paris, FR', 'Lyon, FR', 'Marseille, FR', 'Toulouse, FR', 'Bordeaux, FR', 'Nantes, FR']
+export function onbLoad() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(ONB_STORE)) || {}
+    const merged = Object.assign({}, DEFAULT_PROFILE, saved)
+    merged.location = migrateLocation(saved.location)
+    return merged
+  } catch { return { ...DEFAULT_PROFILE } }
+}
+export function onbSave(p) { try { localStorage.setItem(ONB_STORE, JSON.stringify(p)) } catch {} }
+export function onbWasSeen() { try { return !!localStorage.getItem(ONB_FLAG) } catch { return false } }
+export function onbMarkSeen() { try { localStorage.setItem(ONB_FLAG, '1') } catch {} }
+
+export const ONB_LOCATIONS = Object.keys(ONB_LOCATION_COORDS)
 export const ONB_LEVELS = [
   { k: 'Débutant', d: 'Je découvre le ciel nocturne' },
-  { k: 'Amateur',  d: 'J\'observe régulièrement' },
+  { k: 'Amateur',  d: "J'observe régulièrement" },
   { k: 'Confirmé', d: 'Je maîtrise mon matériel' },
 ]
 export const ONB_INTERESTS = ['Planètes', 'Lune & Soleil', 'Constellations', 'Ciel profond', 'Astrophotographie', 'Cosmologie', 'Actualités spatiales']
 export const ONB_GEAR = [
-  { k: 'À l\'œil nu', Ic: IcEye },
+  { k: "À l'œil nu", Ic: IcEye },
   { k: 'Jumelles',   Ic: IcBino },
   { k: 'Télescope',  Ic: IcTele },
   { k: 'Lunette',    Ic: IcCompass },
 ]
 export const ONB_ALERTS = [
-  { k: 'iss',    label: 'Passages de l\'ISS',          sub: 'Survols visibles à l\'œil nu' },
+  { k: 'iss',    label: "Passages de l'ISS",          sub: "Survols visibles à l'œil nu" },
   { k: 'conj',   label: 'Conjonctions planétaires',    sub: 'Rapprochements remarquables' },
   { k: 'meteor', label: 'Pluies de météores',           sub: 'Perséides, Géminides…' },
   { k: 'eclipse',label: 'Éclipses',                    sub: 'Solaires et lunaires' },
@@ -86,6 +107,46 @@ function RecapRow({ ic, k, v, last }) {
   )
 }
 
+function GeolocButton({ onDetected }) {
+  const [state, setState] = useState('idle')
+
+  const detect = () => {
+    if (!navigator.geolocation) return
+    setState('loading')
+    navigator.geolocation.getCurrentPosition(
+      async pos => {
+        const { latitude: lat, longitude: lng } = pos.coords
+        try {
+          const res = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&accept-language=fr`
+          )
+          const data = await res.json()
+          const city = data.address?.city || data.address?.town || data.address?.village || 'Ma position'
+          onDetected({ city, lat, lng })
+        } catch {
+          onDetected({ city: `${lat.toFixed(2)}°N`, lat, lng })
+        }
+        setState('done')
+      },
+      () => setState('error')
+    )
+  }
+
+  return (
+    <button onClick={detect} disabled={state === 'loading'} className="press" style={{
+      width: '100%', display: 'flex', alignItems: 'center', gap: 12, padding: '14px 16px',
+      borderRadius: 14, cursor: state === 'loading' ? 'default' : 'pointer',
+      background: 'linear-gradient(180deg, rgba(217,179,108,.10), rgba(217,179,108,.04))',
+      border: '1px solid var(--gold-line)', opacity: state === 'loading' ? 0.7 : 1,
+    }}>
+      <span style={{ color: 'var(--gold)', display: 'flex' }}><IcPin size={20} /></span>
+      <span className="h-card" style={{ flex: 1, fontSize: 14 }}>
+        {state === 'loading' ? 'Détection en cours…' : state === 'done' ? 'Position détectée ✓' : 'Détecter ma position GPS'}
+      </span>
+    </button>
+  )
+}
+
 export default function Onboarding({ initial, onFinish, onSkip }) {
   const STEPS = 7
   const [step, setStep] = useState(0)
@@ -104,6 +165,8 @@ export default function Onboarding({ initial, onFinish, onSkip }) {
 
   const primaryLabel = step === 0 ? 'Commencer' : step === STEPS - 1 ? 'Explorer le ciel' : 'Continuer'
   const onPrimary = step === STEPS - 1 ? finish : next
+
+  const currentCity = p.location?.city || ''
 
   let body = null
   if (step === 0) {
@@ -127,13 +190,20 @@ export default function Onboarding({ initial, onFinish, onSkip }) {
       <StepShell eyebrow="Étape 1" title="Où observez-vous ?"
         sub="Pour calculer le ciel visible et les heures de lever et coucher.">
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          {ONB_LOCATIONS.map(loc => (
-            <button key={loc} className={'opt' + (p.location === loc ? ' on' : '')} onClick={() => set({ location: loc })}>
-              <span className="opt-ic"><IcPin size={20} /></span>
-              <span style={{ flex: 1 }} className="h-card">{loc}</span>
-              <OptCheck on={p.location === loc} />
-            </button>
-          ))}
+          <GeolocButton onDetected={loc => set({ location: loc })} />
+          <div className="eyebrow dim" style={{ textAlign: 'center', margin: '4px 0 2px' }}>ou choisissez une ville</div>
+          {ONB_LOCATIONS.map(city => {
+            const coords = ONB_LOCATION_COORDS[city]
+            const loc = { city, ...coords }
+            const selected = currentCity === city
+            return (
+              <button key={city} className={'opt' + (selected ? ' on' : '')} onClick={() => set({ location: loc })}>
+                <span className="opt-ic"><IcPin size={20} /></span>
+                <span style={{ flex: 1 }} className="h-card">{city}</span>
+                <OptCheck on={selected} />
+              </button>
+            )
+          })}
         </div>
       </StepShell>
     )
@@ -161,7 +231,8 @@ export default function Onboarding({ initial, onFinish, onSkip }) {
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 9 }}>
           {ONB_INTERESTS.map(it => (
             <button key={it} className={'chip' + (p.interests.includes(it) ? ' on' : '')}
-              style={{ height: 40, fontSize: 13.5 }} onClick={() => toggle('interests', it)}>
+              style={{ height: 40, fontSize: 13.5 }} onClick={() => toggle('interests', it)}
+              aria-pressed={p.interests.includes(it)}>
               {p.interests.includes(it) && <IcCheck size={14} />} {it}
             </button>
           ))}
@@ -195,7 +266,10 @@ export default function Onboarding({ initial, onFinish, onSkip }) {
                 <span className="h-card" style={{ fontSize: 14.5, display: 'block' }}>{a.label}</span>
                 <span className="body tight" style={{ fontSize: 12 }}>{a.sub}</span>
               </span>
-              <button className={'switch' + (p.alerts?.[a.k] ? ' on' : '')} onClick={() => toggleAlert(a.k)}><i /></button>
+              <button className={'switch' + (p.alerts?.[a.k] ? ' on' : '')}
+                onClick={() => toggleAlert(a.k)}
+                aria-pressed={!!p.alerts?.[a.k]}
+                aria-label={a.label}><i /></button>
             </div>
           ))}
         </div>
@@ -215,7 +289,7 @@ export default function Onboarding({ initial, onFinish, onSkip }) {
         <div className="h-screen" style={{ fontSize: 30, marginBottom: 22 }}>Tout est prêt</div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 1, textAlign: 'left',
           background: 'var(--surface-1)', border: '1px solid var(--line)', borderRadius: 16, overflow: 'hidden', maxWidth: 320, margin: '0 auto', width: '100%' }}>
-          <RecapRow ic={<IcPin size={17} />} k="Lieu" v={p.location} />
+          <RecapRow ic={<IcPin size={17} />} k="Lieu" v={p.location?.city || 'Paris'} />
           <RecapRow ic={<IcStar size={17} />} k="Niveau" v={p.level} />
           <RecapRow ic={<IcOrbit size={17} />} k="Intérêts" v={intN + (intN > 1 ? ' thèmes' : ' thème')} />
           <RecapRow ic={<IcBell size={17} />} k="Alertes" v={Object.values(p.alerts).filter(Boolean).length + ' actives'} last />
@@ -233,7 +307,8 @@ export default function Onboarding({ initial, onFinish, onSkip }) {
           {step > 0 && step < STEPS - 1 && (
             <button onClick={back} className="press" style={{ width: 40, height: 40, borderRadius: 999,
               border: '1px solid var(--line-2)', background: 'rgba(255,255,255,.03)', color: 'var(--dim)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+              display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+              aria-label="Étape précédente">
               <IcArrowLeft size={19} />
             </button>
           )}

@@ -6,16 +6,24 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:ui": "vitest --ui"
   },
   "dependencies": {
+    "astronomy-engine": "^2.1.19",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
     "@vitejs/plugin-react": "^4.3.4",
+    "@vitest/ui": "^4.1.8",
+    "jsdom": "^29.1.1",
     "vite": "^5.4.10",
     "vite-plugin-pwa": "^0.20.5",
+    "vitest": "^4.1.8",
     "workbox-window": "^7.3.0"
   }
 }

@@ -113,7 +113,7 @@ export function LinkRow({ icon, title, sub, right, tag, onClick }) {
   )
 }
 
-export function Sheet({ open, onClose, children }) {
+export function Sheet({ open, onClose, children, 'aria-label': ariaLabel }) {
   useEffect(() => {
     if (!open) return
     const onKey = (e) => e.key === 'Escape' && onClose()
@@ -123,9 +123,15 @@ export function Sheet({ open, onClose, children }) {
   if (!open) return null
   return (
     <>
-      <div className="sheet-backdrop" onClick={onClose} />
-      <div className="sheet" role="dialog">
+      <div className="sheet-backdrop" onClick={onClose} aria-hidden="true" />
+      <div className="sheet" role="dialog" aria-modal="true" aria-label={ariaLabel}>
         <div className="sheet-grip" />
+        <button onClick={onClose} aria-label="Fermer" style={{ position: 'absolute', top: 14, right: 16,
+          width: 32, height: 32, borderRadius: 999, border: '1px solid var(--line-2)',
+          background: 'rgba(255,255,255,.03)', color: 'var(--dim)', display: 'flex',
+          alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+          <IcClose size={16} />
+        </button>
         <div className="sheet-scroll">{children}</div>
       </div>
     </>

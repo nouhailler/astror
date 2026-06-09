@@ -24,9 +24,11 @@ const HELP_KEYS = { sky: 'sky', eph: 'eph', explore: 'explore', feed: 'feed', to
 
 function TabBar({ tab, onChange }) {
   return (
-    <nav className="tab-bar">
+    <nav className="tab-bar" role="tablist" aria-label="Navigation principale">
       {TABS.map(t => (
-        <button key={t.key} onClick={() => onChange(t.key)} className={'tab-btn' + (tab === t.key ? ' active' : '')}>
+        <button key={t.key} onClick={() => onChange(t.key)}
+          className={'tab-btn' + (tab === t.key ? ' active' : '')}
+          role="tab" aria-selected={tab === t.key} aria-label={t.label}>
           <t.Ic size={22} />
           <span>{t.label}</span>
         </button>

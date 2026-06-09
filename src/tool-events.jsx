@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { IcSat, IcZap, IcMoon, IcComet, IcStar } from './icons'
 import { ToolPage, ToolSection, ToolSeg } from './tool-ui'
+import { requestPermission, getPermission, scheduleEventReminder, loadNotifPrefs, saveNotifPrefs } from './notifications'
 
 const EVT_CATS = [
   { key: 'all', label: 'Tout' },
@@ -12,25 +13,25 @@ const EVT_CATS = [
 ]
 
 const EVENTS_FULL = [
-  { cat: 'iss', Ic: IcSat, title: 'Passage de l\'ISS', date: 'Ce soir · 22:41', tag: 'Visible', live: true, detail: 'Mag −3,8 · culmine à 78° · trajectoire SO → NE, visible 6 minutes à l\'œil nu.' },
-  { cat: 'meteor', Ic: IcZap, title: 'Perséides — maximum', date: '12 août 2026', tag: '~100/h', detail: 'Radiant dans Persée. Conditions idéales : Lune à 18 %. Météores rapides et brillants.' },
-  { cat: 'eclipse', Ic: IcMoon, title: 'Éclipse totale de Lune', date: '7 sept. 2026', tag: 'Totale', detail: 'Totalité visible depuis l\'Europe. Lune de sang à 03:11 TU, durée 82 min.' },
+  { cat: 'iss', Ic: IcSat, title: "Passage de l'ISS", date: 'Ce soir · 22:41', tag: 'Visible', live: true, detail: "Mag −3,8 · culmine à 78° · trajectoire SO → NE, visible 6 minutes à l'œil nu." },
+  { cat: 'meteor', Ic: IcZap, title: 'Perséides — maximum', date: '2026-08-12', isoDate: '2026-08-12', tag: '~100/h', detail: 'Radiant dans Persée. Conditions idéales : Lune à 18 %. Météores rapides et brillants.' },
+  { cat: 'eclipse', Ic: IcMoon, title: 'Éclipse totale de Lune', date: '2026-09-07', isoDate: '2026-09-07', tag: 'Totale', detail: 'Totalité visible depuis l\'Europe. Lune de sang à 03:11 TU, durée 82 min.' },
   { cat: 'comet', Ic: IcComet, title: 'Comète C/2025 R2', date: 'Oct. 2026', tag: 'mag 6,5', detail: 'Possiblement visible aux jumelles dans le Bouvier au périhélie. À surveiller.' },
-  { cat: 'special', Ic: IcMoon, title: 'Superlune', date: '5 nov. 2026', tag: 'Périgée', detail: 'Pleine Lune au plus proche (356 800 km) : 14 % plus large et 30 % plus brillante.' },
-  { cat: 'eclipse', Ic: IcMoon, title: 'Éclipse totale de Soleil', date: '2 août 2027', tag: 'Totale', detail: 'Bande de totalité traversant l\'Espagne. Partielle depuis toute la France.' },
-  { cat: 'special', Ic: IcStar, title: 'Occultation de Saturne', date: '14 déc. 2026', tag: 'Occult.', detail: 'La Lune occulte Saturne. Disparition à 19:52, réapparition à 20:48 (côté sombre).' },
-  { cat: 'meteor', Ic: IcZap, title: 'Géminides — maximum', date: '14 déc. 2026', tag: '~120/h', detail: 'La plus riche pluie annuelle. Météores lents issus de (3200) Phaéthon.' },
+  { cat: 'special', Ic: IcMoon, title: 'Superlune', date: '2026-11-05', isoDate: '2026-11-05', tag: 'Périgée', detail: 'Pleine Lune au plus proche (356 800 km) : 14 % plus large et 30 % plus brillante.' },
+  { cat: 'eclipse', Ic: IcMoon, title: 'Éclipse totale de Soleil', date: '2027-08-02', isoDate: '2027-08-02', tag: 'Totale', detail: "Bande de totalité traversant l'Espagne. Partielle depuis toute la France." },
+  { cat: 'special', Ic: IcStar, title: 'Occultation de Saturne', date: '2026-12-14', isoDate: '2026-12-14', tag: 'Occult.', detail: 'La Lune occulte Saturne. Disparition à 19:52, réapparition à 20:48 (côté sombre).' },
+  { cat: 'meteor', Ic: IcZap, title: 'Géminides — maximum', date: '2026-12-14', isoDate: '2026-12-14', tag: '~120/h', detail: 'La plus riche pluie annuelle. Météores lents issus de (3200) Phaéthon.' },
 ]
 
-const NOTIFS = [
+const NOTIFS_RECENT = [
   { Ic: IcStar, color: 'var(--gold)', title: 'Jupiter bien placé', body: 'Jupiter passe au méridien dans 15 minutes — l\'instant idéal pour l\'observer.', time: 'il y a 2 min' },
   { Ic: IcSat, color: 'var(--blue)', title: 'ISS visible à 22:14', body: 'Passage brillant (mag −3,2) au-dessus de Paris, direction sud-ouest.', time: 'il y a 1 h' },
-  { Ic: IcZap, color: 'var(--violet)', title: 'Pic des Perséides cette nuit', body: 'Jusqu\'à 100 météores/h après minuit. Éloignez-vous des lumières.', time: 'aujourd\'hui' },
+  { Ic: IcZap, color: 'var(--violet)', title: 'Pic des Perséides cette nuit', body: "Jusqu'à 100 météores/h après minuit. Éloignez-vous des lumières.", time: "aujourd'hui" },
   { Ic: IcMoon, color: 'var(--good)', title: 'Lune couchée à 02:48', body: 'Le ciel atteint son obscurité maximale — parfait pour le ciel profond.', time: 'hier' },
 ]
 
 const NOTIF_SETTINGS = [
-  { k: 'iss', label: 'Passages de l\'ISS' },
+  { k: 'iss', label: "Passages de l'ISS" },
   { k: 'planet', label: 'Planètes bien placées' },
   { k: 'meteor', label: 'Pluies de météores' },
   { k: 'eclipse', label: 'Éclipses & occultations' },
@@ -39,8 +40,27 @@ const NOTIF_SETTINGS = [
 export default function EventsPage({ onBack }) {
   const [seg, setSeg] = useState('upcoming')
   const [cat, setCat] = useState('all')
-  const [notif, setNotif] = useState({ iss: true, planet: true, meteor: true, eclipse: false })
+  const [notif, setNotif] = useState(() => ({ iss: true, planet: true, meteor: true, eclipse: false, ...loadNotifPrefs() }))
+  const [permission, setPermission] = useState(() => getPermission())
   const list = EVENTS_FULL.filter(e => cat === 'all' || e.cat === cat)
+
+  useEffect(() => { saveNotifPrefs(notif) }, [notif])
+
+  const toggleNotif = async (k, newVal) => {
+    if (newVal && permission !== 'granted') {
+      const perm = await requestPermission()
+      setPermission(perm)
+      if (perm !== 'granted') return
+    }
+    setNotif(v => {
+      const next = { ...v, [k]: newVal }
+      if (newVal && k !== 'iss') {
+        const evt = EVENTS_FULL.find(e => e.cat === k && e.isoDate)
+        if (evt) scheduleEventReminder(evt.title, evt.isoDate, 60)
+      }
+      return next
+    })
+  }
 
   return (
     <ToolPage title="Événements" onBack={onBack}>
@@ -63,7 +83,9 @@ export default function EventsPage({ onBack }) {
                   </span>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div className="h-card" style={{ fontSize: 14.5 }}>{e.title}</div>
-                    <div className="meta" style={{ color: 'var(--gold)', marginTop: 2 }}>{e.date}</div>
+                    <div className="meta" style={{ color: 'var(--gold)', marginTop: 2 }}>
+                      {e.isoDate ? new Date(e.isoDate).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }) : e.date}
+                    </div>
                   </div>
                   <span className={'tag' + (e.live ? ' live' : ' neutral')}>
                     {e.live && <span className="dot pulse" style={{ background: 'var(--good)' }} />}{e.tag}
@@ -78,9 +100,15 @@ export default function EventsPage({ onBack }) {
 
       {seg === 'notif' && (
         <div className="enter">
+          {permission === 'denied' && (
+            <div style={{ margin: '14px 18px 0', padding: 14, borderRadius: 14, background: 'rgba(226,141,126,.08)', border: '1px solid rgba(226,141,126,.3)', fontSize: 13, color: 'var(--bad)' }}>
+              Les notifications sont bloquées dans votre navigateur. Autorisez-les dans les paramètres du navigateur pour les activer.
+            </div>
+          )}
+
           <ToolSection title="Notifications récentes" style={{ paddingTop: 4 }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              {NOTIFS.map((n, i) => (
+              {NOTIFS_RECENT.map((n, i) => (
                 <div key={i} style={{ display: 'flex', gap: 12, padding: 14, borderRadius: 15,
                   background: 'var(--surface-1)', border: '1px solid var(--line)' }}>
                   <span style={{ width: 38, height: 38, borderRadius: 11, flexShrink: 0, display: 'flex', alignItems: 'center',
@@ -105,7 +133,12 @@ export default function EventsPage({ onBack }) {
                 <div key={s.k} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 15px',
                   borderBottom: i < NOTIF_SETTINGS.length - 1 ? '1px solid var(--line)' : 0 }}>
                   <span className="h-card" style={{ flex: 1, fontSize: 14 }}>{s.label}</span>
-                  <button className={'switch' + (notif[s.k] ? ' on' : '')} onClick={() => setNotif(v => ({ ...v, [s.k]: !v[s.k] }))}><i /></button>
+                  <button
+                    className={'switch' + (notif[s.k] ? ' on' : '')}
+                    onClick={() => toggleNotif(s.k, !notif[s.k])}
+                    aria-pressed={!!notif[s.k]}
+                    aria-label={s.label}
+                  ><i /></button>
                 </div>
               ))}
             </div>

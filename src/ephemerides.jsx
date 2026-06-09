@@ -1,7 +1,10 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { IcRocket, IcMoon, IcStar, IcBell } from './icons'
 import { ScreenHeader, IconBtn, SettingsBtn, HeaderTools, SectionTitle, DataRow, Stat, Sheet, useCountdown } from './ui'
-import { SUN_MOON, CONDITIONS, ALERTS, EVENTS } from './data'
+import { ALERTS, EVENTS } from './data'
+import { getMoonData, getSunData } from './astro'
+import { fetchWeather, useLiveData } from './api'
+import { onbLoad } from './onboarding'
 
 function Moon({ illum = 73, size = 116 }) {
   const p = illum / 100
@@ -74,46 +77,57 @@ function EventRow({ e, onClick }) {
 }
 
 export default function EphScreen() {
-  const m = SUN_MOON, c = CONDITIONS
+  const profile = useMemo(() => onbLoad(), [])
+  const lat = profile.location?.lat ?? 48.8566
+  const lng = profile.location?.lng ?? 2.3522
+  const city = profile.location?.city || 'Paris'
+
+  const now = useMemo(() => new Date(), [])
+  const moon = useMemo(() => getMoonData(now, lat, lng), [lat, lng, now])
+  const sun  = useMemo(() => getSunData(now, lat, lng), [lat, lng, now])
+
+  const { data: weather, loading: wLoading } = useLiveData(() => fetchWeather(lat, lng))
   const [evt, setEvt] = useState(null)
+
+  const dateLabel = now.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }) + ' · ' + city
 
   return (
     <div className="screen pad-b">
-      <ScreenHeader eyebrow="7 juin 2026 · Paris" title="Éphémérides"
+      <ScreenHeader eyebrow={dateLabel} title="Éphémérides"
         right={<HeaderTools><IconBtn badge><IcBell size={19} /></IconBtn><SettingsBtn /></HeaderTools>} />
 
       <div className="pad">
         <div className="card enter" style={{ padding: 18, display: 'flex', gap: 18, alignItems: 'center' }}>
-          <Moon illum={m.moonIllum} />
+          <Moon illum={moon.illumination} />
           <div style={{ flex: 1 }}>
             <div className="eyebrow" style={{ marginBottom: 6 }}>Lune</div>
-            <div className="h-sec" style={{ fontSize: 19, marginBottom: 2 }}>{m.moonPhase}</div>
-            <div className="body tight" style={{ fontSize: 12.5 }}>{m.moonIllum}% illuminée · {m.moonAge} j</div>
+            <div className="h-sec" style={{ fontSize: 19, marginBottom: 2 }}>{moon.phase}</div>
+            <div className="body tight" style={{ fontSize: 12.5 }}>{moon.illumination}% illuminée · {moon.age} j</div>
             <div style={{ display: 'flex', gap: 16, marginTop: 12 }}>
               <div>
                 <div className="meta" style={{ fontSize: 9 }}>LEVER</div>
-                <div className="data" style={{ fontSize: 14, color: 'var(--gold)' }}>{m.moonrise}</div>
+                <div className="data" style={{ fontSize: 14, color: 'var(--gold)' }}>{moon.moonrise}</div>
               </div>
               <div>
                 <div className="meta" style={{ fontSize: 9 }}>COUCHER</div>
-                <div className="data" style={{ fontSize: 14, color: 'var(--gold)' }}>{m.moonset}</div>
+                <div className="data" style={{ fontSize: 14, color: 'var(--gold)' }}>{moon.moonset}</div>
               </div>
               <div>
                 <div className="meta" style={{ fontSize: 9 }}>DISTANCE</div>
-                <div className="data" style={{ fontSize: 14, color: 'var(--text)' }}>{m.lunarDist}</div>
+                <div className="data" style={{ fontSize: 14, color: 'var(--text)' }}>{moon.distance}</div>
               </div>
             </div>
           </div>
         </div>
 
         <div className="card-2" style={{ marginTop: 12, padding: '4px 16px' }}>
-          <DataRow k="Lever du Soleil" v={m.sunrise} accent />
-          <DataRow k="Coucher du Soleil" v={m.sunset} accent />
-          <DataRow k="Aube astronomique" v={m.dawnAstro} />
-          <DataRow k="Crépuscule astronomique" v={m.duskAstro} />
+          <DataRow k="Lever du Soleil" v={sun.sunrise} accent />
+          <DataRow k="Coucher du Soleil" v={sun.sunset} accent />
+          <DataRow k="Aube astronomique" v={sun.dawnAstro} />
+          <DataRow k="Crépuscule astronomique" v={sun.duskAstro} />
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '11px 0' }}>
             <span style={{ fontSize: 13, color: 'var(--dim)' }}>Nuit noire</span>
-            <span className="data" style={{ fontSize: 13.5, color: 'var(--text)', fontWeight: 500 }}>{m.nightLen}</span>
+            <span className="data" style={{ fontSize: 13.5, color: 'var(--text)', fontWeight: 500 }}>{sun.nightLen}</span>
           </div>
         </div>
       </div>
@@ -153,17 +167,25 @@ export default function EphScreen() {
       <div className="pad">
         <SectionTitle>Conditions d'observation</SectionTitle>
         <div className="card" style={{ padding: 18 }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '18px 20px' }}>
-            <CondBar label="Seeing" value={c.seeing} level={c.seeingVal} />
-            <CondBar label="Transparence" value={c.transparency} level={c.transVal} />
-          </div>
-          <hr className="hair" style={{ margin: '18px 0' }} />
-          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-            <Stat label="Bortle" value={c.bortle} sub="périurbain" />
-            <Stat label="Nuages" value={c.clouds} unit="%" />
-            <Stat label="Humidité" value={c.humidity} unit="%" />
-            <Stat label="Temp." value={c.temp} unit="°C" />
-          </div>
+          {wLoading ? (
+            <div style={{ textAlign: 'center', color: 'var(--faint)', fontSize: 13, padding: '12px 0' }}>Chargement météo…</div>
+          ) : weather ? (
+            <>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '18px 20px' }}>
+                <CondBar label="Seeing" value={weather.seeing} level={weather.seeingVal} />
+                <CondBar label="Transparence" value={weather.transparency} level={weather.transVal} />
+              </div>
+              <hr className="hair" style={{ margin: '18px 0' }} />
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <Stat label="Bortle" value={weather.bortle} sub="périurbain" />
+                <Stat label="Nuages" value={weather.clouds} unit="%" />
+                <Stat label="Humidité" value={weather.humidity} unit="%" />
+                <Stat label="Temp." value={weather.temp} unit="°C" />
+              </div>
+            </>
+          ) : (
+            <div style={{ textAlign: 'center', color: 'var(--faint)', fontSize: 13, padding: '12px 0' }}>Données météo indisponibles</div>
+          )}
         </div>
       </div>
 

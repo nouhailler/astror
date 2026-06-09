@@ -1,19 +1,20 @@
 import { useState, useRef, useEffect } from 'react'
 import { IcSpark, IcSend, IcArrowLeft } from './icons'
 import { onbLoad } from './onboarding'
+import { callClaude, getApiKey } from './claudeApi'
 
 const AI_SUGGEST = [
   'Que puis-je observer ce soir avec un Dobson 200 mm ?',
-  'Quels objets sont visibles depuis Paris à 23 h ?',
-  'Comment trouver la galaxie d\'Andromède ce soir ?',
-  'Le ciel est-il bon pour l\'astrophoto cette nuit ?',
+  'Quels objets sont visibles depuis ma position à 23 h ?',
+  "Comment trouver la galaxie d'Andromède ce soir ?",
+  "Le ciel est-il bon pour l'astrophoto cette nuit ?",
   'Conseille-moi 3 cibles faciles pour débuter',
 ]
 
 const AI_FALLBACK = {
-  default: 'Connexion à l\'assistant indisponible dans cet aperçu. Une fois l\'application en ligne, je répondrai en temps réel selon votre ciel, votre position et votre matériel.',
-  dobson: 'Avec un Dobson 200 mm ce soir, visez d\'abord Jupiter (mag −2,4, au méridien vers 23 h) : bandes nuageuses et lunes galiléennes au 150×. Puis M13, l\'amas d\'Hercule (mag 5,8), résolu jusqu\'au cœur. Terminez par M57, la nébuleuse de l\'Anneau dans la Lyre, bien placée au zénith. Attendez minuit, après le coucher de la Lune, pour le meilleur contraste.',
-  paris: 'Depuis Paris à 23 h (Bortle 4), privilégiez les cibles brillantes : Jupiter et Saturne sont hauts, la Lune gibbeuse montre son terminateur. Côté ciel profond, M13, M57 et le Double amas de Persée percent malgré la pollution lumineuse. Évitez les galaxies faibles, trop diluées par les lumières de la ville.',
+  default: "Entrez votre clé API Anthropic dans les Paramètres pour activer l'assistant en temps réel.",
+  dobson: "Avec un Dobson 200 mm ce soir, visez d'abord Jupiter (mag −2,4, au méridien vers 23 h) : bandes nuageuses et lunes galiléennes au 150×. Puis M13, l'amas d'Hercule (mag 5,8), résolu jusqu'au cœur. Terminez par M57, la nébuleuse de l'Anneau dans la Lyre, bien placée au zénith. Attendez minuit, après le coucher de la Lune, pour le meilleur contraste.",
+  paris: "Depuis Paris à 23 h (Bortle 4), privilégiez les cibles brillantes : Jupiter et Saturne sont hauts, la Lune gibbeuse montre son terminateur. Côté ciel profond, M13, M57 et le Double amas de Persée percent malgré la pollution lumineuse. Évitez les galaxies faibles, trop diluées par les lumières de la ville.",
 }
 
 function pickFallback(q) {
@@ -48,10 +49,11 @@ function AiBubble({ m }) {
 
 export default function AiPage({ onBack }) {
   const profile = onbLoad()
-  const gear = (profile.gear && profile.gear.length) ? profile.gear.join(', ') : 'à l\'œil nu et aux jumelles'
-  const prime = `Tu es Astror, un assistant expert en astronomie d'observation, intégré à une application mobile. L'utilisateur observe depuis ${profile.location || 'la France'}, son niveau est "${profile.level || 'amateur'}" et son matériel est : ${gear}. Réponds toujours en français, de façon concrète et pratique. Sois précis et concis (4 à 6 phrases), avec des données chiffrées utiles.`
+  const city = profile.location?.city || 'la France'
+  const gear = (profile.gear && profile.gear.length) ? profile.gear.join(', ') : "à l'œil nu et aux jumelles"
+  const prime = `Tu es Astror, un assistant expert en astronomie d'observation, intégré à une application mobile. L'utilisateur observe depuis ${city}, son niveau est "${profile.level || 'amateur'}" et son matériel est : ${gear}. Réponds toujours en français, de façon concrète et pratique. Sois précis et concis (4 à 6 phrases), avec des données chiffrées utiles.`
 
-  const [msgs, setMsgs] = useState([{ role: 'bot', text: `Bonsoir. Je connais votre ciel (${profile.location}) et votre matériel — demandez-moi quoi observer ce soir, comment trouver un objet, ou si les conditions sont bonnes.` }])
+  const [msgs, setMsgs] = useState([{ role: 'bot', text: `Bonsoir. Je connais votre ciel (${city}) et votre matériel — demandez-moi quoi observer ce soir, comment trouver un objet, ou si les conditions sont bonnes.` }])
   const [input, setInput] = useState('')
   const [busy, setBusy] = useState(false)
   const scrollRef = useRef(null)
@@ -66,28 +68,28 @@ export default function AiPage({ onBack }) {
     setMsgs([...next, { role: 'bot', loading: true }])
     setBusy(true)
     try {
-      if (!window.claude || !window.claude.complete) throw new Error('offline')
       const history = next.filter(m => !m.loading).map(m => ({ role: m.role === 'user' ? 'user' : 'assistant', content: m.text }))
       const messages = [
         { role: 'user', content: prime },
         { role: 'assistant', content: 'Compris. Je conseille selon le ciel, la position et le matériel.' },
         ...history,
       ]
-      const reply = await window.claude.complete({ messages })
+      const reply = await callClaude(messages, getApiKey())
       setMsgs(m => [...m.filter(x => !x.loading), { role: 'bot', text: (reply || '').trim() || '…' }])
     } catch (e) {
-      setMsgs(m => [...m.filter(x => !x.loading), { role: 'bot', text: pickFallback(q) }])
+      const fb = e.message === 'no-key' ? AI_FALLBACK.default : pickFallback(q)
+      setMsgs(m => [...m.filter(x => !x.loading), { role: 'bot', text: fb }])
     } finally { setBusy(false) }
   }
 
   return (
     <div className="screen" style={{ height: '100%', display: 'flex', flexDirection: 'column', minHeight: 0, overflow: 'hidden' }}>
       <div className="tool-head">
-        <button className="tool-back press" onClick={onBack}><IcArrowLeft size={19} /></button>
+        <button className="tool-back press" onClick={onBack} aria-label="Retour"><IcArrowLeft size={19} /></button>
         <div style={{ flex: 1 }}>
           <div className="h-sec" style={{ fontSize: 18 }}>Aide à l'observation</div>
           <div className="meta" style={{ color: 'var(--good)', display: 'flex', alignItems: 'center', gap: 6, marginTop: 1 }}>
-            <span className="dot pulse" style={{ background: 'var(--good)' }} /> IA · {profile.location}
+            <span className="dot pulse" style={{ background: 'var(--good)' }} /> IA · {city}
           </div>
         </div>
       </div>
@@ -110,8 +112,11 @@ export default function AiPage({ onBack }) {
       <div style={{ flexShrink: 0, padding: '10px 16px calc(22px + var(--sab))', borderTop: '1px solid var(--line)', background: 'rgba(6,9,18,.7)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 9, background: 'var(--surface-1)', border: '1px solid var(--line-2)', borderRadius: 999, padding: '5px 5px 5px 16px' }}>
           <input value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => e.key === 'Enter' && send()}
-            placeholder="Posez votre question…" style={{ flex: 1, background: 'none', border: 0, outline: 'none', color: 'var(--text)', fontSize: 14, fontFamily: 'var(--sans)' }} />
-          <button onClick={() => send()} disabled={busy || !input.trim()} className="press" style={{ width: 40, height: 40, borderRadius: '50%', flexShrink: 0, border: 0,
+            placeholder="Posez votre question…" aria-label="Message à l'assistant"
+            style={{ flex: 1, background: 'none', border: 0, outline: 'none', color: 'var(--text)', fontSize: 14, fontFamily: 'var(--sans)' }} />
+          <button onClick={() => send()} disabled={busy || !input.trim()} className="press"
+            aria-label="Envoyer"
+            style={{ width: 40, height: 40, borderRadius: '50%', flexShrink: 0, border: 0,
             cursor: busy || !input.trim() ? 'default' : 'pointer', opacity: busy || !input.trim() ? 0.4 : 1, color: '#1a130a',
             background: 'linear-gradient(180deg,var(--gold-2),var(--gold))', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <IcSend size={18} />

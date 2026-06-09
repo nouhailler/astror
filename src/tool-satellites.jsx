@@ -1,25 +1,20 @@
 import { useState } from 'react'
 import { IcSat, IcRocket } from './icons'
 import { ToolPage, ToolSection, ToolSeg } from './tool-ui'
+import { fetchISSPosition, fetchLaunches, useLiveData } from './api'
+
+const SAT_MISSIONS = [
+  { name: 'James Webb (JWST)', org: 'NASA/ESA', status: 'En service', note: "Au point L2, à 1,5 M km. Observe l'univers en infrarouge depuis 2022.", color: 'var(--good)' },
+  { name: 'Perseverance', org: 'NASA', status: 'Active', note: "Cratère Jezero, Mars. Collecte d'échantillons pour retour futur.", color: 'var(--good)' },
+  { name: 'JUICE', org: 'ESA', status: 'En transit', note: 'Survol de Vénus en 2026, arrivée dans le système de Jupiter en 2031.', color: 'var(--warn)' },
+  { name: 'Voyager 1', org: 'NASA', status: 'Espace interstellaire', note: 'À 24,8 milliards de km. Sonde la plus lointaine, lancée en 1977.', color: 'var(--blue)' },
+]
 
 const SAT_PASSES = [
   { name: 'ISS', mag: '−3,8', time: '22:41', dir: 'SO → NE', alt: '78°', dur: '6 min', bright: true },
   { name: 'Tiangong', mag: '−1,9', time: '04:12', dir: 'SO → E', alt: '41°', dur: '4 min' },
   { name: 'Starlink (train)', mag: '+3,5', time: '23:18', dir: 'O → E', alt: '55°', dur: '3 min' },
   { name: 'Hubble (HST)', mag: '+2,1', time: '00:54', dir: 'SO → SE', alt: '32°', dur: '5 min' },
-]
-
-const SAT_MISSIONS = [
-  { name: 'James Webb (JWST)', org: 'NASA/ESA', status: 'En service', note: 'Au point L2, à 1,5 M km. Observe l\'univers en infrarouge depuis 2022.', color: 'var(--good)' },
-  { name: 'Perseverance', org: 'NASA', status: 'Active', note: 'Cratère Jezero, Mars. Collecte d\'échantillons pour retour futur.', color: 'var(--good)' },
-  { name: 'JUICE', org: 'ESA', status: 'En transit', note: 'Survol de Vénus en 2026, arrivée dans le système de Jupiter en 2031.', color: 'var(--warn)' },
-  { name: 'Voyager 1', org: 'NASA', status: 'Espace interstellaire', note: 'À 24,8 milliards de km. Sonde la plus lointaine, lancée en 1977.', color: 'var(--blue)' },
-]
-
-const SAT_LAUNCHES = [
-  { org: 'SpaceX', title: 'Starship — vol orbital V3', date: '12 juin 2026', tag: 'à venir' },
-  { org: 'NASA', title: 'Artemis II — autour de la Lune', date: 'Fév. 2026', tag: 'proche' },
-  { org: 'ESA', title: 'Ariane 6 — vol commercial', date: '4 juil. 2026', tag: 'à venir' },
 ]
 
 const SAT_PROBES = [
@@ -29,8 +24,40 @@ const SAT_PROBES = [
   { name: 'Parker Solar Probe', dist: '0,05 UA', detail: 'Périhélie · couronne solaire' },
 ]
 
+function ISSLiveCard({ iss, loading }) {
+  return (
+    <div style={{ padding: 16, borderRadius: 18, background: 'linear-gradient(180deg, rgba(126,166,230,.12), var(--surface-1))', border: '1px solid rgba(126,166,230,.3)' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
+        <span style={{ width: 38, height: 38, borderRadius: 11, display: 'flex', alignItems: 'center', justifyContent: 'center',
+          color: 'var(--blue)', background: 'rgba(126,166,230,.12)', border: '1px solid rgba(126,166,230,.3)' }}><IcSat size={20} /></span>
+        <div style={{ flex: 1 }}>
+          <div className="h-card" style={{ fontSize: 15 }}>Station spatiale (ISS)</div>
+          <div className="meta" style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 2, color: 'var(--good)' }}>
+            <span className="dot pulse" style={{ background: 'var(--good)' }} />
+            {loading ? 'Connexion…' : iss ? `En orbite · ${iss.visibility === 'daylight' ? 'côté jour' : iss.visibility === 'eclipsed' ? 'éclipsée' : 'visible'}` : 'En orbite'}
+          </div>
+        </div>
+      </div>
+      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+        {[
+          ['Altitude', iss ? iss.altitude + ' km' : '—'],
+          ['Vitesse', iss ? iss.velocity + ' km/h' : '—'],
+          ['Position', iss ? `${iss.lat?.toFixed(1)}° / ${iss.lng?.toFixed(1)}°` : '—'],
+        ].map(([k, v]) => (
+          <div key={k}>
+            <div className="meta" style={{ textTransform: 'uppercase', letterSpacing: '.08em' }}>{k}</div>
+            <div className="data" style={{ fontSize: 14, color: 'var(--text)', marginTop: 4 }}>{v}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 export default function SatellitesPage({ onBack }) {
   const [seg, setSeg] = useState('track')
+  const { data: iss, loading: issLoading } = useLiveData(fetchISSPosition, 10000)
+  const { data: launches } = useLiveData(fetchLaunches)
 
   return (
     <ToolPage title="Satellites" onBack={onBack}>
@@ -39,26 +66,7 @@ export default function SatellitesPage({ onBack }) {
       {seg === 'track' && (
         <div className="enter">
           <div className="pad" style={{ paddingTop: 14 }}>
-            <div style={{ padding: 16, borderRadius: 18, background: 'linear-gradient(180deg, rgba(126,166,230,.12), var(--surface-1))', border: '1px solid rgba(126,166,230,.3)' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
-                <span style={{ width: 38, height: 38, borderRadius: 11, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  color: 'var(--blue)', background: 'rgba(126,166,230,.12)', border: '1px solid rgba(126,166,230,.3)' }}><IcSat size={20} /></span>
-                <div style={{ flex: 1 }}>
-                  <div className="h-card" style={{ fontSize: 15 }}>Station spatiale (ISS)</div>
-                  <div className="meta" style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 2, color: 'var(--good)' }}>
-                    <span className="dot pulse" style={{ background: 'var(--good)' }} /> En orbite · au-dessus du Pacifique
-                  </div>
-                </div>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                {[['Altitude', '418 km'], ['Vitesse', '27 600 km/h'], ['Prochain passage', '22:41']].map(([k, v]) => (
-                  <div key={k}>
-                    <div className="meta" style={{ textTransform: 'uppercase', letterSpacing: '.08em' }}>{k}</div>
-                    <div className="data" style={{ fontSize: 14, color: 'var(--text)', marginTop: 4 }}>{v}</div>
-                  </div>
-                ))}
-              </div>
-            </div>
+            <ISSLiveCard iss={iss} loading={issLoading} />
           </div>
 
           <ToolSection title="Passages visibles ce soir">
@@ -103,9 +111,9 @@ export default function SatellitesPage({ onBack }) {
 
           <ToolSection title="Lancements à venir">
             <div className="card-2" style={{ overflow: 'hidden' }}>
-              {SAT_LAUNCHES.map((l, i) => (
+              {(launches || []).map((l, i) => (
                 <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '13px 15px',
-                  borderBottom: i < SAT_LAUNCHES.length - 1 ? '1px solid var(--line)' : 0 }}>
+                  borderBottom: i < (launches.length - 1) ? '1px solid var(--line)' : 0 }}>
                   <span style={{ width: 34, height: 34, borderRadius: 9, flexShrink: 0, display: 'flex', alignItems: 'center',
                     justifyContent: 'center', color: 'var(--gold)', background: 'var(--gold-soft)', border: '1px solid var(--gold-line)' }}><IcRocket size={16} /></span>
                   <span style={{ flex: 1, minWidth: 0 }}>
@@ -118,6 +126,9 @@ export default function SatellitesPage({ onBack }) {
                   </span>
                 </div>
               ))}
+              {!launches && (
+                <div style={{ padding: '14px 15px', color: 'var(--faint)', fontSize: 13 }}>Chargement…</div>
+              )}
             </div>
           </ToolSection>
 

@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { IcSpark, IcSend } from './icons'
 import { SettingsBtn } from './ui'
+import { callClaude, getApiKey } from './claudeApi'
 
 const PRIME = "Tu es Astror, un assistant expert en astronomie, astrophysique et cosmologie, intégré à une application pour astronomes amateurs confirmés. Réponds toujours en français, de façon précise, rigoureuse et concise (4 à 6 phrases maximum). Emploie des données chiffrées et des termes techniques quand c'est pertinent, sans jargon inutile. Si la question sort de l'astronomie, ramène poliment au sujet."
 
@@ -8,7 +9,7 @@ const SUGGESTIONS = [
   'Comment observer Saturne ce soir ?',
   'Explique la tension de Hubble simplement',
   'Quelle est la différence entre matière et énergie noire ?',
-  'Pourquoi le ciel profond demande-t-il l\'obscurité ?',
+  "Pourquoi le ciel profond demande-t-il l'obscurité ?",
   'Conseille-moi un télescope pour les nébuleuses',
 ]
 
@@ -48,7 +49,7 @@ function Bubble({ m }) {
 
 export default function AssistantScreen() {
   const [msgs, setMsgs] = useState([
-    { role: 'bot', text: 'Bonsoir. Je suis votre assistant astronomique. Posez-moi une question sur le ciel de ce soir, une théorie, un objet à observer ou votre matériel.' },
+    { role: 'bot', text: "Bonsoir. Je suis votre assistant astronomique. Posez-moi une question sur le ciel de ce soir, une théorie, un objet à observer ou votre matériel." },
   ])
   const [input, setInput] = useState('')
   const [busy, setBusy] = useState(false)
@@ -67,7 +68,6 @@ export default function AssistantScreen() {
     setMsgs([...next, { role: 'bot', loading: true }])
     setBusy(true)
     try {
-      if (!window.claude || !window.claude.complete) throw new Error('offline')
       const history = next.filter(m => !m.loading).map(m => ({
         role: m.role === 'user' ? 'user' : 'assistant', content: m.text,
       }))
@@ -76,13 +76,13 @@ export default function AssistantScreen() {
         { role: 'assistant', content: 'Compris. Je suis prêt à répondre en expert.' },
         ...history,
       ]
-      const reply = await window.claude.complete({ messages })
+      const reply = await callClaude(messages, getApiKey())
       setMsgs(m => [...m.filter(x => !x.loading), { role: 'bot', text: (reply || '').trim() || '…' }])
     } catch (e) {
-      setMsgs(m => [...m.filter(x => !x.loading), {
-        role: 'bot',
-        text: 'Connexion à l\'assistant indisponible dans cet aperçu. Une fois l\'application en ligne, je répondrai à vos questions d\'astronomie en temps réel.',
-      }])
+      const msg = e.message === 'no-key'
+        ? "Entrez votre clé API Anthropic dans les Paramètres pour activer l'assistant."
+        : "Erreur de connexion à l'assistant. Vérifiez votre clé API dans les Paramètres."
+      setMsgs(m => [...m.filter(x => !x.loading), { role: 'bot', text: msg }])
     } finally {
       setBusy(false)
     }
@@ -128,9 +128,12 @@ export default function AssistantScreen() {
           border: '1px solid var(--line-2)', borderRadius: 999, padding: '6px 6px 6px 18px' }}>
           <input value={input} onChange={e => setInput(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && send()}
-            placeholder="Posez votre question…" style={{ flex: 1, background: 'none', border: 0, outline: 'none',
+            placeholder="Posez votre question…" aria-label="Message à l'assistant"
+            style={{ flex: 1, background: 'none', border: 0, outline: 'none',
               color: 'var(--text)', fontFamily: 'var(--sans)', fontSize: 14 }} />
-          <button onClick={() => send()} disabled={busy} className="press" style={{ width: 40, height: 40, flexShrink: 0,
+          <button onClick={() => send()} disabled={busy} className="press"
+            aria-label="Envoyer"
+            style={{ width: 40, height: 40, flexShrink: 0,
             borderRadius: '50%', border: 0, cursor: busy ? 'default' : 'pointer', display: 'flex',
             alignItems: 'center', justifyContent: 'center', color: '#1a130a', opacity: busy ? 0.5 : 1,
             background: 'linear-gradient(180deg,var(--gold-2),var(--gold))' }}>

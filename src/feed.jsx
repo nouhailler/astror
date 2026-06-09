@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
 import { IcRocket, IcEye, IcPlus, IcTrash, IcChevron, IcCheck } from './icons'
 import { ScreenHeader, SettingsBtn, HeaderTools, Sheet } from './ui'
-import { NEWS, CONFERENCES, PEOPLE, BOOKS, PHOTO_SITES } from './data'
+import { CONFERENCES, PEOPLE, BOOKS, PHOTO_SITES } from './data'
+import { fetchSpaceNews, useLiveData } from './api'
 
 const FEED_SEG = [
   { key: 'news', label: 'Actualités' },
@@ -295,6 +296,8 @@ export default function FeedScreen() {
   const [adding, setAdding] = useState(false)
   const [adds, setAdds] = useState(feedLoad)
 
+  const { data: liveNews, loading: newsLoading } = useLiveData(fetchSpaceNews)
+
   const addItem = (key, data) => {
     setAdds(prev => {
       const next = { ...prev, [key]: [{ id: key + '-' + Date.now(), _user: true, ...data }, ...(prev[key] || [])] }
@@ -310,7 +313,7 @@ export default function FeedScreen() {
     })
   }
 
-  const newsList   = [...(adds.news || []),   ...NEWS]
+  const newsList   = [...(adds.news || []),   ...(liveNews || [])]
   const confList   = [...(adds.conf || []),    ...CONFERENCES]
   const peopleList = [...(adds.people || []),  ...PEOPLE]
   const booksList  = [...(adds.books || []),   ...BOOKS]
@@ -333,7 +336,9 @@ export default function FeedScreen() {
           <button key={s.key} className={'chip' + (seg === s.key ? ' on' : '')} onClick={() => setSeg(s.key)}>{s.label}</button>
         ))}
       </div>
-      {seg === 'news'   && <NewsView   items={newsList}   onPick={setNews}   onDelete={id => delItem('news', id)} />}
+      {seg === 'news'   && (newsLoading && !newsList.length
+        ? <div style={{ textAlign: 'center', color: 'var(--faint)', padding: '40px 18px', fontSize: 13 }}>Chargement des actualités…</div>
+        : <NewsView items={newsList} onPick={setNews} onDelete={id => delItem('news', id)} />)}
       {seg === 'conf'   && <ConfView   items={confList}   onDelete={id => delItem('conf', id)} />}
       {seg === 'people' && <PeopleView items={peopleList} onPick={setPerson} onDelete={id => delItem('people', id)} />}
       {seg === 'books'  && <BooksView  items={booksList}  onDelete={id => delItem('books', id)} />}
