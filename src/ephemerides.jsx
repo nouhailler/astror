@@ -1,10 +1,11 @@
 import { useState, useMemo } from 'react'
-import { IcRocket, IcMoon, IcStar, IcBell } from './icons'
+import { IcRocket, IcMoon, IcStar, IcBell, IcSpark } from './icons'
 import { ScreenHeader, IconBtn, SettingsBtn, HeaderTools, SectionTitle, DataRow, Stat, Sheet, useCountdown } from './ui'
 import { ALERTS, EVENTS } from './data'
 import { getMoonData, getSunData } from './astro'
 import { fetchWeather, useLiveData } from './api'
 import { onbLoad } from './onboarding'
+import { callAI, getOpenRouterKey, getSelectedModel, getApiKey } from './claudeApi'
 
 function Moon({ illum = 73, size = 116 }) {
   const p = illum / 100
@@ -42,6 +43,70 @@ function CondBar({ label, value, level, max = 5 }) {
             background: i < level ? 'linear-gradient(90deg,var(--gold-3),var(--gold-2))' : 'var(--surface-3)' }} />
         ))}
       </div>
+    </div>
+  )
+}
+
+function AiInfoPanel({ buildPrompt }) {
+  const [open, setOpen] = useState(false)
+  const [info, setInfo] = useState(null)
+  const aiConnected = !!(getOpenRouterKey() && getSelectedModel()) || !!getApiKey()
+
+  const toggle = async () => {
+    const next = !open
+    setOpen(next)
+    if (next && aiConnected && info == null) {
+      setInfo('loading')
+      try {
+        const prompt = typeof buildPrompt === 'function' ? buildPrompt() : buildPrompt
+        const reply = await callAI([{ role: 'user', content: prompt }])
+        setInfo(reply.trim())
+      } catch {
+        setInfo('Erreur de connexion. Réessayez.')
+      }
+    }
+  }
+
+  return (
+    <div style={{ marginBottom: 12 }}>
+      <button onClick={toggle} className="press" style={{
+        display: 'inline-flex', alignItems: 'center', gap: 5,
+        padding: '4px 11px 4px 9px', borderRadius: 99, cursor: 'pointer',
+        background: open ? 'rgba(217,179,108,.14)' : 'rgba(217,179,108,.07)',
+        border: `1px solid ${open ? 'var(--gold-line)' : 'rgba(217,179,108,.18)'}`,
+        color: 'var(--gold)', fontSize: 11.5, fontFamily: 'var(--mono)',
+        textTransform: 'uppercase', letterSpacing: '.07em',
+      }}>
+        <IcSpark size={12} />
+        Analyse IA
+      </button>
+
+      {open && (
+        <div style={{ marginTop: 10, padding: '12px 14px', borderRadius: 13,
+          background: 'rgba(217,179,108,.04)', border: '1px solid var(--gold-line)' }}>
+          {!aiConnected ? (
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: 9 }}>
+              <IcSpark size={14} style={{ color: 'var(--faint)', flexShrink: 0, marginTop: 2, opacity: 0.5 }} />
+              <span className="body tight" style={{ fontSize: 12.5, color: 'var(--faint)', lineHeight: 1.5 }}>
+                Configurez une clé OpenRouter ou Anthropic dans les Paramètres pour activer l'analyse.
+              </span>
+            </div>
+          ) : info === 'loading' ? (
+            <div style={{ display: 'flex', gap: 5, padding: '2px 0' }}>
+              {[0, 1, 2].map(i => (
+                <span key={i} style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--gold)',
+                  animation: 'pulse 1.2s ease-in-out infinite', animationDelay: `${i * 0.18}s` }} />
+              ))}
+            </div>
+          ) : (
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: 9 }}>
+              <IcSpark size={14} style={{ color: 'var(--gold)', flexShrink: 0, marginTop: 3 }} />
+              <p style={{ margin: 0, fontSize: 13, lineHeight: 1.65, color: 'var(--dim)',
+                fontFamily: 'var(--serif)' }}>{info}</p>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   )
 }
@@ -157,6 +222,14 @@ export default function EphScreen() {
 
       <div className="pad">
         <SectionTitle action="Tout voir">Calendrier céleste</SectionTitle>
+        <AiInfoPanel buildPrompt={() => {
+          const sorted = [...EVENTS].sort((a, b) => new Date(a.date) - new Date(b.date))
+          const lines = sorted.map(e => {
+            const d = new Date(e.date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
+            return `- ${e.label} (${d}, ${e.kind}) : ${e.detail}`
+          }).join('\n')
+          return `Voici les prochains événements du calendrier astronomique :\n${lines}\n\nEn 4 à 5 phrases, explique quels sont les plus spectaculaires, lesquels nécessitent un équipement particulier, et donne une astuce pratique pour préparer l'observation du prochain événement.`
+        }} />
         <div className="card-2" style={{ overflow: 'hidden' }}>
           {[...EVENTS].sort((a, b) => new Date(a.date) - new Date(b.date)).map(e => (
             <EventRow key={e.id} e={e} onClick={() => setEvt(e)} />
@@ -166,6 +239,18 @@ export default function EphScreen() {
 
       <div className="pad">
         <SectionTitle>Conditions d'observation</SectionTitle>
+        <AiInfoPanel buildPrompt={() => {
+          if (!weather) return "En 4 à 5 phrases, explique à un astronome amateur comment évaluer les conditions d'observation : seeing, transparence, indice de Bortle, humidité. Quels sont les critères les plus importants selon le type d'observation (planètes, ciel profond, astrophoto) ?"
+          return `Conditions d'observation actuelles :
+- Seeing : ${weather.seeing} (${weather.seeingVal}/5)
+- Transparence : ${weather.transparency} (${weather.transVal}/5)
+- Indice de Bortle : ${weather.bortle}
+- Couverture nuageuse : ${weather.clouds} %
+- Humidité : ${weather.humidity} %
+- Température : ${weather.temp} °C
+
+En 4 à 5 phrases, analyse ces conditions pour la nuit : qu'est-il raisonnable d'observer avec un télescope amateur ? Quels types d'objets sont favorisés ou défavorisés ? Y a-t-il des précautions à prendre ?`
+        }} />
         <div className="card" style={{ padding: 18 }}>
           {wLoading ? (
             <div style={{ textAlign: 'center', color: 'var(--faint)', fontSize: 13, padding: '12px 0' }}>Chargement météo…</div>
