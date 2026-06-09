@@ -162,25 +162,57 @@ export function useCountdown(targetISO) {
   return `${String(h).padStart(2, '0')}h ${String(m).padStart(2, '0')}m`
 }
 
-export function AiInfoPanel({ buildPrompt, label = 'Analyse IA', style: outerStyle }) {
+const AI_CACHE_LS = 'astror_ai_cache_v1'
+
+export function loadAiCache(key) {
+  try { return JSON.parse(localStorage.getItem(AI_CACHE_LS) || '{}')[key]?.text ?? null } catch { return null }
+}
+export function saveAiCache(key, text) {
+  try {
+    const d = JSON.parse(localStorage.getItem(AI_CACHE_LS) || '{}')
+    d[key] = { text, ts: Date.now() }
+    localStorage.setItem(AI_CACHE_LS, JSON.stringify(d))
+  } catch {}
+}
+export function clearAiCache(key) {
+  try {
+    const d = JSON.parse(localStorage.getItem(AI_CACHE_LS) || '{}')
+    delete d[key]
+    localStorage.setItem(AI_CACHE_LS, JSON.stringify(d))
+  } catch {}
+}
+
+export function AiInfoPanel({ buildPrompt, cacheKey, label = 'Analyse IA', style: outerStyle }) {
   const [open, setOpen] = useState(false)
-  const [info, setInfo] = useState(null)
+  const [info, setInfo] = useState(() => cacheKey ? loadAiCache(cacheKey) : null)
   const aiConnected = !!(getOpenRouterKey() && getSelectedModel()) || !!getApiKey()
+
+  const doFetch = async () => {
+    setInfo('loading')
+    try {
+      const prompt = typeof buildPrompt === 'function' ? buildPrompt() : buildPrompt
+      const reply = await callAI([{ role: 'user', content: prompt }])
+      const text = reply.trim()
+      if (cacheKey) saveAiCache(cacheKey, text)
+      setInfo(text)
+    } catch {
+      setInfo('Erreur de connexion. Réessayez.')
+    }
+  }
 
   const toggle = async () => {
     const next = !open
     setOpen(next)
-    if (next && aiConnected && info == null) {
-      setInfo('loading')
-      try {
-        const prompt = typeof buildPrompt === 'function' ? buildPrompt() : buildPrompt
-        const reply = await callAI([{ role: 'user', content: prompt }])
-        setInfo(reply.trim())
-      } catch {
-        setInfo('Erreur de connexion. Réessayez.')
-      }
-    }
+    if (next && aiConnected && info == null) await doFetch()
   }
+
+  const refresh = async (e) => {
+    e.stopPropagation()
+    if (cacheKey) clearAiCache(cacheKey)
+    await doFetch()
+  }
+
+  const hasCached = info != null && info !== 'loading'
 
   return (
     <div style={outerStyle}>
@@ -193,6 +225,7 @@ export function AiInfoPanel({ buildPrompt, label = 'Analyse IA', style: outerSty
         textTransform: 'uppercase', letterSpacing: '.07em',
       }}>
         <IcSpark size={12} />{label}
+        {hasCached && !open && <span style={{ marginLeft: 2, fontSize: 9, opacity: 0.55 }}>✓</span>}
       </button>
       {open && (
         <div style={{ marginTop: 10, padding: '12px 14px', borderRadius: 13,
@@ -212,11 +245,19 @@ export function AiInfoPanel({ buildPrompt, label = 'Analyse IA', style: outerSty
               ))}
             </div>
           ) : (
-            <div style={{ display: 'flex', alignItems: 'flex-start', gap: 9 }}>
-              <IcSpark size={14} style={{ color: 'var(--gold)', flexShrink: 0, marginTop: 3 }} />
-              <p style={{ margin: 0, fontSize: 13, lineHeight: 1.65, color: 'var(--dim)',
-                fontFamily: 'var(--serif)' }}>{info}</p>
-            </div>
+            <>
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: 9 }}>
+                <IcSpark size={14} style={{ color: 'var(--gold)', flexShrink: 0, marginTop: 3 }} />
+                <p style={{ margin: 0, fontSize: 13, lineHeight: 1.65, color: 'var(--dim)',
+                  fontFamily: 'var(--serif)' }}>{info}</p>
+              </div>
+              <button onClick={refresh} style={{ marginTop: 10, fontSize: 11, color: 'var(--faint)',
+                background: 'none', border: 0, cursor: 'pointer', padding: 0,
+                display: 'flex', alignItems: 'center', gap: 4, fontFamily: 'var(--mono)',
+                textTransform: 'uppercase', letterSpacing: '.06em' }}>
+                ↻ Regénérer
+              </button>
+            </>
           )}
         </div>
       )}

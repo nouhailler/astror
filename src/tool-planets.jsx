@@ -94,7 +94,7 @@ export default function PlanetsPage({ onBack }) {
           </ToolSection>
 
           <div className="pad" style={{ marginTop: -4 }}>
-            <AiInfoPanel buildPrompt={`Planètes visibles ce soir :
+            <AiInfoPanel cacheKey="planets_eph" buildPrompt={`Planètes visibles ce soir :
 ${OBS_ORDER.map(id => { const p = PLANETS.find(x => x.id === id); const o = PLANET_OBS[id]; return p ? `- ${p.name} : mag ${o.mag}, ${o.ang}″, ${o.vis.toLowerCase()}, ${o.when}` : '' }).filter(Boolean).join('\n')}
 En 4 phrases, quelle est la priorité d'observation ce soir ? Quelle planète offre le plus beau spectacle, et quel matériel recommander pour chacune ?`} />
           </div>
@@ -152,7 +152,7 @@ En 4 phrases, quelle est la priorité d'observation ce soir ? Quelle planète of
               </div>
               <div className="body tight serif-body" style={{ fontSize: 13 }}>{obs.when}. {planet.note}</div>
               <div style={{ marginTop: 12 }}>
-                <AiInfoPanel buildPrompt={`Planète ${planet.name} ce soir : magnitude ${obs.mag}, diamètre apparent ${obs.ang}″, phase ${obs.phase}, visibilité "${obs.vis}", ${obs.when}.
+                <AiInfoPanel cacheKey={`planets_obs_${planet.id}`} buildPrompt={`Planète ${planet.name} ce soir : magnitude ${obs.mag}, diamètre apparent ${obs.ang}″, phase ${obs.phase}, visibilité "${obs.vis}", ${obs.when}.
 ${planet.note}
 En 4 phrases, que peut-on concrètement voir de ${planet.name} avec un télescope amateur ? Quel grossissement recommander, et quels détails chercher à la surface ou dans l'atmosphère ?`} />
               </div>

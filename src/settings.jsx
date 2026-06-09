@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { IcPin, IcStar, IcSpark, IcChevron, IcChevDown, IcCheck } from './icons'
-import { Sheet } from './ui'
+import { Sheet, loadAiCache, saveAiCache, clearAiCache } from './ui'
 import {
   ONB_LEVELS, ONB_LOCATIONS, ONB_LOCATION_COORDS, ONB_INTERESTS, ONB_GEAR, ONB_ALERTS, DEFAULT_PROFILE
 } from './onboarding'
@@ -192,26 +192,37 @@ function ApiKeySection() {
 }
 
 function AlertInfoRow({ alert, isOn, onToggle, isLast }) {
+  const cacheKey = `alert_${alert.k}`
   const [open, setOpen] = useState(false)
-  const [info, setInfo] = useState(null) // null | 'loading' | string
+  const [info, setInfo] = useState(() => loadAiCache(cacheKey))
 
   const aiConnected = !!(getOpenRouterKey() && getSelectedModel()) || !!getApiKey()
+
+  const doFetch = async () => {
+    setInfo('loading')
+    try {
+      const reply = await callAI([{
+        role: 'user',
+        content: `En 3 à 4 phrases courtes, explique l'alerte astronomique "${alert.label}" (${alert.sub}) à un astronome amateur : à quelle fréquence elle se produit, comment bien l'observer, et une astuce pratique pour ne pas la rater.`,
+      }])
+      const text = reply.trim()
+      saveAiCache(cacheKey, text)
+      setInfo(text)
+    } catch {
+      setInfo('Erreur de connexion. Réessayez.')
+    }
+  }
 
   const expand = async () => {
     const next = !open
     setOpen(next)
-    if (next && aiConnected && info == null) {
-      setInfo('loading')
-      try {
-        const reply = await callAI([{
-          role: 'user',
-          content: `En 3 à 4 phrases courtes, explique l'alerte astronomique "${alert.label}" (${alert.sub}) à un astronome amateur : à quelle fréquence elle se produit, comment bien l'observer, et une astuce pratique pour ne pas la rater.`,
-        }])
-        setInfo(reply.trim())
-      } catch {
-        setInfo('Erreur de connexion. Réessayez.')
-      }
-    }
+    if (next && aiConnected && info == null) await doFetch()
+  }
+
+  const refresh = async (e) => {
+    e.stopPropagation()
+    clearAiCache(cacheKey)
+    await doFetch()
   }
 
   return (
@@ -250,11 +261,19 @@ function AlertInfoRow({ alert, isOn, onToggle, isLast }) {
               ))}
             </div>
           ) : (
-            <div style={{ display: 'flex', alignItems: 'flex-start', gap: 9 }}>
-              <IcSpark size={14} style={{ color: 'var(--gold)', flexShrink: 0, marginTop: 3 }} />
-              <p style={{ margin: 0, fontSize: 13, lineHeight: 1.65, color: 'var(--dim)',
-                fontFamily: 'var(--serif)' }}>{info}</p>
-            </div>
+            <>
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: 9 }}>
+                <IcSpark size={14} style={{ color: 'var(--gold)', flexShrink: 0, marginTop: 3 }} />
+                <p style={{ margin: 0, fontSize: 13, lineHeight: 1.65, color: 'var(--dim)',
+                  fontFamily: 'var(--serif)' }}>{info}</p>
+              </div>
+              <button onClick={refresh} style={{ marginTop: 10, fontSize: 11, color: 'var(--faint)',
+                background: 'none', border: 0, cursor: 'pointer', padding: 0,
+                display: 'flex', alignItems: 'center', gap: 4, fontFamily: 'var(--mono)',
+                textTransform: 'uppercase', letterSpacing: '.06em' }}>
+                ↻ Regénérer
+              </button>
+            </>
           )}
         </div>
       )}

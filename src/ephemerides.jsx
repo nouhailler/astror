@@ -157,7 +157,7 @@ export default function EphScreen() {
 
       <div className="pad">
         <SectionTitle action="Tout voir">Calendrier céleste</SectionTitle>
-        <AiInfoPanel buildPrompt={() => {
+        <AiInfoPanel cacheKey="ephem_calendar" buildPrompt={() => {
           const sorted = [...EVENTS].sort((a, b) => new Date(a.date) - new Date(b.date))
           const lines = sorted.map(e => {
             const d = new Date(e.date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
@@ -174,7 +174,7 @@ export default function EphScreen() {
 
       <div className="pad">
         <SectionTitle>Conditions d'observation</SectionTitle>
-        <AiInfoPanel buildPrompt={() => {
+        <AiInfoPanel cacheKey="ephem_conditions" buildPrompt={() => {
           if (!weather) return "En 4 à 5 phrases, explique à un astronome amateur comment évaluer les conditions d'observation : seeing, transparence, indice de Bortle, humidité. Quels sont les critères les plus importants selon le type d'observation (planètes, ciel profond, astrophoto) ?"
           return `Conditions d'observation actuelles :
 - Seeing : ${weather.seeing} (${weather.seeingVal}/5)

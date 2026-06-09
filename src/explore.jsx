@@ -172,7 +172,7 @@ export default function ExploreScreen() {
               <div className="h-sec" style={{ fontSize: 28 }}>{planet.name}</div>
             </div>
             <p className="body serif-body" style={{ fontSize: 15, lineHeight: 1.6, textAlign: 'center', margin: '0 0 14px' }}>{planet.note}</p>
-            <AiInfoPanel style={{ marginBottom: 18 }} buildPrompt={`Planète ${planet.name} (${planet.sub}) : diamètre ${planet.diam}, masse ${planet.mass}, distance ${planet.dist}, température ${planet.temp}, ${planet.moons} lune(s).
+            <AiInfoPanel cacheKey={`explore_planet_${planet.id}`} style={{ marginBottom: 18 }} buildPrompt={`Planète ${planet.name} (${planet.sub}) : diamètre ${planet.diam}, masse ${planet.mass}, distance ${planet.dist}, température ${planet.temp}, ${planet.moons} lune(s).
 ${planet.note}
 En 4 phrases, décris ce qu'un astronome amateur peut voir de ${planet.name} avec un télescope, les aspects les plus fascinants, et une anecdote marquante sur cette planète.`} />
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 24px' }}>
@@ -197,7 +197,7 @@ En 4 phrases, décris ce qu'un astronome amateur peut voir de ${planet.name} ave
             </div>
             <div className="tag" style={{ marginBottom: 16 }}>{anom.tag}</div>
             <p className="body serif-body" style={{ fontSize: 15, lineHeight: 1.62, margin: '0 0 14px' }}>{anom.body}</p>
-            <AiInfoPanel style={{ marginBottom: 18 }} buildPrompt={`Anomalie astronomique : ${anom.name} (${anom.tag}).
+            <AiInfoPanel cacheKey={`explore_anom_${anom.id}`} style={{ marginBottom: 18 }} buildPrompt={`Anomalie astronomique : ${anom.name} (${anom.tag}).
 ${anom.body}
 En 3 à 4 phrases, vulgarise ce phénomène davantage : pourquoi est-il inexpliqué ou surprenant, quelles hypothèses existent, et ce que cela signifie pour notre compréhension de l'univers ?`} />
             <div className="card-2" style={{ padding: '4px 16px' }}>
@@ -221,7 +221,7 @@ En 3 à 4 phrases, vulgarise ce phénomène davantage : pourquoi est-il inexpliq
             </div>
             <p className="body serif-body" style={{ fontSize: 15.5, lineHeight: 1.62, color: 'var(--text)', margin: '0 0 14px' }}>{theo.short}</p>
             <p className="body serif-body" style={{ fontSize: 14.5, lineHeight: 1.62, margin: '0 0 16px' }}>{theo.body}</p>
-            <AiInfoPanel buildPrompt={`Théorie cosmologique : ${theo.name} (${theo.when}).
+            <AiInfoPanel cacheKey={`explore_theo_${theo.id}`} buildPrompt={`Théorie cosmologique : ${theo.name} (${theo.when}).
 ${theo.short}
 ${theo.body}
 En 3 à 4 phrases, développe les implications de cette théorie pour un passionné d'astronomie : les questions ouvertes qu'elle soulève, les observations qui la soutiennent ou la challengent, et une conséquence concrète si elle était confirmée.`} />

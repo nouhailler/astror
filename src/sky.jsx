@@ -341,7 +341,7 @@ function SkySheet({ o, onClose }) {
               </button>
             </div>
             <p className="body serif-body" style={{ fontSize: 15, lineHeight: 1.6, color: 'var(--dim)', margin: '0 0 16px' }}>{o.info}</p>
-            <AiInfoPanel style={{ marginBottom: 20 }} buildPrompt={`Objet céleste : ${o.name} (${o.kind}, constellation ${o.cons}).
+            <AiInfoPanel cacheKey={`sky_${o.id}`} style={{ marginBottom: 20 }} buildPrompt={`Objet céleste : ${o.name} (${o.kind}, constellation ${o.cons}).
 Magnitude : ${o.mag}, altitude : ${o.alt}°, distance : ${o.dist}.
 ${o.info}
 En 4 phrases, que peut-on observer de ${o.name} ce soir avec un télescope amateur ? Quel grossissement utiliser, et quel est le détail le plus intéressant à chercher ?`} />
