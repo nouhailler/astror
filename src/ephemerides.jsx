@@ -5,6 +5,13 @@ import { ALERTS, EVENTS } from './data'
 import { getMoonData, getSunData } from './astro'
 import { fetchWeather, useLiveData } from './api'
 import { onbLoad } from './onboarding'
+import { requestPermission, getPermission, loadNotifPrefs, saveNotifPrefs } from './notifications'
+
+const ALERT_NOTIF_SETTINGS = [
+  { k: 'iss',  label: "Passages de l'ISS",         sub: 'Alertes avant chaque passage visible' },
+  { k: 'conj', label: 'Conjonctions planétaires',   sub: 'Rapprochements Lune-planète, etc.' },
+  { k: 'iri',  label: 'Stations spatiales',         sub: 'Tiangong et autres passages' },
+]
 
 function Moon({ illum = 73, size = 116 }) {
   const p = illum / 100
@@ -88,6 +95,22 @@ export default function EphScreen() {
 
   const { data: weather, loading: wLoading } = useLiveData(() => fetchWeather(lat, lng))
   const [evt, setEvt] = useState(null)
+  const [manageOpen, setManageOpen] = useState(false)
+  const [notifPrefs, setNotifPrefs] = useState(() => ({ iss: true, conj: true, iri: false, ...loadNotifPrefs() }))
+  const [permission, setPermission] = useState(() => getPermission())
+
+  const toggleAlert = async (k, newVal) => {
+    if (newVal && permission !== 'granted') {
+      const perm = await requestPermission()
+      setPermission(perm)
+      if (perm !== 'granted') return
+    }
+    setNotifPrefs(v => {
+      const next = { ...v, [k]: newVal }
+      saveNotifPrefs(next)
+      return next
+    })
+  }
 
   const dateLabel = now.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }) + ' · ' + city
 
@@ -133,7 +156,7 @@ export default function EphScreen() {
       </div>
 
       <div className="pad">
-        <SectionTitle action="Gérer">Alertes</SectionTitle>
+        <SectionTitle action="Gérer" onAction={() => setManageOpen(true)}>Alertes</SectionTitle>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           {ALERTS.map(a => (
             <div key={a.id} className="card" style={{ padding: 14, display: 'flex', gap: 13 }}>
@@ -208,6 +231,42 @@ En 4 à 5 phrases, analyse ces conditions pour la nuit : qu'est-il raisonnable d
           )}
         </div>
       </div>
+
+      <Sheet open={manageOpen} onClose={() => setManageOpen(false)} aria-label="Gérer les alertes">
+        <div className="h-sec" style={{ fontSize: 22, marginBottom: 6 }}>Alertes</div>
+        <p className="body" style={{ fontSize: 13, marginBottom: 20 }}>
+          Choisissez les événements pour lesquels vous souhaitez être notifié.
+        </p>
+        {permission === 'denied' && (
+          <div style={{ marginBottom: 16, padding: 14, borderRadius: 14,
+            background: 'rgba(226,141,126,.08)', border: '1px solid rgba(226,141,126,.3)',
+            fontSize: 13, color: 'var(--bad)' }}>
+            Les notifications sont bloquées dans votre navigateur. Autorisez-les dans les paramètres du navigateur.
+          </div>
+        )}
+        <div className="card-2" style={{ overflow: 'hidden' }}>
+          {ALERT_NOTIF_SETTINGS.map((s, i) => (
+            <div key={s.k} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 15px',
+              borderBottom: i < ALERT_NOTIF_SETTINGS.length - 1 ? '1px solid var(--line)' : 0 }}>
+              <span style={{ width: 36, height: 36, borderRadius: 10, flexShrink: 0, display: 'flex',
+                alignItems: 'center', justifyContent: 'center', color: 'var(--gold)',
+                background: 'var(--gold-soft)', border: '1px solid var(--gold-line)' }}>
+                {ALERT_ICON[s.k]}
+              </span>
+              <span style={{ flex: 1, minWidth: 0 }}>
+                <span className="h-card" style={{ display: 'block', fontSize: 14 }}>{s.label}</span>
+                <span className="meta" style={{ display: 'block', marginTop: 2 }}>{s.sub}</span>
+              </span>
+              <button
+                className={'switch' + (notifPrefs[s.k] ? ' on' : '')}
+                onClick={() => toggleAlert(s.k, !notifPrefs[s.k])}
+                aria-pressed={!!notifPrefs[s.k]}
+                aria-label={s.label}
+              ><i /></button>
+            </div>
+          ))}
+        </div>
+      </Sheet>
 
       <Sheet open={!!evt} onClose={() => setEvt(null)}>
         {evt && (
