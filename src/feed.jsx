@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { IcRocket, IcEye, IcPlus, IcTrash, IcChevron, IcCheck, IcSearch, IcBook } from './icons'
 import { ScreenHeader, SettingsBtn, HeaderTools, Sheet } from './ui'
 import { CONFERENCES, PEOPLE, BOOKS, PHOTO_SITES } from './data'
-import { fetchSpaceNews, useLiveData, searchBooks, fetchBookCover } from './api'
+import { fetchSpaceNews, useLiveData, searchBooks, fetchBookCover, fetchConfImage } from './api'
 
 const FEED_SEG = [
   { key: 'news', label: 'Actualités' },
@@ -255,7 +255,7 @@ function confYear(date) {
   return m ? m[1] : ''
 }
 
-function ConfPoster({ name, date, size = 'full' }) {
+function ConfPoster({ name, date, size = 'full', imgUrl = null }) {
   const [c1, c2] = CONF_PALETTES[titleHash(name) % CONF_PALETTES.length]
   const acronym = confAcronym(name)
   const year = confYear(date)
@@ -266,6 +266,12 @@ function ConfPoster({ name, date, size = 'full' }) {
       background: `linear-gradient(145deg, ${c1}, ${c2})`,
       boxShadow: isSmall ? '0 2px 8px rgba(0,0,0,.4)' : '0 4px 16px rgba(0,0,0,.5)',
       border: '1px solid rgba(217,179,108,0.22)' }}>
+      {imgUrl && (
+        <img src={imgUrl} alt={name}
+          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%',
+            objectFit: 'cover', objectPosition: 'center',
+            opacity: isSmall ? 0.18 : 0.25, mixBlendMode: 'luminosity' }} />
+      )}
       <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column',
         alignItems: 'center', justifyContent: 'center', gap: 2 }}>
         <span style={{ fontFamily: 'var(--mono)', fontSize: isSmall ? 18 : 26, fontWeight: 700,
@@ -281,9 +287,42 @@ function ConfPoster({ name, date, size = 'full' }) {
 
 function ConfView({ items, onDelete }) {
   const [conf, setConf] = useState(null)
+  const [imgs, setImgs] = useState(confImgLoad)
+  const [refreshing, setRefreshing] = useState(false)
+
+  const getImg = (c) => imgs[c.id] || imgs[c.name] || null
+
+  const refresh = async () => {
+    setRefreshing(true)
+    const cache = { ...imgs }
+    await Promise.all(items.filter(c => !getImg(c)).map(async c => {
+      const url = await fetchConfImage(c.name)
+      if (url) cache[c.id || c.name] = url
+    }))
+    setImgs(cache)
+    confImgSave(cache)
+    setRefreshing(false)
+  }
 
   return (
     <div className="enter pad" style={{ marginTop: 8 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+        <span className="eyebrow" style={{ fontSize: 10, color: 'var(--faint)', letterSpacing: '.18em' }}>
+          {items.length} événement{items.length > 1 ? 's' : ''}
+        </span>
+        <button onClick={refresh} disabled={refreshing}
+          style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '5px 11px', borderRadius: 99,
+            background: 'var(--gold-soft)', border: '1px solid var(--gold-line)',
+            color: 'var(--gold)', fontSize: 11.5, fontFamily: 'var(--mono)', cursor: refreshing ? 'default' : 'pointer',
+            opacity: refreshing ? 0.6 : 1, letterSpacing: '.04em' }}>
+          {refreshing ? (
+            <>{[0,1,2].map(i => (
+              <span key={i} style={{ width: 4, height: 4, borderRadius: '50%', background: 'var(--gold)',
+                animation: 'pulse 1.2s ease-in-out infinite', animationDelay: `${i * 0.18}s` }} />
+            ))} Recherche…</>
+          ) : <>↻ Images</>}
+        </button>
+      </div>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
         {items.map(c => (
           <div key={c.id} style={{ position: 'relative' }}>
@@ -297,7 +336,7 @@ function ConfView({ items, onDelete }) {
             <button onClick={() => setConf(c)} className="press"
               style={{ width: '100%', background: 'none', border: 'none', cursor: 'pointer',
                 textAlign: 'left', padding: 0, display: 'flex', flexDirection: 'column' }}>
-              <ConfPoster name={c.name} date={c.date} />
+              <ConfPoster name={c.name} date={c.date} imgUrl={getImg(c)} />
               <div style={{ marginTop: 9, paddingBottom: 2 }}>
                 <div className="h-card" style={{ fontSize: 12, lineHeight: 1.3, marginBottom: 4,
                   display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
@@ -314,7 +353,7 @@ function ConfView({ items, onDelete }) {
       <Sheet open={!!conf} onClose={() => setConf(null)}>
         {conf && (
           <div>
-            <ConfPoster name={conf.name} date={conf.date} />
+            <ConfPoster name={conf.name} date={conf.date} imgUrl={getImg(conf)} />
             <div style={{ marginTop: 18, marginBottom: 6 }}>
               <div className="h-sec" style={{ fontSize: 22, lineHeight: 1.2, marginBottom: 10 }}>{conf.name}</div>
               {conf.date && (
@@ -395,6 +434,10 @@ function PeopleView({ items, onPick, onDelete }) {
 const BOOK_COVER_STORE = 'astror_book_covers_v1'
 function bookCoverLoad() { try { return JSON.parse(localStorage.getItem(BOOK_COVER_STORE)) || {} } catch { return {} } }
 function bookCoverSave(c) { try { localStorage.setItem(BOOK_COVER_STORE, JSON.stringify(c)) } catch {} }
+
+const CONF_IMG_STORE = 'astror_conf_imgs_v1'
+function confImgLoad() { try { return JSON.parse(localStorage.getItem(CONF_IMG_STORE)) || {} } catch { return {} } }
+function confImgSave(c) { try { localStorage.setItem(CONF_IMG_STORE, JSON.stringify(c)) } catch {} }
 
 const COVER_PALETTES = [
   ['#213d6e','#111e3a'], ['#352055','#1b1030'], ['#1d4030','#0e2018'],

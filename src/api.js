@@ -48,6 +48,30 @@ export async function searchBooks(query) {
   }))
 }
 
+export async function fetchConfImage(name) {
+  // Build query candidates from the conference name
+  const noYear = name.replace(/\s*\d{4}\s*/g, ' ').trim()
+  const parts = noYear.split(/\s*[—–]\s*/)
+  const candidates = [...new Set([
+    parts[0].trim(),                              // "European Astronomical Society"
+    parts.length > 1 ? parts[1].trim() : null,   // "EAS" or "General Assembly"
+    noYear.split(/\s+/).slice(0, 3).join(' '),    // first 3 words
+  ].filter(Boolean).filter(s => s.length > 3))]
+
+  for (const q of candidates) {
+    for (const lang of ['en', 'fr']) {
+      try {
+        const res = await fetch(
+          `https://${lang}.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(q)}`
+        )
+        const d = await res.json()
+        if (d.thumbnail?.source && d.type === 'standard') return d.thumbnail.source
+      } catch {}
+    }
+  }
+  return null
+}
+
 export async function fetchBookCover(title, author) {
   const q = [title, author].filter(Boolean).join(' ')
   try {
