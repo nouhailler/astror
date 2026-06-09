@@ -63,10 +63,12 @@ export function SectionTitle({ children, action, onAction }) {
     <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between',
                   margin: '26px 0 12px' }}>
       <div className="h-sec">{children}</div>
-      {action && (
-        <button onClick={onAction} style={{ background: 'none', border: 0, cursor: 'pointer',
-          color: 'var(--gold)', fontFamily: 'var(--mono)', fontSize: 11, letterSpacing: '.08em',
-          textTransform: 'uppercase' }}>{action}</button>
+      {action && (onAction
+        ? <button onClick={onAction} style={{ background: 'none', border: 0, cursor: 'pointer',
+            color: 'var(--gold)', fontFamily: 'var(--mono)', fontSize: 11, letterSpacing: '.08em',
+            textTransform: 'uppercase' }}>{action}</button>
+        : <span style={{ color: 'var(--gold)', fontFamily: 'var(--mono)', fontSize: 11,
+            letterSpacing: '.08em' }}>{action}</span>
       )}
     </div>
   )

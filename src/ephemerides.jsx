@@ -196,7 +196,7 @@ export default function EphScreen() {
       </div>
 
       <div className="pad">
-        <SectionTitle>Conditions d'observation</SectionTitle>
+        <SectionTitle action={weather ? now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }) : null}>Conditions d'observation</SectionTitle>
         <AiInfoPanel cacheKey="ephem_conditions" buildPrompt={() => {
           if (!weather) return "En 4 à 5 phrases, explique à un astronome amateur comment évaluer les conditions d'observation : seeing, transparence, indice de Bortle, humidité. Quels sont les critères les plus importants selon le type d'observation (planètes, ciel profond, astrophoto) ?"
           return `Conditions d'observation actuelles :
