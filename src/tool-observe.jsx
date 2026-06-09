@@ -195,17 +195,17 @@ export default function ObservePage({ onBack }) {
       <ToolSeg items={[{ key: 'prep', label: 'Préparer' }, { key: 'journal', label: 'Journal' }, { key: 'objets', label: 'Objets' }]}
         value={seg} onChange={setSeg} />
 
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '6px 18px 0', gap: 8 }}>
+        <span className="meta" style={{ color: 'var(--gold)', display: 'flex', alignItems: 'center', gap: 4 }}>
+          <IcPin size={13} /> {city}
+        </span>
+        <span className="meta">
+          {now.toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric', month: 'long', year: 'numeric' })}
+        </span>
+      </div>
+
       {seg === 'prep' && (
         <div className="enter">
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 18px 0', gap: 8 }}>
-            <span className="meta" style={{ color: 'var(--gold)', display: 'flex', alignItems: 'center', gap: 4 }}>
-              <IcPin size={13} /> {city}
-            </span>
-            <span className="meta">
-              {now.toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric', month: 'long', year: 'numeric' })}
-            </span>
-          </div>
-
           <ToolSection title="Conditions ce soir" action={weather ? now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }) : null}>
             <div className="metric-grid" style={{ gridTemplateColumns: '1fr 1fr' }}>
               <div className="metric">
