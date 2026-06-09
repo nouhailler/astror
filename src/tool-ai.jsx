@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { IcSpark, IcSend, IcArrowLeft } from './icons'
 import { onbLoad } from './onboarding'
-import { callClaude, getApiKey } from './claudeApi'
+import { callAI } from './claudeApi'
 
 const AI_SUGGEST = [
   'Que puis-je observer ce soir avec un Dobson 200 mm ?',
@@ -74,10 +74,12 @@ export default function AiPage({ onBack }) {
         { role: 'assistant', content: 'Compris. Je conseille selon le ciel, la position et le matériel.' },
         ...history,
       ]
-      const reply = await callClaude(messages, getApiKey())
+      const reply = await callAI(messages)
       setMsgs(m => [...m.filter(x => !x.loading), { role: 'bot', text: (reply || '').trim() || '…' }])
     } catch (e) {
-      const fb = e.message === 'no-key' ? AI_FALLBACK.default : pickFallback(q)
+      const fb = e.message === 'no-key'
+        ? "Configurez une clé OpenRouter ou Anthropic dans les Paramètres pour activer l'assistant."
+        : pickFallback(q)
       setMsgs(m => [...m.filter(x => !x.loading), { role: 'bot', text: fb }])
     } finally { setBusy(false) }
   }

@@ -4,7 +4,10 @@ import { Sheet } from './ui'
 import {
   ONB_LEVELS, ONB_LOCATIONS, ONB_LOCATION_COORDS, ONB_INTERESTS, ONB_GEAR, ONB_ALERTS, DEFAULT_PROFILE
 } from './onboarding'
-import { getApiKey, saveApiKey, testApiKey } from './claudeApi'
+import {
+  getApiKey, saveApiKey, testApiKey,
+  getOpenRouterKey, saveOpenRouterKey, fetchFreeModels, getSelectedModel, saveSelectedModel,
+} from './claudeApi'
 
 function SettingsSection({ label }) {
   return (
@@ -48,6 +51,96 @@ function GeolocButton({ onDetected }) {
       <IcPin size={14} />
       {state === 'loading' ? 'Détection…' : state === 'done' ? 'Détecté ✓' : 'GPS'}
     </button>
+  )
+}
+
+function OpenRouterSection() {
+  const [key, setKey] = useState(() => getOpenRouterKey())
+  const [models, setModels] = useState(null)
+  const [loading, setLoading] = useState(false)
+  const [selected, setSelected] = useState(() => getSelectedModel())
+  const [status, setStatus] = useState('')
+
+  const load = async () => {
+    if (!key.trim()) return
+    saveOpenRouterKey(key)
+    setLoading(true)
+    setStatus('')
+    try {
+      const list = await fetchFreeModels(key.trim())
+      setModels(list)
+      setStatus('ok')
+    } catch {
+      setStatus('error')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const pick = (modelId) => {
+    setSelected(modelId)
+    saveSelectedModel(modelId)
+  }
+
+  return (
+    <div style={{ marginBottom: 24 }}>
+      <SettingsSection label="Assistant IA · OpenRouter (prioritaire)" />
+      <div style={{ marginBottom: 8 }}>
+        <input
+          type="password"
+          className="input"
+          placeholder="sk-or-v1-…"
+          value={key}
+          onChange={e => { setKey(e.target.value); setStatus('') }}
+          aria-label="Clé API OpenRouter"
+        />
+      </div>
+      <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 12 }}>
+        <button className="chip" style={{ height: 34, fontSize: 12.5 }} onClick={load}
+          disabled={!key.trim() || loading}>
+          {loading ? 'Chargement…' : 'Modèles gratuits'}
+        </button>
+        {status === 'ok' && <span style={{ fontSize: 12, color: 'var(--good)' }}>✓ {models?.length} modèles</span>}
+        {status === 'error' && <span style={{ fontSize: 12, color: 'var(--bad)' }}>Clé invalide</span>}
+      </div>
+
+      {selected && (
+        <div style={{ marginBottom: 10, padding: '8px 13px', borderRadius: 11,
+          background: 'rgba(126,166,230,.08)', border: '1px solid rgba(126,166,230,.25)' }}>
+          <div className="meta" style={{ fontSize: 11, marginBottom: 2 }}>Modèle actif</div>
+          <div style={{ fontSize: 12.5, color: 'var(--blue)', fontFamily: 'var(--sans)', wordBreak: 'break-all' }}>{selected}</div>
+        </div>
+      )}
+
+      {models && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 7,
+          maxHeight: 280, overflowY: 'auto', paddingRight: 2 }}>
+          {models.map(m => {
+            const active = selected === m.id
+            const ctxK = m.context >= 1000 ? `${Math.round(m.context / 1000)}k` : String(m.context)
+            return (
+              <button key={m.id} onClick={() => pick(m.id)} className="press"
+                style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 13px',
+                  borderRadius: 12, textAlign: 'left', cursor: 'pointer',
+                  background: active ? 'rgba(126,166,230,.12)' : 'var(--surface-1)',
+                  border: `1px solid ${active ? 'rgba(126,166,230,.4)' : 'var(--line)'}` }}>
+                <span style={{ width: 16, flexShrink: 0, color: 'var(--blue)' }}>
+                  {active && <IcCheck size={14} />}
+                </span>
+                <span style={{ flex: 1, minWidth: 0 }}>
+                  <span className="h-card" style={{ fontSize: 13, display: 'block' }}>{m.name}</span>
+                  <span className="meta" style={{ fontSize: 11 }}>ctx {ctxK}</span>
+                </span>
+              </button>
+            )
+          })}
+        </div>
+      )}
+
+      <div className="body tight" style={{ fontSize: 11.5, marginTop: 10, color: 'var(--faint)', lineHeight: 1.5 }}>
+        Accès à des dizaines de modèles IA gratuits via openrouter.ai. Prioritaire sur la clé Anthropic.
+      </div>
+    </div>
   )
 }
 
@@ -202,6 +295,8 @@ export default function SettingsSheet({ open, onClose, profile, onChange, onRepl
           </div>
         ))}
       </div>
+
+      <OpenRouterSection />
 
       <ApiKeySection />
 

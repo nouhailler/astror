@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { IcSpark, IcSend } from './icons'
 import { SettingsBtn } from './ui'
-import { callClaude, getApiKey } from './claudeApi'
+import { callAI } from './claudeApi'
 
 const PRIME = "Tu es Astror, un assistant expert en astronomie, astrophysique et cosmologie, intégré à une application pour astronomes amateurs confirmés. Réponds toujours en français, de façon précise, rigoureuse et concise (4 à 6 phrases maximum). Emploie des données chiffrées et des termes techniques quand c'est pertinent, sans jargon inutile. Si la question sort de l'astronomie, ramène poliment au sujet."
 
@@ -76,12 +76,12 @@ export default function AssistantScreen() {
         { role: 'assistant', content: 'Compris. Je suis prêt à répondre en expert.' },
         ...history,
       ]
-      const reply = await callClaude(messages, getApiKey())
+      const reply = await callAI(messages)
       setMsgs(m => [...m.filter(x => !x.loading), { role: 'bot', text: (reply || '').trim() || '…' }])
     } catch (e) {
       const msg = e.message === 'no-key'
-        ? "Entrez votre clé API Anthropic dans les Paramètres pour activer l'assistant."
-        : "Erreur de connexion à l'assistant. Vérifiez votre clé API dans les Paramètres."
+        ? "Configurez une clé OpenRouter ou Anthropic dans les Paramètres pour activer l'assistant."
+        : "Erreur de connexion. Vérifiez votre clé API dans les Paramètres."
       setMsgs(m => [...m.filter(x => !x.loading), { role: 'bot', text: msg }])
     } finally {
       setBusy(false)
