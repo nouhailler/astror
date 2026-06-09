@@ -48,7 +48,7 @@ export async function searchBooks(query) {
   }))
 }
 
-export async function fetchConfImage(name) {
+export async function fetchConfImage(name, place) {
   // Build query candidates from the conference name
   const noYear = name.replace(/\s*\d{4}\s*/g, ' ').trim()
   const parts = noYear.split(/\s*[—–]\s*/)
@@ -69,7 +69,64 @@ export async function fetchConfImage(name) {
       } catch {}
     }
   }
+
+  // Fallback: host city (most reliable — cities almost always have a Wikipedia photo)
+  if (place) {
+    const city = place.split(/[,、]/)[0].trim()
+    for (const lang of ['fr', 'en']) {
+      try {
+        const res = await fetch(
+          `https://${lang}.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(city)}`
+        )
+        const d = await res.json()
+        if (d.thumbnail?.source && d.type === 'standard') return d.thumbnail.source
+      } catch {}
+    }
+  }
   return null
+}
+
+async function fetchWikiCategoryImages(category, limit = 4) {
+  const params = new URLSearchParams({
+    action: 'query', generator: 'categorymembers',
+    gcmtitle: category, gcmtype: 'file', gcmlimit: String(limit),
+    gcmsort: 'timestamp', gcmdir: 'descending',
+    prop: 'imageinfo', iiprop: 'url|mime', iiurlwidth: '500',
+    format: 'json', origin: '*',
+  })
+  const res = await fetch(`https://commons.wikimedia.org/w/api.php?${params}`)
+  if (!res.ok) return []
+  const data = await res.json()
+  return Object.values(data.query?.pages || {})
+    .map(p => {
+      const ii = p.imageinfo?.[0]
+      if (!ii?.thumburl) return null
+      if (!['image/jpeg', 'image/png', 'image/webp'].includes(ii.mime)) return null
+      return ii.thumburl
+    })
+    .filter(Boolean)
+    .slice(0, limit)
+}
+
+export async function fetchSitePhotos(siteId) {
+  switch (siteId) {
+    case 's1': {
+      const res = await fetch('https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY&count=6')
+      if (!res.ok) return []
+      const items = await res.json()
+      return items.filter(i => i.media_type === 'image').map(i => i.url).slice(0, 4)
+    }
+    case 's2':
+      return fetchWikiCategoryImages('Category:Images_by_the_Hubble_Space_Telescope', 4)
+    case 's3':
+      return fetchWikiCategoryImages('Category:Images_by_the_James_Webb_Space_Telescope', 4)
+    case 's4':
+      return fetchWikiCategoryImages('Category:Astrophotography', 4)
+    case 's5':
+      return fetchWikiCategoryImages('Category:Images_from_the_European_Southern_Observatory', 4)
+    default:
+      return []
+  }
 }
 
 export async function fetchBookCover(title, author) {

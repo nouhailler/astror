@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { IcRocket, IcEye, IcPlus, IcTrash, IcChevron, IcCheck, IcSearch, IcBook } from './icons'
 import { ScreenHeader, SettingsBtn, HeaderTools, Sheet } from './ui'
 import { CONFERENCES, PEOPLE, BOOKS, PHOTO_SITES } from './data'
-import { fetchSpaceNews, useLiveData, searchBooks, fetchBookCover, fetchConfImage } from './api'
+import { fetchSpaceNews, useLiveData, searchBooks, fetchBookCover, fetchConfImage, fetchSitePhotos } from './api'
 
 const FEED_SEG = [
   { key: 'news', label: 'Actualités' },
@@ -296,7 +296,7 @@ function ConfView({ items, onDelete }) {
     setRefreshing(true)
     const cache = { ...imgs }
     await Promise.all(items.filter(c => !getImg(c)).map(async c => {
-      const url = await fetchConfImage(c.name)
+      const url = await fetchConfImage(c.name, c.place)
       if (url) cache[c.id || c.name] = url
     }))
     setImgs(cache)
@@ -685,25 +685,75 @@ function BooksView({ items, onAdd, onDelete }) {
   )
 }
 
+const SITE_PHOTOS_STORE = 'astror_site_photos_v1'
+function sitePhotosLoad() { try { return JSON.parse(localStorage.getItem(SITE_PHOTOS_STORE)) || {} } catch { return {} } }
+function sitePhotosSave(c) { try { localStorage.setItem(SITE_PHOTOS_STORE, JSON.stringify(c)) } catch {} }
+
+function SiteCard({ site, index, total }) {
+  const [photos, setPhotos] = useState(() => sitePhotosLoad()[site.id] || null)
+  const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    if (photos !== null) return
+    setLoading(true)
+    fetchSitePhotos(site.id)
+      .then(urls => {
+        setPhotos(urls)
+        const cache = sitePhotosLoad()
+        cache[site.id] = urls
+        sitePhotosSave(cache)
+      })
+      .catch(() => setPhotos([]))
+      .finally(() => setLoading(false))
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [site.id])
+
+  return (
+    <div style={{ borderBottom: index < total - 1 ? '1px solid var(--line)' : 0 }}>
+      <a href={'https://' + site.url} target="_blank" rel="noreferrer" className="press"
+        style={{ display: 'flex', alignItems: 'center', gap: 13, padding: '14px 15px', textDecoration: 'none' }}>
+        <span style={{ width: 38, height: 38, borderRadius: 11, flexShrink: 0, display: 'flex',
+          alignItems: 'center', justifyContent: 'center', color: 'var(--gold)', background: 'var(--gold-soft)',
+          border: '1px solid var(--gold-line)' }}><IcEye size={18} /></span>
+        <span style={{ flex: 1, minWidth: 0 }}>
+          <span className="h-card" style={{ fontSize: 14.5 }}>{site.name}</span>
+          <span style={{ display: 'block', fontSize: 12, color: 'var(--faint)', marginTop: 2 }}>{site.note}</span>
+        </span>
+        <span className="meta" style={{ color: 'var(--gold)', display: 'flex', alignItems: 'center', gap: 5 }}>
+          {site.url} <IcArrowUpR size={15} />
+        </span>
+      </a>
+      {loading && (
+        <div style={{ display: 'flex', gap: 5, padding: '0 15px 14px', alignItems: 'center' }}>
+          {[0,1,2].map(i => (
+            <span key={i} style={{ width: 5, height: 5, borderRadius: '50%', background: 'var(--faint)',
+              animation: 'pulse 1.2s ease-in-out infinite', animationDelay: `${i * 0.18}s` }} />
+          ))}
+        </div>
+      )}
+      {photos && photos.length > 0 && (
+        <div style={{ display: 'flex', gap: 6, padding: '0 15px 14px',
+          overflowX: 'auto', scrollbarWidth: 'none' }}>
+          {photos.map((url, i) => (
+            <a key={i} href={'https://' + site.url} target="_blank" rel="noreferrer"
+              style={{ flexShrink: 0, width: 96, height: 64, borderRadius: 8, overflow: 'hidden',
+                border: '1px solid var(--line-2)', display: 'block' }}>
+              <img src={url} alt="" loading="lazy"
+                style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+            </a>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
 function SitesView() {
   return (
     <div className="enter pad" style={{ marginTop: 8 }}>
       <div className="card-2" style={{ overflow: 'hidden' }}>
         {PHOTO_SITES.map((s, i) => (
-          <a key={s.id} href={'https://' + s.url} target="_blank" rel="noreferrer" className="press"
-            style={{ display: 'flex', alignItems: 'center', gap: 13, padding: '14px 15px', textDecoration: 'none',
-              borderBottom: i < PHOTO_SITES.length - 1 ? '1px solid var(--line)' : 0 }}>
-            <span style={{ width: 38, height: 38, borderRadius: 11, flexShrink: 0, display: 'flex',
-              alignItems: 'center', justifyContent: 'center', color: 'var(--gold)', background: 'var(--gold-soft)',
-              border: '1px solid var(--gold-line)' }}><IcEye size={18} /></span>
-            <span style={{ flex: 1, minWidth: 0 }}>
-              <span className="h-card" style={{ fontSize: 14.5 }}>{s.name}</span>
-              <span style={{ display: 'block', fontSize: 12, color: 'var(--faint)', marginTop: 2 }}>{s.note}</span>
-            </span>
-            <span className="meta" style={{ color: 'var(--gold)', display: 'flex', alignItems: 'center', gap: 5 }}>
-              {s.url} <IcArrowUpR size={15} />
-            </span>
-          </a>
+          <SiteCard key={s.id} site={s} index={i} total={PHOTO_SITES.length} />
         ))}
       </div>
     </div>
