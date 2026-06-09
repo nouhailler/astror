@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { IcPin, IcStar, IcSpark, IcChevron, IcCheck } from './icons'
+import { IcPin, IcStar, IcSpark, IcChevron, IcChevDown, IcCheck } from './icons'
 import { Sheet } from './ui'
 import {
   ONB_LEVELS, ONB_LOCATIONS, ONB_LOCATION_COORDS, ONB_INTERESTS, ONB_GEAR, ONB_ALERTS, DEFAULT_PROFILE
@@ -7,6 +7,7 @@ import {
 import {
   getApiKey, saveApiKey, testApiKey,
   getOpenRouterKey, saveOpenRouterKey, fetchFreeModels, getSelectedModel, saveSelectedModel,
+  callAI,
 } from './claudeApi'
 
 function SettingsSection({ label }) {
@@ -190,6 +191,77 @@ function ApiKeySection() {
   )
 }
 
+function AlertInfoRow({ alert, isOn, onToggle, isLast }) {
+  const [open, setOpen] = useState(false)
+  const [info, setInfo] = useState(null) // null | 'loading' | string
+
+  const aiConnected = !!(getOpenRouterKey() && getSelectedModel()) || !!getApiKey()
+
+  const expand = async () => {
+    const next = !open
+    setOpen(next)
+    if (next && aiConnected && info == null) {
+      setInfo('loading')
+      try {
+        const reply = await callAI([{
+          role: 'user',
+          content: `En 3 à 4 phrases courtes, explique l'alerte astronomique "${alert.label}" (${alert.sub}) à un astronome amateur : à quelle fréquence elle se produit, comment bien l'observer, et une astuce pratique pour ne pas la rater.`,
+        }])
+        setInfo(reply.trim())
+      } catch {
+        setInfo('Erreur de connexion. Réessayez.')
+      }
+    }
+  }
+
+  return (
+    <div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '13px 15px',
+        borderBottom: (!isLast || open) ? '1px solid var(--line)' : 0 }}>
+        <button onClick={expand} className="press"
+          style={{ flex: 1, textAlign: 'left', background: 'none', border: 0,
+            cursor: 'pointer', padding: 0, color: 'inherit', display: 'flex',
+            flexDirection: 'column', gap: 2 }}>
+          <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <span className="h-card" style={{ fontSize: 14 }}>{alert.label}</span>
+            <IcChevDown size={12} style={{ color: 'var(--faint)', flexShrink: 0,
+              transform: open ? 'rotate(180deg)' : 'none', transition: 'transform .2s' }} />
+          </span>
+          <span className="body tight" style={{ fontSize: 11.5 }}>{alert.sub}</span>
+        </button>
+        <button className={'switch' + (isOn ? ' on' : '')} onClick={onToggle}
+          aria-pressed={isOn} aria-label={alert.label}><i /></button>
+      </div>
+
+      {open && (
+        <div style={{ padding: '12px 15px 14px', borderBottom: !isLast ? '1px solid var(--line)' : 0 }}>
+          {!aiConnected ? (
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: 9 }}>
+              <IcSpark size={14} style={{ color: 'var(--faint)', flexShrink: 0, marginTop: 2, opacity: 0.5 }} />
+              <span className="body tight" style={{ fontSize: 12.5, color: 'var(--faint)', lineHeight: 1.5 }}>
+                Configurez une clé OpenRouter ou Anthropic ci-dessus pour obtenir des informations détaillées.
+              </span>
+            </div>
+          ) : info === 'loading' ? (
+            <div style={{ display: 'flex', gap: 5, padding: '2px 0' }}>
+              {[0, 1, 2].map(i => (
+                <span key={i} style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--gold)',
+                  animation: 'pulse 1.2s ease-in-out infinite', animationDelay: `${i * 0.18}s` }} />
+              ))}
+            </div>
+          ) : (
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: 9 }}>
+              <IcSpark size={14} style={{ color: 'var(--gold)', flexShrink: 0, marginTop: 3 }} />
+              <p style={{ margin: 0, fontSize: 13, lineHeight: 1.65, color: 'var(--dim)',
+                fontFamily: 'var(--serif)' }}>{info}</p>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
+
 export default function SettingsSheet({ open, onClose, profile, onChange, onReplay }) {
   const p = profile || DEFAULT_PROFILE
   const update = (patch) => onChange({ ...p, ...patch })
@@ -282,17 +354,9 @@ export default function SettingsSheet({ open, onClose, profile, onChange, onRepl
       <SettingsSection label="Alertes" />
       <div className="card-2" style={{ overflow: 'hidden', marginBottom: 26 }}>
         {ONB_ALERTS.map((a, i) => (
-          <div key={a.k} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '13px 15px',
-            borderBottom: i < ONB_ALERTS.length - 1 ? '1px solid var(--line)' : 0 }}>
-            <span style={{ flex: 1, minWidth: 0 }}>
-              <span className="h-card" style={{ fontSize: 14, display: 'block' }}>{a.label}</span>
-              <span className="body tight" style={{ fontSize: 11.5 }}>{a.sub}</span>
-            </span>
-            <button className={'switch' + (p.alerts?.[a.k] ? ' on' : '')}
-              onClick={() => toggleAlert(a.k)}
-              aria-pressed={!!p.alerts?.[a.k]}
-              aria-label={a.label}><i /></button>
-          </div>
+          <AlertInfoRow key={a.k} alert={a}
+            isOn={!!p.alerts?.[a.k]} onToggle={() => toggleAlert(a.k)}
+            isLast={i === ONB_ALERTS.length - 1} />
         ))}
       </div>
 
