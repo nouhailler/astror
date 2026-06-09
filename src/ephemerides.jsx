@@ -179,7 +179,7 @@ export default function EphScreen() {
       </div>
 
       <div className="pad">
-        <SectionTitle action="Tout voir">Calendrier céleste</SectionTitle>
+        <SectionTitle action="Tout voir" onAction={() => window.openAstrorTool?.('events')}>Calendrier céleste</SectionTitle>
         <AiInfoPanel cacheKey="ephem_calendar" buildPrompt={() => {
           const sorted = [...EVENTS].sort((a, b) => new Date(a.date) - new Date(b.date))
           const lines = sorted.map(e => {

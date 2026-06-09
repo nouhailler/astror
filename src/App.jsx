@@ -43,12 +43,14 @@ export default function App() {
   const [helpKey, setHelpKey] = useState(null)
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [profile, setProfile] = useState(() => onbLoad())
+  const [toolDeepLink, setToolDeepLink] = useState(null)
 
   const handleProfileChange = (p) => { setProfile(p); onbSave(p) }
 
   useEffect(() => {
     window.openAstrorSettings = () => setSettingsOpen(true)
-    return () => { delete window.openAstrorSettings }
+    window.openAstrorTool = (key) => { setTab('tools'); setToolDeepLink(key) }
+    return () => { delete window.openAstrorSettings; delete window.openAstrorTool }
   }, [])
 
   if (!onboarded) {
@@ -69,7 +71,7 @@ export default function App() {
         {tab === 'eph' && <EphScreen />}
         {tab === 'explore' && <ExploreScreen />}
         {tab === 'feed' && <FeedScreen />}
-        {tab === 'tools' && <OutilsScreen />}
+        {tab === 'tools' && <OutilsScreen deepLink={toolDeepLink} onDeepLinkConsumed={() => setToolDeepLink(null)} />}
         {tab === 'ai' && <AssistantScreen />}
       </div>
       <TabBar tab={tab} onChange={setTab} />

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { IcEye, IcMoon, IcPlanet, IcCal, IcCamera, IcSat, IcBook, IcUsers, IcSpark, IcOrbit } from './icons'
 import { ScreenHeader } from './ui'
 
@@ -50,8 +50,13 @@ function ToolsHub({ onOpen }) {
   )
 }
 
-export default function OutilsScreen() {
+export default function OutilsScreen({ deepLink, onDeepLinkConsumed }) {
   const [open, setOpen] = useState(null)
+
+  useEffect(() => {
+    if (deepLink) { setOpen(deepLink); onDeepLinkConsumed?.() }
+  }, [deepLink])
+
   const tool = TOOLS.find(t => t.key === open)
 
   if (tool) {
