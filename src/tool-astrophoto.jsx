@@ -153,13 +153,24 @@ En 4 phrases, quels objets recommandes-tu de photographier ce soir (galaxies, n�
       {seg === 'tools' && (
         <div className="enter pad" style={{ paddingTop: 16 }}>
           <div style={{ padding: 16, borderRadius: 16, background: 'var(--surface-1)', border: '1px solid var(--line)', marginBottom: 16 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 4 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 2 }}>
               <span className="field-label" style={{ margin: 0 }}>Focale</span>
               <span className="data" style={{ fontSize: 15, color: 'var(--gold)' }}>{focal} mm</span>
             </div>
+            <p className="meta" style={{ margin: '0 0 8px', lineHeight: 1.5 }}>
+              Distance focale de votre objectif. Courte (14–35 mm) = grand champ, idéal pour la Voie Lactée et les grands panoramas. Longue (100–300 mm) = détails sur nébuleuses et galaxies, mais les temps de pose autorisés diminuent.
+            </p>
             <input type="range" min="14" max="300" step="1" value={focal} onChange={e => setFocal(+e.target.value)}
               style={{ width: '100%', accentColor: 'var(--gold)' }} />
-            <div className="field-label" style={{ margin: '14px 0 9px' }}>Capteur</div>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <span className="meta" style={{ fontSize: 10 }}>14 mm · grand angle</span>
+              <span className="meta" style={{ fontSize: 10 }}>300 mm · téléphoto</span>
+            </div>
+
+            <div className="field-label" style={{ margin: '16px 0 2px' }}>Capteur</div>
+            <p className="meta" style={{ margin: '0 0 9px', lineHeight: 1.5 }}>
+              La taille du capteur détermine le champ réel. Le facteur crop (×{s.crop}) est multiplié à la focale : un objectif 50 mm sur APS-C donne un champ équivalent à {Math.round(focal * s.crop)} mm en plein format.
+            </p>
             <div style={{ display: 'flex', gap: 8 }}>
               {AP_SENSORS.map(se => (
                 <button key={se.key} className={'chip' + (sensor === se.key ? ' on' : '')} style={{ flex: 1, justifyContent: 'center' }}
@@ -168,16 +179,20 @@ En 4 phrases, quels objets recommandes-tu de photographier ce soir (galaxies, n�
             </div>
           </div>
 
-          <div className="metric-grid" style={{ gridTemplateColumns: '1fr 1fr', marginBottom: 16 }}>
-            <div className="metric">
-              <div className="m-k">Pose max · règle 500</div>
-              <div className="m-v" style={{ color: 'var(--gold)' }}>{expo}<span className="u">s</span></div>
-              <div className="m-sub">Sans suivi · étoiles ponctuelles</div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 16 }}>
+            <div style={{ padding: 14, borderRadius: 14, background: 'var(--surface-1)', border: '1px solid var(--gold-line)' }}>
+              <div className="m-k" style={{ marginBottom: 6 }}>Pose max · règle 500</div>
+              <div className="data" style={{ fontSize: 22, color: 'var(--gold)', marginBottom: 6 }}>{expo}<span style={{ fontSize: 13, marginLeft: 3 }}>s</span></div>
+              <p className="meta" style={{ margin: 0, lineHeight: 1.5 }}>
+                Durée maximale sans monture motorisée avant que les étoiles deviennent des traits. Formule : 500 ÷ (focale × crop). Au-delà, la rotation de la Terre crée un filé d'étoiles.
+              </p>
             </div>
-            <div className="metric">
-              <div className="m-k">Pose stricte · NPF</div>
-              <div className="m-v">{npf}<span className="u">s</span></div>
-              <div className="m-sub">Pour pixels fins</div>
+            <div style={{ padding: 14, borderRadius: 14, background: 'var(--surface-1)', border: '1px solid var(--line)' }}>
+              <div className="m-k" style={{ marginBottom: 6 }}>Pose stricte · NPF</div>
+              <div className="data" style={{ fontSize: 22, marginBottom: 6 }}>{npf}<span style={{ fontSize: 13, marginLeft: 3 }}>s</span></div>
+              <p className="meta" style={{ margin: 0, lineHeight: 1.5 }}>
+                Règle NPF (North Pole Formula), plus précise pour les capteurs haute résolution. Formule : 300 ÷ (focale × crop). Recommandée si votre appareil dépasse 24 Mpx.
+              </p>
             </div>
           </div>
 
