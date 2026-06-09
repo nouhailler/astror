@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { IcRocket, IcEye, IcPlus, IcTrash, IcChevron, IcCheck } from './icons'
 import { ScreenHeader, SettingsBtn, HeaderTools, Sheet } from './ui'
 import { CONFERENCES, PEOPLE, BOOKS, PHOTO_SITES } from './data'
-import { fetchSpaceNews, useLiveData } from './api'
+import { fetchSpaceNews, useLiveData, searchBooks } from './api'
 
 const FEED_SEG = [
   { key: 'news', label: 'Actualités' },
@@ -275,29 +275,133 @@ function PeopleView({ items, onPick, onDelete }) {
   )
 }
 
-function BooksView({ items, onDelete }) {
+function BookSpine({ author }) {
   return (
-    <div className="enter pad" style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: 8 }}>
-      {items.map(b => (
-        <div key={b.id} style={{ position: 'relative', display: 'flex', gap: 14,
-          background: 'linear-gradient(180deg,var(--surface-2),var(--surface-1))',
-          border: '1px solid var(--line)', borderRadius: 'var(--r-m)', padding: 14 }}>
-          {b._user && <DelBtn onClick={() => onDelete(b.id)} />}
-          <div style={{ width: 52, height: 74, borderRadius: 6, flexShrink: 0, position: 'relative',
-            overflow: 'hidden', backgroundImage: 'linear-gradient(135deg,#1a2647,#0c1326)',
-            boxShadow: 'inset -3px 0 6px rgba(0,0,0,.4), 0 2px 8px rgba(0,0,0,.3)', border: '1px solid var(--line-2)' }}>
-            <div style={{ position: 'absolute', left: 6, top: 0, bottom: 0, width: 2, background: 'var(--gold-line)' }} />
-            <div style={{ position: 'absolute', inset: '10px 8px', display: 'flex', alignItems: 'flex-end' }}>
-              <span className="meta" style={{ fontSize: 7.5, color: 'var(--gold)', lineHeight: 1.2 }}>{(b.author || '').split(' ').slice(-1)[0]}</span>
-            </div>
+    <div style={{ width: 52, height: 74, borderRadius: 6, flexShrink: 0, position: 'relative',
+      overflow: 'hidden', backgroundImage: 'linear-gradient(135deg,#1a2647,#0c1326)',
+      boxShadow: 'inset -3px 0 6px rgba(0,0,0,.4), 0 2px 8px rgba(0,0,0,.3)', border: '1px solid var(--line-2)' }}>
+      <div style={{ position: 'absolute', left: 6, top: 0, bottom: 0, width: 2, background: 'var(--gold-line)' }} />
+      <div style={{ position: 'absolute', inset: '10px 8px', display: 'flex', alignItems: 'flex-end' }}>
+        <span className="meta" style={{ fontSize: 7.5, color: 'var(--gold)', lineHeight: 1.2 }}>{(author || '').split(' ').slice(-1)[0]}</span>
+      </div>
+    </div>
+  )
+}
+
+const SOURCE_LABEL = { google: 'Google Books', openlibrary: 'Open Library' }
+
+function BooksView({ items, onAdd, onDelete }) {
+  const [query, setQuery] = useState('')
+  const [results, setResults] = useState(null)
+  const [searching, setSearching] = useState(false)
+  const [searchErr, setSearchErr] = useState(null)
+  const debounceRef = useRef(null)
+
+  const doSearch = (q) => {
+    setQuery(q)
+    clearTimeout(debounceRef.current)
+    if (q.trim().length < 3) { setResults(null); setSearchErr(null); return }
+    debounceRef.current = setTimeout(async () => {
+      setSearching(true)
+      setSearchErr(null)
+      try {
+        const r = await searchBooks(q.trim())
+        setResults(r)
+      } catch {
+        setSearchErr('Erreur de recherche. Vérifiez votre connexion.')
+        setResults([])
+      } finally {
+        setSearching(false)
+      }
+    }, 500)
+  }
+
+  const addResult = (book) => {
+    onAdd({ title: book.title, author: book.author, year: book.year, note: book.note, url: book.url })
+  }
+
+  const alreadyAdded = (book) => items.some(b => b._user && b.title === book.title)
+
+  return (
+    <div className="enter pad" style={{ marginTop: 8 }}>
+      <div style={{ position: 'relative', marginBottom: 14 }}>
+        <input className="input" placeholder="Rechercher un livre (3 car. min)…"
+          value={query} onChange={e => doSearch(e.target.value)}
+          style={{ paddingRight: searching ? 44 : undefined }} />
+        {searching && (
+          <div style={{ position: 'absolute', right: 14, top: '50%', transform: 'translateY(-50%)', display: 'flex', gap: 3 }}>
+            {[0,1,2].map(i => (
+              <span key={i} style={{ width: 5, height: 5, borderRadius: '50%', background: 'var(--gold)',
+                animation: 'pulse 1.2s ease-in-out infinite', animationDelay: `${i * 0.18}s` }} />
+            ))}
           </div>
-          <div style={{ flex: 1, minWidth: 0, paddingRight: b._user ? 22 : 0 }}>
-            <div className="h-card" style={{ fontSize: 14.5, lineHeight: 1.25, fontFamily: 'var(--serif)', fontWeight: 600 }}>{b.title}</div>
-            {(b.author || b.year) && <div className="meta" style={{ color: 'var(--gold)', margin: '4px 0 6px' }}>{[b.author, b.year].filter(Boolean).join(' · ')}</div>}
-            {b.note && <div className="body tight" style={{ fontSize: 12 }}>{b.note}</div>}
+        )}
+      </div>
+
+      {results !== null && (
+        <div style={{ marginBottom: 18 }}>
+          {searchErr && <div style={{ color: 'var(--bad)', fontSize: 13, padding: '6px 2px' }}>{searchErr}</div>}
+          {!searchErr && results.length === 0 && !searching && (
+            <div style={{ color: 'var(--faint)', fontSize: 13, textAlign: 'center', padding: '14px 0' }}>Aucun résultat trouvé</div>
+          )}
+          {results.map(book => (
+            <div key={book.id} style={{ display: 'flex', gap: 12, padding: '12px 14px', marginBottom: 8,
+              background: 'linear-gradient(180deg,var(--surface-2),var(--surface-1))',
+              border: '1px solid var(--line)', borderRadius: 'var(--r-m)', alignItems: 'flex-start' }}>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: 7, marginBottom: 3, flexWrap: 'wrap' }}>
+                  <span className="h-card" style={{ fontSize: 13.5, fontFamily: 'var(--serif)', flex: 1 }}>{book.title}</span>
+                  <span style={{ fontSize: 9.5, padding: '2px 7px', borderRadius: 99, flexShrink: 0, whiteSpace: 'nowrap',
+                    background: 'rgba(126,166,230,.08)', color: 'var(--blue)', border: '1px solid rgba(126,166,230,.2)',
+                    fontFamily: 'var(--mono)', letterSpacing: '.04em' }}>
+                    {SOURCE_LABEL[book.source]}
+                  </span>
+                </div>
+                {(book.author || book.year) && (
+                  <div className="meta" style={{ color: 'var(--gold)', fontSize: 11.5, marginBottom: book.note ? 4 : 0 }}>
+                    {[book.author, book.year].filter(Boolean).join(' · ')}
+                  </div>
+                )}
+                {book.note && <div className="body tight" style={{ fontSize: 11.5 }}>{book.note.slice(0, 120)}{book.note.length > 120 ? '…' : ''}</div>}
+              </div>
+              <button className={'chip' + (alreadyAdded(book) ? ' on' : '')}
+                style={{ height: 30, fontSize: 11.5, flexShrink: 0, marginTop: 2 }}
+                disabled={alreadyAdded(book)}
+                onClick={() => addResult(book)}>
+                {alreadyAdded(book) ? <><IcCheck size={11} /> Ajouté</> : '+ Ajouter'}
+              </button>
+            </div>
+          ))}
+          <div className="eyebrow dim" style={{ color: 'var(--faint)', letterSpacing: '.16em', fontSize: 10.5,
+            margin: '18px 0 10px', textAlign: 'center' }}>
+            — Sélection —
           </div>
         </div>
-      ))}
+      )}
+
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+        {items.map(b => (
+          <div key={b.id} style={{ position: 'relative', display: 'flex', gap: 14,
+            background: 'linear-gradient(180deg,var(--surface-2),var(--surface-1))',
+            border: '1px solid var(--line)', borderRadius: 'var(--r-m)', padding: 14 }}>
+            {b._user && <DelBtn onClick={() => onDelete(b.id)} />}
+            <BookSpine author={b.author} />
+            <div style={{ flex: 1, minWidth: 0, paddingRight: b._user ? 22 : 0 }}>
+              <div className="h-card" style={{ fontSize: 14.5, lineHeight: 1.25, fontFamily: 'var(--serif)', fontWeight: 600 }}>{b.title}</div>
+              {(b.author || b.year) && <div className="meta" style={{ color: 'var(--gold)', margin: '4px 0 6px' }}>{[b.author, b.year].filter(Boolean).join(' · ')}</div>}
+              {b.note && <div className="body tight" style={{ fontSize: 12 }}>{b.note}</div>}
+              {b.url && (
+                <a href={b.url} target="_blank" rel="noopener noreferrer"
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: 4, marginTop: 7,
+                    fontSize: 11, color: 'var(--gold)', fontFamily: 'var(--mono)',
+                    textDecoration: 'none', letterSpacing: '.05em' }}>
+                  Voir <IcArrowUpR size={12} />
+                </a>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   )
 }
@@ -450,7 +554,7 @@ export default function FeedScreen() {
         : <NewsView items={newsList} onPick={setNews} onDelete={id => delItem('news', id)} />)}
       {seg === 'conf'   && <ConfView   items={confList}   onDelete={id => delItem('conf', id)} />}
       {seg === 'people' && <PeopleView items={peopleList} onPick={setPerson} onDelete={id => delItem('people', id)} />}
-      {seg === 'books'  && <BooksView  items={booksList}  onDelete={id => delItem('books', id)} />}
+      {seg === 'books'  && <BooksView  items={booksList}  onAdd={data => addItem('books', data)} onDelete={id => delItem('books', id)} />}
       {seg === 'sites'  && <SitesView />}
 
       <AddSheet seg={seg} open={adding} onClose={() => setAdding(false)} onAdd={addItem} />

@@ -1,6 +1,50 @@
 import { useState, useEffect, useRef } from 'react'
 import * as satellite from 'satellite.js'
 
+export function getGBooksKey() { return localStorage.getItem('astror_gbooks_key_v1') || '' }
+export function saveGBooksKey(k) { localStorage.setItem('astror_gbooks_key_v1', k.trim()) }
+
+export async function searchBooks(query) {
+  const key = getGBooksKey()
+  if (key) {
+    try {
+      const url = `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}&lr=lang_fr&printType=books&maxResults=10&key=${key}`
+      const res = await fetch(url)
+      if (res.ok) {
+        const d = await res.json()
+        if (d.items?.length) {
+          return d.items.map(item => {
+            const vi = item.volumeInfo || {}
+            return {
+              id: item.id,
+              title: vi.title || '',
+              author: (vi.authors || []).join(', '),
+              year: (vi.publishedDate || '').slice(0, 4),
+              note: (vi.description || '').slice(0, 220),
+              url: vi.canonicalVolumeLink || vi.infoLink || '',
+              source: 'google',
+            }
+          })
+        }
+      }
+    } catch {}
+  }
+  const res = await fetch(
+    `https://openlibrary.org/search.json?q=${encodeURIComponent(query)}&language=fre&limit=10&fields=title,author_name,first_publish_year,key`
+  )
+  if (!res.ok) throw new Error('Open Library error')
+  const d = await res.json()
+  return (d.docs || []).map((item, idx) => ({
+    id: item.key ? item.key.replace('/works/', '') : `ol-${idx}`,
+    title: item.title || '',
+    author: (item.author_name || []).slice(0, 2).join(', '),
+    year: String(item.first_publish_year || ''),
+    note: '',
+    url: item.key ? `https://openlibrary.org${item.key}` : '',
+    source: 'openlibrary',
+  }))
+}
+
 const AZ_DIRS = ['N', 'N-E', 'E', 'S-E', 'S', 'S-O', 'O', 'N-O']
 function azDir(az) { return AZ_DIRS[Math.round(az / 45) % 8] }
 

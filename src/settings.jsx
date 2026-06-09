@@ -9,6 +9,7 @@ import {
   getOpenRouterKey, saveOpenRouterKey, fetchFreeModels, getSelectedModel, saveSelectedModel,
   callAI,
 } from './claudeApi'
+import { getGBooksKey, saveGBooksKey } from './api'
 
 function SettingsSection({ label }) {
   return (
@@ -186,6 +187,36 @@ function ApiKeySection() {
       </div>
       <div className="body tight" style={{ fontSize: 11.5, marginTop: 9, color: 'var(--faint)', lineHeight: 1.5 }}>
         Clé API Anthropic pour l'assistant IA. Stockée sur cet appareil uniquement.
+      </div>
+    </div>
+  )
+}
+
+function GBooksKeySection() {
+  const [key, setKey] = useState(() => getGBooksKey())
+  const [status, setStatus] = useState('')
+
+  const save = () => { saveGBooksKey(key); setStatus('saved') }
+
+  return (
+    <div style={{ marginBottom: 24 }}>
+      <SettingsSection label="Bibliothèque · Google Books" />
+      <div style={{ marginBottom: 8 }}>
+        <input
+          type="password"
+          className="input"
+          placeholder="AIzaSy…"
+          value={key}
+          onChange={e => { setKey(e.target.value); setStatus('') }}
+          aria-label="Clé API Google Books"
+        />
+      </div>
+      <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+        <button className="chip" style={{ height: 34, fontSize: 12.5 }} onClick={save}>Enregistrer</button>
+        {status === 'saved' && <span style={{ fontSize: 12, color: 'var(--good)' }}>Enregistrée</span>}
+      </div>
+      <div className="body tight" style={{ fontSize: 11.5, marginTop: 9, color: 'var(--faint)', lineHeight: 1.5 }}>
+        Clé optionnelle pour la recherche Google Books. Sans clé, Open Library est utilisé automatiquement.
       </div>
     </div>
   )
@@ -382,6 +413,8 @@ export default function SettingsSheet({ open, onClose, profile, onChange, onRepl
       <OpenRouterSection />
 
       <ApiKeySection />
+
+      <GBooksKeySection />
 
       <div className="meta" style={{ textAlign: 'center', color: 'var(--faint)', padding: '4px 0 2px' }}>
         Astror · version 1.0 — préférences enregistrées sur cet appareil
