@@ -1,22 +1,18 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { IcSky, IcMoon, IcStar } from './icons'
 import { ToolPage, ToolSection, ToolSeg } from './tool-ui'
+import { AiInfoPanel } from './ui'
+import { getAstrophotoData } from './astro'
+import { onbLoad } from './onboarding'
 
 function IcCloud({ size = 22 }) {
   return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M7.5 18a4 4 0 0 1-.5-8 5.5 5.5 0 0 1 10.6 1.3A3.6 3.6 0 0 1 17 18Z"/></svg>
 }
 
 const AP_SENSORS = [
-  { key: 'ff', label: 'Plein format', w: 36, h: 24, crop: 1.0 },
-  { key: 'apsc', label: 'APS-C', w: 23.5, h: 15.6, crop: 1.53 },
-  { key: 'm43', label: 'Micro 4/3', w: 17.3, h: 13, crop: 2.0 },
-]
-
-const AP_TIMES = [
-  { label: 'Coucher du Soleil', time: '21:54', Ic: IcSky, note: 'Début de l\'heure dorée' },
-  { label: 'Heure bleue', time: '22:10 – 22:34', Ic: IcCloud, note: 'Ciel indigo, premières étoiles' },
-  { label: 'Crépuscule astro.', time: '00:05', Ic: IcMoon, note: 'Nuit noire — ciel profond' },
-  { label: 'Aube astronomique', time: '03:42', Ic: IcStar, note: 'Fin de la fenêtre de pose' },
+  { key: 'ff',   label: 'Plein format', w: 36,   h: 24,   crop: 1.0  },
+  { key: 'apsc', label: 'APS-C',        w: 23.5, h: 15.6, crop: 1.53 },
+  { key: 'm43',  label: 'Micro 4/3',    w: 17.3, h: 13,   crop: 2.0  },
 ]
 
 function ApFraming({ fovH, fovV }) {
@@ -50,11 +46,24 @@ export default function AstrophotoPage({ onBack }) {
   const [seg, setSeg] = useState('plan')
   const [focal, setFocal] = useState(50)
   const [sensor, setSensor] = useState('ff')
+
+  const profile = useMemo(() => onbLoad(), [])
+  const lat = profile.location?.lat ?? 48.8566
+  const lng = profile.location?.lng ?? 2.3522
+  const ap = useMemo(() => getAstrophotoData(new Date(), lat, lng), [lat, lng])
+
   const s = AP_SENSORS.find(x => x.key === sensor)
   const expo = Math.round((500 / (focal * s.crop)) * 10) / 10
-  const npf = Math.round((300 / (focal * s.crop)) * 10) / 10
+  const npf  = Math.round((300 / (focal * s.crop)) * 10) / 10
   const fovH = 2 * Math.atan(s.w / (2 * focal)) * 180 / Math.PI
   const fovV = 2 * Math.atan(s.h / (2 * focal)) * 180 / Math.PI
+
+  const apTimes = [
+    { label: 'Coucher du Soleil', time: ap.sunset,    Ic: IcSky,   note: "Début de l'heure dorée" },
+    { label: 'Heure bleue',       time: ap.blueHour,  Ic: IcCloud, note: 'Ciel indigo, premières étoiles' },
+    { label: 'Crépuscule astro.', time: ap.duskAstro, Ic: IcMoon,  note: 'Nuit noire — ciel profond' },
+    { label: 'Aube astronomique', time: ap.dawnAstro, Ic: IcStar,  note: 'Fin de la fenêtre de pose' },
+  ]
 
   return (
     <ToolPage title="Astrophoto" onBack={onBack}>
@@ -63,18 +72,22 @@ export default function AstrophotoPage({ onBack }) {
       {seg === 'plan' && (
         <div className="enter">
           <div className="pad" style={{ paddingTop: 14 }}>
-            <div style={{ padding: 16, borderRadius: 18, background: 'linear-gradient(180deg, rgba(217,179,108,.1), var(--surface-1))', border: '1px solid var(--gold-line)' }}>
+            <div style={{ padding: 16, borderRadius: 18,
+              background: ap.hasNight
+                ? 'linear-gradient(180deg, rgba(217,179,108,.1), var(--surface-1))'
+                : 'linear-gradient(180deg, rgba(226,141,126,.08), var(--surface-1))',
+              border: `1px solid ${ap.hasNight ? 'var(--gold-line)' : 'rgba(226,141,126,.3)'}` }}>
               <div className="eyebrow" style={{ marginBottom: 8 }}>Fenêtre de prise de vue</div>
-              <div className="h-sec" style={{ fontSize: 24 }}>00:05 → 03:42</div>
-              <div className="body tight" style={{ fontSize: 12.5, marginTop: 6 }}>3 h 37 de nuit astronomique, Lune couchée. Idéal pour le ciel profond et la Voie Lactée.</div>
+              <div className="h-sec" style={{ fontSize: 24 }}>{ap.nightWindow}</div>
+              <div className="body tight" style={{ fontSize: 12.5, marginTop: 6 }}>{ap.nightDesc}</div>
             </div>
           </div>
 
           <ToolSection title="Lumière du soir">
             <div className="card-2" style={{ overflow: 'hidden' }}>
-              {AP_TIMES.map((t, i) => (
+              {apTimes.map((t, i) => (
                 <div key={t.label} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '13px 15px',
-                  borderBottom: i < AP_TIMES.length - 1 ? '1px solid var(--line)' : 0 }}>
+                  borderBottom: i < apTimes.length - 1 ? '1px solid var(--line)' : 0 }}>
                   <span style={{ color: 'var(--gold)', display: 'flex' }}><t.Ic size={17} /></span>
                   <span style={{ flex: 1, minWidth: 0 }}>
                     <span className="h-card" style={{ fontSize: 13.5, display: 'block' }}>{t.label}</span>
@@ -88,12 +101,41 @@ export default function AstrophotoPage({ onBack }) {
 
           <ToolSection title="Voie Lactée & alignements">
             <div className="metric-grid" style={{ gridTemplateColumns: '1fr 1fr' }}>
-              <div className="metric"><div className="m-k">Cœur galactique</div><div className="m-v" style={{ fontSize: 16 }}>Sud-Est</div><div className="m-sub">Altitude 24° à 01:00</div></div>
-              <div className="metric"><div className="m-k">Saison</div><div className="m-v" style={{ fontSize: 16 }}>Favorable</div><div className="m-sub">Juin → août</div></div>
-              <div className="metric"><div className="m-k">Lune</div><div className="m-v" style={{ fontSize: 16 }}>Couchée</div><div className="m-sub">Aucune pollution</div></div>
-              <div className="metric"><div className="m-k">Heure bleue</div><div className="m-v" style={{ fontSize: 16 }}>22:10</div><div className="m-sub">Durée ≈ 24 min</div></div>
+              <div className="metric">
+                <div className="m-k">Cœur galactique</div>
+                <div className="m-v" style={{ fontSize: 16 }}>{ap.gcDir}</div>
+                <div className="m-sub">{ap.gcSub}</div>
+              </div>
+              <div className="metric">
+                <div className="m-k">Saison</div>
+                <div className="m-v" style={{ fontSize: 16 }}>{ap.seasonLabel}</div>
+                <div className="m-sub">{ap.seasonSub}</div>
+              </div>
+              <div className="metric">
+                <div className="m-k">Lune</div>
+                <div className="m-v" style={{ fontSize: 16 }}>{ap.moonLabel}</div>
+                <div className="m-sub">{ap.moonSub}</div>
+              </div>
+              <div className="metric">
+                <div className="m-k">Heure bleue</div>
+                <div className="m-v" style={{ fontSize: 16 }}>{ap.blueHour ? ap.blueHour.split(' ')[0] : '--'}</div>
+                <div className="m-sub">Durée ≈ 20–30 min</div>
+              </div>
             </div>
           </ToolSection>
+
+          <div className="pad" style={{ marginTop: -8 }}>
+            <AiInfoPanel
+              cacheKey={`astrophoto_plan_${new Date().toISOString().slice(0, 10)}`}
+              buildPrompt={`Conditions astrophoto ce soir :
+- Fenêtre de nuit astronomique : ${ap.nightWindow} (${ap.nightLen})
+- Lune : ${ap.moonLabel} (${ap.illum}% illuminée)
+- Centre galactique : ${ap.gcDir}, ${ap.gcSub}
+- Saison Voie Lactée : ${ap.seasonLabel}
+- Heure bleue : ${ap.blueHour}
+En 4 phrases, quels objets recommandes-tu de photographier ce soir (galaxies, nébuleuses, planètes, Voie Lactée) ? Quel réglage ISO/temps de pose convient selon la durée de la fenêtre et la Lune ?`}
+            />
+          </div>
         </div>
       )}
 
@@ -116,8 +158,16 @@ export default function AstrophotoPage({ onBack }) {
           </div>
 
           <div className="metric-grid" style={{ gridTemplateColumns: '1fr 1fr', marginBottom: 16 }}>
-            <div className="metric"><div className="m-k">Pose max · règle 500</div><div className="m-v" style={{ color: 'var(--gold)' }}>{expo}<span className="u">s</span></div><div className="m-sub">Sans suivi · étoiles ponctuelles</div></div>
-            <div className="metric"><div className="m-k">Pose stricte · NPF</div><div className="m-v">{npf}<span className="u">s</span></div><div className="m-sub">Pour pixels fins</div></div>
+            <div className="metric">
+              <div className="m-k">Pose max · règle 500</div>
+              <div className="m-v" style={{ color: 'var(--gold)' }}>{expo}<span className="u">s</span></div>
+              <div className="m-sub">Sans suivi · étoiles ponctuelles</div>
+            </div>
+            <div className="metric">
+              <div className="m-k">Pose stricte · NPF</div>
+              <div className="m-v">{npf}<span className="u">s</span></div>
+              <div className="m-sub">Pour pixels fins</div>
+            </div>
           </div>
 
           <div style={{ padding: 16, borderRadius: 16, background: 'radial-gradient(100% 80% at 50% 0%, #0a0f1f, #05070f)', border: '1px solid var(--line)' }}>

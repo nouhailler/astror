@@ -75,6 +75,99 @@ const PLANETS = [
   { body: Astronomy.Body.Neptune, name: 'Neptune',  id: 'neptune' },
 ]
 
+function azToDir(az) {
+  return ['N', 'N-E', 'E', 'S-E', 'S', 'S-O', 'O', 'N-O'][Math.round(az / 45) % 8]
+}
+
+export function getAstrophotoData(date = new Date(), lat = 48.8566, lng = 2.3522) {
+  const obs = new Astronomy.Observer(lat, lng, 0)
+
+  const sunset    = Astronomy.SearchRiseSet(Astronomy.Body.Sun, obs, -1, date, 1)
+  let blueStart = null, blueEnd = null, duskAstro = null, dawnAstro = null
+  try { blueStart = Astronomy.SearchAltitude(Astronomy.Body.Sun, obs, -1, date, 1,  -4) } catch {}
+  try { blueEnd   = Astronomy.SearchAltitude(Astronomy.Body.Sun, obs, -1, date, 1,  -8) } catch {}
+  try { duskAstro = Astronomy.SearchAltitude(Astronomy.Body.Sun, obs, -1, date, 1, -18) } catch {}
+  try { dawnAstro = Astronomy.SearchAltitude(Astronomy.Body.Sun, obs, +1, date, 1, -18) } catch {}
+
+  const moonSet = Astronomy.SearchRiseSet(Astronomy.Body.Moon, obs, -1, date, 1)
+  const phase   = Astronomy.MoonPhase(date)
+  const illum   = Math.round((1 - Math.cos(phase * Math.PI / 180)) / 2 * 100)
+
+  // Durée nuit
+  let nightLen = null
+  if (duskAstro && dawnAstro) {
+    let ms = dawnAstro.date.getTime() - duskAstro.date.getTime()
+    if (ms < 0) ms += 86400000
+    nightLen = fmtDur(ms)
+  }
+
+  // Centre galactique au milieu de la nuit
+  let gcAlt = null, gcAz = null
+  try {
+    const midDate = duskAstro && dawnAstro
+      ? new Date((duskAstro.date.getTime() + (dawnAstro.date >= duskAstro.date ? dawnAstro.date.getTime() : dawnAstro.date.getTime() + 86400000)) / 2)
+      : (() => { const d = new Date(date); d.setHours(23, 0, 0, 0); return d })()
+    const hor = Astronomy.Horizon(midDate, obs, 17 + 45 / 60 + 40 / 3600, -(29 + 0.5 / 60), 'normal')
+    gcAlt = Math.round(hor.altitude)
+    gcAz  = Math.round(hor.azimuth)
+  } catch {}
+
+  // Lune — impact astrophoto
+  const moonDownBeforeNight = !!(moonSet && duskAstro && moonSet.date < duskAstro.date)
+  let moonLabel, moonSub
+  if (illum < 5 || moonDownBeforeNight) {
+    moonLabel = moonDownBeforeNight ? 'Couchée' : 'Nouvelle'
+    moonSub   = 'Aucune pollution lumineuse'
+  } else if (illum < 30) {
+    moonLabel = 'Favorable'; moonSub = `${illum} % illuminée`
+  } else if (illum < 60) {
+    moonLabel = 'Modérée'; moonSub = `${illum} % · gêne partielle`
+  } else {
+    moonLabel = 'Gênante'; moonSub = `${illum} % · éviter le ciel profond`
+  }
+
+  // Qualité saison Voie Lactée
+  let seasonLabel, seasonSub
+  if (gcAlt === null || gcAlt <= 0) {
+    seasonLabel = 'Hors saison'; seasonSub = 'Centre galactique non visible'
+  } else if (gcAlt > 25) {
+    seasonLabel = 'Excellente'; seasonSub = `Centre galactique à ${gcAlt}°`
+  } else if (gcAlt > 10) {
+    seasonLabel = 'Favorable'; seasonSub = `Centre galactique à ${gcAlt}°`
+  } else {
+    seasonLabel = 'Médiocre'; seasonSub = `Centre galactique bas (${gcAlt}°)`
+  }
+
+  // Description fenêtre
+  let nightDesc
+  if (!duskAstro) {
+    nightDesc = 'Nuit blanche — pas de nuit astronomique ce soir.'
+  } else {
+    const parts = [nightLen ? `${nightLen} de nuit astronomique` : 'Nuit astronomique']
+    if (moonDownBeforeNight || illum < 5) parts.push('Lune absente')
+    else if (illum >= 60) parts.push(`Lune ${illum} % (gênante)`)
+    else parts.push(`Lune ${illum} %`)
+    nightDesc = parts.join(' · ') + '.'
+  }
+
+  return {
+    sunset:      fmtTime(sunset),
+    blueHour:    blueStart && blueEnd ? `${fmtTime(blueStart)} – ${fmtTime(blueEnd)}` : fmtTime(blueStart),
+    duskAstro:   fmtTime(duskAstro),
+    dawnAstro:   fmtTime(dawnAstro),
+    nightLen:    nightLen || '--',
+    nightWindow: duskAstro && dawnAstro
+      ? `${fmtTime(duskAstro)} → ${fmtTime(dawnAstro)}`
+      : duskAstro ? `Après ${fmtTime(duskAstro)}` : 'Nuit blanche',
+    nightDesc,
+    moonLabel, moonSub, illum,
+    gcDir:    gcAlt !== null && gcAlt > 0 && gcAz !== null ? azToDir(gcAz) : '--',
+    gcSub:    gcAlt !== null ? (gcAlt > 0 ? `Altitude ${gcAlt}° à minuit` : 'Non visible ce soir') : '--',
+    seasonLabel, seasonSub,
+    hasNight: !!duskAstro,
+  }
+}
+
 const METEOR_SHOWERS = [
   { name: 'Quadrantides',   mm: 1,  dd: 3,  tag: '~120/h', detail: 'Pluie intense mais brève (pic de quelques heures). Radiant dans le Bouvier, météores rapides à 41 km/s.' },
   { name: 'Lyrids',         mm: 4,  dd: 22, tag: '~20/h',  detail: 'Issue de la comète Thatcher. Météores rapides avec traînées occasionnelles, radiant près de Véga.' },
