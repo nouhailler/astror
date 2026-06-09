@@ -54,6 +54,36 @@ const FEED_STORE = 'astror_veille_v1'
 function feedLoad() { try { return JSON.parse(localStorage.getItem(FEED_STORE)) || {} } catch (e) { return {} } }
 function feedSave(adds) { try { localStorage.setItem(FEED_STORE, JSON.stringify(adds)) } catch (e) {} }
 
+const THUMB_STORE = 'astror_wiki_thumbs_v1'
+function thumbLoad() { try { return JSON.parse(localStorage.getItem(THUMB_STORE)) || {} } catch { return {} } }
+function thumbSave(cache) { try { localStorage.setItem(THUMB_STORE, JSON.stringify(cache)) } catch {} }
+
+function usePersonThumb(person) {
+  const [url, setUrl] = useState(() => {
+    if (person.thumbUrl) return person.thumbUrl
+    return thumbLoad()[person.name] || null
+  })
+  useEffect(() => {
+    if (url || !person.wikiUrl) return
+    const title = person.wikiUrl.split('/wiki/').pop()
+    if (!title) return
+    fetch(`https://fr.wikipedia.org/api/rest_v1/page/summary/${title}`)
+      .then(r => r.json())
+      .then(d => {
+        const src = d.thumbnail?.source
+        if (src) {
+          setUrl(src)
+          const cache = thumbLoad()
+          cache[person.name] = src
+          thumbSave(cache)
+        }
+      })
+      .catch(() => {})
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [person.name])
+  return url
+}
+
 const TAG_STYLE = { 'à venir': 'tag', proche: 'tag', trajet: 'tag neutral', publié: 'tag neutral' }
 
 const WIKI_LINK_STYLE = {
@@ -133,6 +163,7 @@ function PersonCombobox({ value, onChange, onSelect }) {
         note: (d.extract || '').replace(/<[^>]+>/g, '').slice(0, 280),
         wikiUrl: d.content_urls?.desktop?.page
           || `https://fr.wikipedia.org/wiki/${encodeURIComponent(item.title)}`,
+        thumbUrl: d.thumbnail?.source || null,
       })
     } catch {
       onChange(item.title)
@@ -307,32 +338,55 @@ function ConfView({ items, onDelete }) {
   )
 }
 
+function PersonAvatar({ person, thumb, size = 46 }) {
+  if (thumb) {
+    return (
+      <img src={thumb} alt={person.name}
+        style={{ width: size, height: size, borderRadius: '50%', flexShrink: 0,
+          objectFit: 'cover', objectPosition: 'top center',
+          border: '1px solid var(--gold-line)' }} />
+    )
+  }
+  return (
+    <span style={{ width: size, height: size, borderRadius: '50%', flexShrink: 0, display: 'flex',
+      alignItems: 'center', justifyContent: 'center',
+      fontFamily: 'var(--serif)', fontSize: size * 0.42, fontWeight: 500,
+      color: 'var(--gold)', background: 'radial-gradient(circle at 35% 30%, #1c2950, #0d1326)',
+      border: '1px solid var(--gold-line)' }}>
+      {person.name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()}
+    </span>
+  )
+}
+
+function PersonCard({ person, onPick, onDelete }) {
+  const thumb = usePersonThumb(person)
+  return (
+    <div style={{ position: 'relative' }}>
+      {person._user && <DelBtn onClick={() => onDelete(person.id)} />}
+      <button onClick={() => onPick(thumb ? { ...person, thumbUrl: thumb } : person)}
+        className="press" style={{ width: '100%', textAlign: 'left', display: 'flex',
+          gap: 14, alignItems: 'center', background: 'linear-gradient(180deg,var(--surface-2),var(--surface-1))',
+          border: '1px solid var(--line)', borderRadius: 'var(--r-m)', padding: 14, cursor: 'pointer' }}>
+        <PersonAvatar person={person} thumb={thumb} />
+        <span style={{ flex: 1, minWidth: 0, paddingRight: person._user ? 24 : 0 }}>
+          <span className="h-card" style={{ fontSize: 15 }}>{person.name}</span>
+          <span style={{ display: 'flex', gap: 8, marginTop: 3, alignItems: 'center', flexWrap: 'wrap' }}>
+            {person.role && <span className="meta" style={{ color: 'var(--gold)' }}>{person.role}</span>}
+            {person.role && person.field && <span style={{ width: 3, height: 3, borderRadius: 9, background: 'var(--faint)' }} />}
+            {person.field && <span className="meta">{person.field}</span>}
+          </span>
+        </span>
+        <IcChevron size={17} className="arrow" />
+      </button>
+    </div>
+  )
+}
+
 function PeopleView({ items, onPick, onDelete }) {
   return (
     <div className="enter pad" style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 8 }}>
       {items.map(p => (
-        <div key={p.id} style={{ position: 'relative' }}>
-          {p._user && <DelBtn onClick={() => onDelete(p.id)} />}
-          <button onClick={() => onPick(p)} className="press" style={{ width: '100%', textAlign: 'left', display: 'flex',
-            gap: 14, alignItems: 'center', background: 'linear-gradient(180deg,var(--surface-2),var(--surface-1))',
-            border: '1px solid var(--line)', borderRadius: 'var(--r-m)', padding: 14, cursor: 'pointer' }}>
-            <span style={{ width: 46, height: 46, borderRadius: '50%', flexShrink: 0, display: 'flex',
-              alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--serif)', fontSize: 19, fontWeight: 500,
-              color: 'var(--gold)', background: 'radial-gradient(circle at 35% 30%, #1c2950, #0d1326)',
-              border: '1px solid var(--gold-line)' }}>
-              {p.name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()}
-            </span>
-            <span style={{ flex: 1, minWidth: 0, paddingRight: p._user ? 24 : 0 }}>
-              <span className="h-card" style={{ fontSize: 15 }}>{p.name}</span>
-              <span style={{ display: 'flex', gap: 8, marginTop: 3, alignItems: 'center', flexWrap: 'wrap' }}>
-                {p.role && <span className="meta" style={{ color: 'var(--gold)' }}>{p.role}</span>}
-                {p.role && p.field && <span style={{ width: 3, height: 3, borderRadius: 9, background: 'var(--faint)' }} />}
-                {p.field && <span className="meta">{p.field}</span>}
-              </span>
-            </span>
-            <IcChevron size={17} className="arrow" />
-          </button>
-        </div>
+        <PersonCard key={p.id} person={p} onPick={onPick} onDelete={onDelete} />
       ))}
     </div>
   )
@@ -584,6 +638,7 @@ function AddSheet({ seg, open, onClose, onAdd }) {
     const clean = {}
     fields.forEach(f => { const v = (form[f.k] || '').trim(); if (v) clean[f.k] = v })
     if (form.wikiUrl) clean.wikiUrl = form.wikiUrl
+    if (form.thumbUrl) clean.thumbUrl = form.thumbUrl
     onAdd(seg, clean)
     onClose()
   }
@@ -715,18 +770,24 @@ export default function FeedScreen() {
       <Sheet open={!!person} onClose={() => setPerson(null)}>
         {person && (
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 16 }}>
-              <span style={{ width: 58, height: 58, borderRadius: '50%', flexShrink: 0, display: 'flex',
-                alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--serif)', fontSize: 23, fontWeight: 500,
-                color: 'var(--gold)', background: 'radial-gradient(circle at 35% 30%, #1c2950, #0d1326)',
-                border: '1px solid var(--gold-line)' }}>
-                {person.name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()}
-              </span>
-              <div style={{ flex: 1 }}>
+            {person.thumbUrl ? (
+              <div style={{ marginBottom: 20 }}>
+                <img src={person.thumbUrl} alt={person.name}
+                  style={{ width: 90, height: 90, borderRadius: '50%', objectFit: 'cover',
+                    objectPosition: 'top center', border: '2px solid var(--gold-line)',
+                    display: 'block', marginBottom: 14 }} />
                 <div className="h-sec" style={{ fontSize: 22 }}>{person.name}</div>
                 {person.role && <div className="meta" style={{ color: 'var(--gold)', marginTop: 4 }}>{person.role}</div>}
               </div>
-            </div>
+            ) : (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 16 }}>
+                <PersonAvatar person={person} thumb={null} size={58} />
+                <div style={{ flex: 1 }}>
+                  <div className="h-sec" style={{ fontSize: 22 }}>{person.name}</div>
+                  {person.role && <div className="meta" style={{ color: 'var(--gold)', marginTop: 4 }}>{person.role}</div>}
+                </div>
+              </div>
+            )}
             {person.field && <div className="tag" style={{ marginBottom: 16 }}>{person.field}</div>}
             {person.note && <p className="body serif-body" style={{ fontSize: 15, lineHeight: 1.62, marginBottom: 4 }}>{person.note}</p>}
             <a
