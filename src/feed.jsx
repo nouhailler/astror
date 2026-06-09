@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { IcRocket, IcEye, IcPlus, IcTrash, IcChevron, IcCheck, IcSearch, IcBook } from './icons'
 import { ScreenHeader, SettingsBtn, HeaderTools, Sheet } from './ui'
 import { CONFERENCES, PEOPLE, BOOKS, PHOTO_SITES } from './data'
-import { fetchSpaceNews, useLiveData, searchBooks } from './api'
+import { fetchSpaceNews, useLiveData, searchBooks, fetchBookCover } from './api'
 
 const FEED_SEG = [
   { key: 'news', label: 'Actualités' },
@@ -392,6 +392,10 @@ function PeopleView({ items, onPick, onDelete }) {
   )
 }
 
+const BOOK_COVER_STORE = 'astror_book_covers_v1'
+function bookCoverLoad() { try { return JSON.parse(localStorage.getItem(BOOK_COVER_STORE)) || {} } catch { return {} } }
+function bookCoverSave(c) { try { localStorage.setItem(BOOK_COVER_STORE, JSON.stringify(c)) } catch {} }
+
 const COVER_PALETTES = [
   ['#213d6e','#111e3a'], ['#352055','#1b1030'], ['#1d4030','#0e2018'],
   ['#4a2410','#2a1408'], ['#342a10','#1c1808'], ['#203554','#101c2e'],
@@ -404,17 +408,27 @@ function titleHash(s) {
   return Math.abs(h)
 }
 
-function BookCover({ title, author, size = 'full' }) {
+function BookCover({ title, author, size = 'full', coverUrl = null }) {
   const [c1, c2] = COVER_PALETTES[titleHash(title) % COVER_PALETTES.length]
   const isSmall = size === 'small'
+  const box = {
+    width: '100%', aspectRatio: '2/3', position: 'relative',
+    borderRadius: isSmall ? 5 : 8, overflow: 'hidden',
+    boxShadow: isSmall
+      ? '2px 3px 8px rgba(0,0,0,.5), inset -2px 0 4px rgba(0,0,0,.3)'
+      : '4px 6px 18px rgba(0,0,0,.6), inset -3px 0 7px rgba(0,0,0,.35)',
+    border: '1px solid rgba(217,179,108,0.20)',
+  }
+  if (coverUrl) {
+    return (
+      <div style={{ ...box, background: 'var(--surface-2)' }}>
+        <img src={coverUrl} alt={title}
+          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+      </div>
+    )
+  }
   return (
-    <div style={{ width: '100%', aspectRatio: '2/3', position: 'relative',
-      borderRadius: isSmall ? 5 : 8, overflow: 'hidden',
-      background: `linear-gradient(148deg, ${c1}, ${c2})`,
-      boxShadow: isSmall
-        ? '2px 3px 8px rgba(0,0,0,.5), inset -2px 0 4px rgba(0,0,0,.3)'
-        : '4px 6px 18px rgba(0,0,0,.6), inset -3px 0 7px rgba(0,0,0,.35)',
-      border: '1px solid rgba(217,179,108,0.20)' }}>
+    <div style={{ ...box, background: `linear-gradient(148deg, ${c1}, ${c2})` }}>
       <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column',
         padding: isSmall ? '7px 6px' : '11px 10px' }}>
         <div style={{ height: 2, background: 'rgba(217,179,108,0.60)', borderRadius: 1,
@@ -444,7 +458,24 @@ function BooksView({ items, onAdd, onDelete }) {
   const [searching, setSearching] = useState(false)
   const [searchErr, setSearchErr] = useState(null)
   const [book, setBook]       = useState(null)
+  const [covers, setCovers]   = useState(bookCoverLoad)
+  const [refreshing, setRefreshing] = useState(false)
   const debounceRef = useRef(null)
+
+  const getCover = (b) => b.coverUrl || covers[b.id] || covers[b.title] || null
+
+  const refresh = async () => {
+    setRefreshing(true)
+    const cache = { ...covers }
+    const toFetch = items.filter(b => !getCover(b))
+    await Promise.all(toFetch.map(async b => {
+      const url = await fetchBookCover(b.title, b.author)
+      if (url) cache[b.id || b.title] = url
+    }))
+    setCovers(cache)
+    bookCoverSave(cache)
+    setRefreshing(false)
+  }
 
   const doSearch = (q) => {
     setQuery(q)
@@ -461,7 +492,7 @@ function BooksView({ items, onAdd, onDelete }) {
     }, 500)
   }
 
-  const addResult = (b) => onAdd({ title: b.title, author: b.author, year: b.year, note: b.note, url: b.url })
+  const addResult = (b) => onAdd({ title: b.title, author: b.author, year: b.year, note: b.note, url: b.url, coverUrl: b.coverUrl || '', source: b.source })
   const alreadyAdded = (b) => items.some(x => x._user && x.title === b.title)
 
   const bookIdx = (b) => items.findIndex(x => x.id === b.id)
@@ -500,7 +531,7 @@ function BooksView({ items, onAdd, onDelete }) {
                 background: 'linear-gradient(180deg,var(--surface-2),var(--surface-1))',
                 border: '1px solid var(--line)', borderRadius: 'var(--r-m)', alignItems: 'flex-start' }}>
                 <div style={{ width: 38, flexShrink: 0 }}>
-                  <BookCover title={b.title} author={b.author} size="small" />
+                  <BookCover title={b.title} author={b.author} size="small" coverUrl={b.coverUrl || null} />
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ display: 'flex', alignItems: 'flex-start', gap: 6, marginBottom: 3, flexWrap: 'wrap' }}>
@@ -535,6 +566,26 @@ function BooksView({ items, onAdd, onDelete }) {
       )}
 
       {/* Grille bibliothèque */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+        <span className="eyebrow" style={{ fontSize: 10, color: 'var(--faint)', letterSpacing: '.18em' }}>
+          {items.length} livre{items.length > 1 ? 's' : ''}
+        </span>
+        <button onClick={refresh} disabled={refreshing}
+          style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '5px 11px', borderRadius: 99,
+            background: 'var(--gold-soft)', border: '1px solid var(--gold-line)',
+            color: 'var(--gold)', fontSize: 11.5, fontFamily: 'var(--mono)', cursor: refreshing ? 'default' : 'pointer',
+            opacity: refreshing ? 0.6 : 1, letterSpacing: '.04em' }}>
+          {refreshing ? (
+            <>
+              {[0,1,2].map(i => (
+                <span key={i} style={{ width: 4, height: 4, borderRadius: '50%', background: 'var(--gold)',
+                  animation: 'pulse 1.2s ease-in-out infinite', animationDelay: `${i * 0.18}s` }} />
+              ))}
+              Recherche…
+            </>
+          ) : <>↻ Couvertures</>}
+        </button>
+      </div>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
         {items.map((b, i) => (
           <div key={b.id} style={{ position: 'relative' }}>
@@ -548,7 +599,7 @@ function BooksView({ items, onAdd, onDelete }) {
             <button onClick={() => setBook(b)} className="press"
               style={{ width: '100%', background: 'none', border: 'none', cursor: 'pointer',
                 textAlign: 'left', padding: 0, display: 'flex', flexDirection: 'column' }}>
-              <BookCover title={b.title} author={b.author} />
+              <BookCover title={b.title} author={b.author} coverUrl={getCover(b)} />
               <div style={{ marginTop: 9, paddingBottom: 2 }}>
                 <div className="h-card" style={{ fontSize: 12.5, lineHeight: 1.3, marginBottom: 3,
                   fontFamily: 'var(--serif)', display: '-webkit-box', WebkitLineClamp: 2,
@@ -570,7 +621,7 @@ function BooksView({ items, onAdd, onDelete }) {
           <div>
             <div style={{ display: 'flex', gap: 18, marginBottom: 22, alignItems: 'flex-start' }}>
               <div style={{ width: 88, flexShrink: 0 }}>
-                <BookCover title={book.title} author={book.author} />
+                <BookCover title={book.title} author={book.author} coverUrl={getCover(book)} />
               </div>
               <div style={{ flex: 1, minWidth: 0, paddingTop: 4 }}>
                 <div className="h-sec" style={{ fontSize: 21, lineHeight: 1.2, marginBottom: 8 }}>{book.title}</div>

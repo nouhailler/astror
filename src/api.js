@@ -15,6 +15,7 @@ export async function searchBooks(query) {
         if (d.items?.length) {
           return d.items.map(item => {
             const vi = item.volumeInfo || {}
+            const thumb = vi.imageLinks?.thumbnail || vi.imageLinks?.smallThumbnail || ''
             return {
               id: item.id,
               title: vi.title || '',
@@ -22,6 +23,7 @@ export async function searchBooks(query) {
               year: (vi.publishedDate || '').slice(0, 4),
               note: (vi.description || '').slice(0, 220),
               url: vi.canonicalVolumeLink || vi.infoLink || '',
+              coverUrl: thumb ? thumb.replace('http://', 'https://') : '',
               source: 'google',
             }
           })
@@ -30,7 +32,7 @@ export async function searchBooks(query) {
     } catch {}
   }
   const res = await fetch(
-    `https://openlibrary.org/search.json?q=${encodeURIComponent(query)}&language=fre&limit=10&fields=title,author_name,first_publish_year,key`
+    `https://openlibrary.org/search.json?q=${encodeURIComponent(query)}&language=fre&limit=10&fields=title,author_name,first_publish_year,key,cover_i`
   )
   if (!res.ok) throw new Error('Open Library error')
   const d = await res.json()
@@ -41,8 +43,22 @@ export async function searchBooks(query) {
     year: String(item.first_publish_year || ''),
     note: '',
     url: item.key ? `https://openlibrary.org${item.key}` : '',
+    coverUrl: item.cover_i ? `https://covers.openlibrary.org/b/id/${item.cover_i}-M.jpg` : '',
     source: 'openlibrary',
   }))
+}
+
+export async function fetchBookCover(title, author) {
+  const q = [title, author].filter(Boolean).join(' ')
+  try {
+    const res = await fetch(
+      `https://openlibrary.org/search.json?q=${encodeURIComponent(q)}&fields=cover_i&limit=5`
+    )
+    if (!res.ok) return null
+    const d = await res.json()
+    const coverId = d.docs?.find(b => b.cover_i)?.cover_i
+    return coverId ? `https://covers.openlibrary.org/b/id/${coverId}-M.jpg` : null
+  } catch { return null }
 }
 
 const AZ_DIRS = ['N', 'N-E', 'E', 'S-E', 'S', 'S-O', 'O', 'N-O']
