@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react'
-import { IcSat, IcRocket } from './icons'
+import { IcSat, IcRocket, IcPin } from './icons'
 import { ToolPage, ToolSection, ToolSeg } from './tool-ui'
+import { AiInfoPanel } from './ui'
 import { fetchISSPosition, fetchISSPasses, fetchLaunches, useLiveData } from './api'
 import { onbLoad } from './onboarding'
 
@@ -54,6 +55,8 @@ export default function SatellitesPage({ onBack }) {
   const profile = useMemo(() => onbLoad(), [])
   const lat = profile.location?.lat ?? 48.8566
   const lng = profile.location?.lng ?? 2.3522
+  const city = profile.location?.city ?? 'Paris'
+  const today = useMemo(() => new Date(), [])
 
   const { data: iss, loading: issLoading } = useLiveData(fetchISSPosition, 10000)
   const { data: passes, loading: passesLoading } = useLiveData(() => fetchISSPasses(lat, lng), 3600000)
@@ -65,6 +68,15 @@ export default function SatellitesPage({ onBack }) {
 
       {seg === 'track' && (
         <div className="enter">
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 18px 0', gap: 8 }}>
+            <span className="meta" style={{ color: 'var(--gold)', display: 'flex', alignItems: 'center', gap: 4 }}>
+              <IcPin size={13} /> {city}
+            </span>
+            <span className="meta">
+              {today.toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric', month: 'long', year: 'numeric' })}
+            </span>
+          </div>
+
           <div className="pad" style={{ paddingTop: 14 }}>
             <ISSLiveCard iss={iss} loading={issLoading} />
           </div>
@@ -100,6 +112,19 @@ export default function SatellitesPage({ onBack }) {
               <div style={{ padding: '14px 15px', color: 'var(--faint)', fontSize: 13 }}>Impossible de récupérer les données de passage.</div>
             )}
           </ToolSection>
+
+          <div className="pad" style={{ marginTop: 4 }}>
+            <AiInfoPanel
+              cacheKey={`sat_other_${today.toISOString().slice(0, 10)}_${lat.toFixed(1)}_${lng.toFixed(1)}`}
+              label="Tiangong · Starlink · Hubble"
+              buildPrompt={`Je suis à ${city} (latitude ${lat.toFixed(2)}°, longitude ${lng.toFixed(2)}°) le ${today.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}.
+Peux-tu me donner des informations sur les prochains passages visibles de ces satellites depuis ma position ?
+- Station Tiangong (chinoise)
+- Constellation Starlink (SpaceX)
+- Télescope spatial Hubble (HST)
+Pour chaque satellite, indique des horaires approximatifs ou les ressources fiables (sites, apps) pour les suivre précisément.`}
+            />
+          </div>
         </div>
       )}
 
