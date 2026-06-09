@@ -186,6 +186,17 @@ export default function ObservePage({ onBack }) {
   const humidity   = weather?.humidity ?? null
   const humidLabel = humidity === null ? '—' : humidity < 40 ? 'Faible humidité' : humidity < 70 ? 'Humidité mod.' : 'Humidité élevée'
 
+  // Qualité météo (0-4) utilisée pour plafonner la qualité des créneaux
+  const weatherQual = clouds === null ? null
+    : clouds < 10 ? 4 : clouds < 25 ? 3 : clouds < 50 ? 2 : clouds < 75 ? 1 : 0
+  const W_LABELS = ['Couvert', 'Mauvais', 'Médiocre', 'Bon', 'Excellent']
+  const effectiveWindows = weatherQual === null ? windows : windows.map(w => {
+    const ev = Math.min(w.val, weatherQual)
+    if (ev === w.val) return w
+    const wNote = clouds >= 75 ? `Ciel couvert (${clouds} %)` : `Couverture nuageuse ${clouds} %`
+    return { ...w, val: ev, q: W_LABELS[ev], note: w.note + ' · ' + wNote }
+  })
+
   const saveJournal = (list) => { setJournal(list); try { localStorage.setItem('astror_journal_v1', JSON.stringify(list)) } catch (e) {} }
   const addSession  = (s) => saveJournal([{ id: 'j' + Date.now(), ...s }, ...journal])
   const delSession  = (id) => saveJournal(journal.filter(x => x.id !== id))
@@ -242,21 +253,30 @@ export default function ObservePage({ onBack }) {
               </div>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                {windows.map((w, i) => (
-                  <div key={i} style={{ display: 'flex', gap: 13, padding: 14, borderRadius: 14,
-                    background: w.val === 4 ? 'linear-gradient(180deg, rgba(132,211,169,.08), var(--surface-1))' : 'var(--surface-1)',
-                    border: '1px solid ' + (w.val === 4 ? 'rgba(132,211,169,.3)' : 'var(--line)') }}>
-                    <span style={{ width: 4, borderRadius: 9, flexShrink: 0, background: w.val === 4 ? 'var(--good)' : w.val === 3 ? 'var(--gold)' : 'var(--faint)' }} />
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
-                        <span className="data" style={{ fontSize: 14, color: 'var(--text)' }}>{w.t}</span>
-                        <span className={'tag' + (w.val === 4 ? ' live' : w.val === 2 ? ' neutral' : '')}>{w.q}</span>
+                {effectiveWindows.map((w, i) => {
+                  const accent = w.val >= 4 ? 'var(--good)' : w.val >= 3 ? 'var(--gold)' : w.val <= 1 ? 'var(--warn)' : 'var(--faint)'
+                  const bg = w.val >= 4
+                    ? 'linear-gradient(180deg, rgba(132,211,169,.08), var(--surface-1))'
+                    : w.val <= 1
+                    ? 'linear-gradient(180deg, rgba(226,141,126,.07), var(--surface-1))'
+                    : 'var(--surface-1)'
+                  const border = w.val >= 4 ? 'rgba(132,211,169,.3)' : w.val <= 1 ? 'rgba(226,141,126,.35)' : 'var(--line)'
+                  const tagCls = w.val >= 4 ? 'tag live' : w.val >= 3 ? 'tag' : 'tag neutral'
+                  const tagStyle = w.val <= 1 ? { borderColor: 'var(--warn)', color: 'var(--warn)' } : {}
+                  return (
+                    <div key={i} style={{ display: 'flex', gap: 13, padding: 14, borderRadius: 14, background: bg, border: `1px solid ${border}` }}>
+                      <span style={{ width: 4, borderRadius: 9, flexShrink: 0, background: accent }} />
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+                          <span className="data" style={{ fontSize: 14, color: 'var(--text)' }}>{w.t}</span>
+                          <span className={tagCls} style={tagStyle}>{w.q}</span>
+                        </div>
+                        <div className="h-card" style={{ fontSize: 13.5, margin: '5px 0 3px' }}>{w.label}</div>
+                        <div className="body tight" style={{ fontSize: 12 }}>{w.note}</div>
                       </div>
-                      <div className="h-card" style={{ fontSize: 13.5, margin: '5px 0 3px' }}>{w.label}</div>
-                      <div className="body tight" style={{ fontSize: 12 }}>{w.note}</div>
                     </div>
-                  </div>
-                ))}
+                  )
+                })}
               </div>
             )}
           </ToolSection>
