@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react'
-import { IcSky, IcMoon, IcStar } from './icons'
+import { IcSky, IcMoon, IcStar, IcPin } from './icons'
 import { ToolPage, ToolSection, ToolSeg } from './tool-ui'
 import { AiInfoPanel } from './ui'
 import { getAstrophotoData } from './astro'
@@ -48,9 +48,11 @@ export default function AstrophotoPage({ onBack }) {
   const [sensor, setSensor] = useState('ff')
 
   const profile = useMemo(() => onbLoad(), [])
-  const lat = profile.location?.lat ?? 48.8566
-  const lng = profile.location?.lng ?? 2.3522
-  const ap = useMemo(() => getAstrophotoData(new Date(), lat, lng), [lat, lng])
+  const lat  = profile.location?.lat  ?? 48.8566
+  const lng  = profile.location?.lng  ?? 2.3522
+  const city = profile.location?.city ?? 'Paris'
+  const now  = useMemo(() => new Date(), [])
+  const ap   = useMemo(() => getAstrophotoData(now, lat, lng), [lat, lng, now])
 
   const s = AP_SENSORS.find(x => x.key === sensor)
   const expo = Math.round((500 / (focal * s.crop)) * 10) / 10
@@ -71,6 +73,15 @@ export default function AstrophotoPage({ onBack }) {
 
       {seg === 'plan' && (
         <div className="enter">
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            padding: '8px 18px 0', gap: 8 }}>
+            <span className="meta" style={{ color: 'var(--gold)', display: 'flex', alignItems: 'center', gap: 4 }}>
+              <IcPin size={13} /> {city}
+            </span>
+            <span className="meta">
+              {now.toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric', month: 'long', year: 'numeric' })}
+            </span>
+          </div>
           <div className="pad" style={{ paddingTop: 14 }}>
             <div style={{ padding: 16, borderRadius: 18,
               background: ap.hasNight
