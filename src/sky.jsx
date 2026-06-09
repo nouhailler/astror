@@ -10,28 +10,28 @@ function angleDiff(target, current) {
 function useCompass() {
   const [orient, setOrient] = useState(null)
   const [supported, setSupported] = useState(null) // null=détection, true=ok, false=non dispo
+  const [dbg, setDbg] = useState({ abs: 0, rel: 0, lastAlpha: '—', lastAbsolute: '—' })
 
   useEffect(() => {
     let hasData = false
+    let absCount = 0, relCount = 0
 
     function process(e) {
+      const isAbs = e.type === 'deviceorientationabsolute'
+      if (isAbs) absCount++; else relCount++
+      setDbg({ abs: absCount, rel: relCount, lastAlpha: e.alpha?.toFixed(1) ?? 'null', lastAbsolute: String(e.absolute) })
+
       if (e.alpha == null) return
       hasData = true
-      // alpha=0 → Nord magnétique, croît antihoraire → cap boussole = (360 - alpha) % 360
       const heading = (360 - e.alpha + 360) % 360
-      // |beta|=90 → téléphone vertical (horizon), |beta|=0 → à plat (zénith)
       const elevation = 90 - Math.abs(e.beta ?? 0)
       setOrient({ heading, elevation })
       setSupported(true)
     }
 
-    // Chrome Android : événement absolu (priorité). Sur certains Galaxy/Chrome,
-    // seul deviceorientation est émis même si e.absolute===false — on accepte les deux
-    // car le flag e.absolute est non fiable sur plusieurs versions de Chrome Android.
     window.addEventListener('deviceorientationabsolute', process)
     window.addEventListener('deviceorientation', process)
 
-    // Si aucune donnée après 5 s → capteur indisponible
     const timeout = setTimeout(() => {
       if (!hasData) setSupported(false)
     }, 5000)
@@ -43,14 +43,14 @@ function useCompass() {
     }
   }, [])
 
-  return { orient, supported }
+  return { orient, supported, dbg }
 }
 
 const RADAR_R = 110  // radius of the radar display in px
 const DEG_PER_PX = 1.6  // degrees per pixel displacement
 
 function PointerOverlay({ object: o, onClose }) {
-  const { orient, supported } = useCompass()
+  const { orient, supported, dbg } = useCompass()
   const animRef = useRef(null)
   const dotRef = useRef({ x: 0, y: 0 })
   const dotElRef = useRef(null)
@@ -121,9 +121,28 @@ function PointerOverlay({ object: o, onClose }) {
             <IcCompass size={36} />
           </div>
           <div className="h-card" style={{ marginBottom: 10 }}>Capteur boussole indisponible</div>
+          {/* Panneau de diagnostic temporaire */}
+          <div style={{ fontFamily: 'monospace', fontSize: 11, color: 'var(--gold)', background: 'rgba(255,200,0,.07)',
+            border: '1px solid rgba(255,200,0,.2)', borderRadius: 10, padding: '10px 14px', marginBottom: 14,
+            textAlign: 'left', width: 280 }}>
+            <div>events absolute: <b>{dbg.abs}</b></div>
+            <div>events relative: <b>{dbg.rel}</b></div>
+            <div>last alpha: <b>{dbg.lastAlpha}</b></div>
+            <div>last e.absolute: <b>{dbg.lastAbsolute}</b></div>
+            {dbg.abs === 0 && dbg.rel === 0 && (
+              <div style={{ marginTop: 6, color: 'var(--warn)', fontSize: 11 }}>
+                Aucun événement reçu → Chrome bloque les capteurs.<br />
+                Chrome → ⋮ → Paramètres → Paramètres des sites → Capteurs → Autoriser
+              </div>
+            )}
+            {(dbg.abs > 0 || dbg.rel > 0) && dbg.lastAlpha === 'null' && (
+              <div style={{ marginTop: 6, color: 'var(--warn)', fontSize: 11 }}>
+                Événements reçus mais alpha=null → agitez le téléphone en 8 pour calibrer la boussole
+              </div>
+            )}
+          </div>
           <p className="body" style={{ color: 'var(--faint)', fontSize: 13.5, maxWidth: 280, lineHeight: 1.6 }}>
-            Essayez d'abord d'ouvrir Google Maps et d'activer la boussole, puis revenez ici.<br /><br />
-            Sinon, orientez-vous manuellement :<br />
+            Orientez-vous manuellement :<br />
             Cap <strong style={{ color: 'var(--gold)' }}>{o.az}°</strong> (azimut) ·{' '}
             à <strong style={{ color: 'var(--gold)' }}>{o.alt}°</strong> au-dessus de l'horizon
           </p>
