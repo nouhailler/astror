@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect, useRef } from 'react'
 import { IcPin, IcSearch, IcCompass, IcClose } from './icons'
-import { ScreenHeader, IconBtn, SettingsBtn, HeaderTools, ChipRow, SectionTitle, DataRow, Sheet } from './ui'
+import { ScreenHeader, IconBtn, SettingsBtn, HeaderTools, ChipRow, SectionTitle, DataRow, Sheet, AiInfoPanel } from './ui'
 import { SKY_OBJECTS, CONSTELLATIONS } from './data'
 
 function angleDiff(target, current) {
@@ -340,7 +340,11 @@ function SkySheet({ o, onClose }) {
                 <IcClose size={22} />
               </button>
             </div>
-            <p className="body serif-body" style={{ fontSize: 15, lineHeight: 1.6, color: 'var(--dim)', margin: '0 0 20px' }}>{o.info}</p>
+            <p className="body serif-body" style={{ fontSize: 15, lineHeight: 1.6, color: 'var(--dim)', margin: '0 0 16px' }}>{o.info}</p>
+            <AiInfoPanel style={{ marginBottom: 20 }} buildPrompt={`Objet céleste : ${o.name} (${o.kind}, constellation ${o.cons}).
+Magnitude : ${o.mag}, altitude : ${o.alt}°, distance : ${o.dist}.
+${o.info}
+En 4 phrases, que peut-on observer de ${o.name} ce soir avec un télescope amateur ? Quel grossissement utiliser, et quel est le détail le plus intéressant à chercher ?`} />
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 24px' }}>
               <DataRow k="Magnitude" v={`${o.mag > 0 ? '+' : ''}${o.mag.toFixed(1)}`} accent />
               <DataRow k="Constellation" v={o.cons} />

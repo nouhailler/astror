@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { ToolPage, ToolSection, ToolSeg, Metric, MetricGrid } from './tool-ui'
+import { AiInfoPanel } from './ui'
 
 function MoonDisc({ size = 124, illum = 73 }) {
   const off = Math.round(size * (1 - illum / 100) * 0.9)
@@ -74,6 +75,10 @@ export default function MoonPage({ onBack }) {
             <Metric k="Distance Terre-Lune" v="389 400" u="km" />
             <Metric k="Diamètre apparent" v="30,7" u="′" />
           </MetricGrid>
+          <div className="pad" style={{ marginTop: 4 }}>
+            <AiInfoPanel buildPrompt={`Phase lunaire ce soir : Gibbeuse croissante, ${illum}% illuminée, âge ${age} jours, distance 389 400 km.
+En 4 phrases, que recommandes-tu d'observer sur la Lune ce soir ? Quelles zones sont bien éclairées par le terminateur et méritent d'être observées avec un télescope amateur de 100 à 200 mm ?`} />
+          </div>
 
           <ToolSection title="Calendrier des phases">
             <div className="card-2" style={{ overflow: 'hidden' }}>
@@ -120,7 +125,9 @@ export default function MoonPage({ onBack }) {
                     <span className="h-card" style={{ fontSize: 14 }}>{m.name}</span>
                     <span className="meta" style={{ color: 'var(--faint)', fontStyle: 'italic' }}>{m.lat}</span>
                   </div>
-                  <div className="body tight" style={{ fontSize: 12, marginTop: 4 }}>{m.note}</div>
+                  <div className="body tight" style={{ fontSize: 12, marginTop: 4, marginBottom: 10 }}>{m.note}</div>
+                  <AiInfoPanel buildPrompt={`Mer lunaire : ${m.name} (${m.lat}). ${m.note}
+En 3 phrases, décris ce qu'un astronome amateur peut observer dans cette région avec un télescope de 100-200 mm, à quelle phase lunaire c'est le plus spectaculaire, et un détail géologique notable.`} />
                 </div>
               ))}
             </div>
@@ -134,7 +141,9 @@ export default function MoonPage({ onBack }) {
                     <span className="h-card" style={{ fontSize: 14 }}>{c.name}</span>
                     <span className="data" style={{ fontSize: 12, color: 'var(--gold)' }}>⌀ {c.diam}</span>
                   </div>
-                  <div className="body tight" style={{ fontSize: 12, marginTop: 4 }}>{c.note}</div>
+                  <div className="body tight" style={{ fontSize: 12, marginTop: 4, marginBottom: 10 }}>{c.note}</div>
+                  <AiInfoPanel buildPrompt={`Cratère lunaire ${c.name} (diamètre ${c.diam}) : ${c.note}
+En 3 phrases, explique comment observer ce cratère avec un télescope amateur, à quelle phase la lumière est la plus favorable, et ce qu'on peut y voir de remarquable.`} />
                 </div>
               ))}
             </div>

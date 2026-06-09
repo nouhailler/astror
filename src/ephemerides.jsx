@@ -1,11 +1,10 @@
 import { useState, useMemo } from 'react'
-import { IcRocket, IcMoon, IcStar, IcBell, IcSpark } from './icons'
-import { ScreenHeader, IconBtn, SettingsBtn, HeaderTools, SectionTitle, DataRow, Stat, Sheet, useCountdown } from './ui'
+import { IcRocket, IcMoon, IcStar, IcBell } from './icons'
+import { ScreenHeader, IconBtn, SettingsBtn, HeaderTools, SectionTitle, DataRow, Stat, Sheet, useCountdown, AiInfoPanel } from './ui'
 import { ALERTS, EVENTS } from './data'
 import { getMoonData, getSunData } from './astro'
 import { fetchWeather, useLiveData } from './api'
 import { onbLoad } from './onboarding'
-import { callAI, getOpenRouterKey, getSelectedModel, getApiKey } from './claudeApi'
 
 function Moon({ illum = 73, size = 116 }) {
   const p = illum / 100
@@ -43,70 +42,6 @@ function CondBar({ label, value, level, max = 5 }) {
             background: i < level ? 'linear-gradient(90deg,var(--gold-3),var(--gold-2))' : 'var(--surface-3)' }} />
         ))}
       </div>
-    </div>
-  )
-}
-
-function AiInfoPanel({ buildPrompt }) {
-  const [open, setOpen] = useState(false)
-  const [info, setInfo] = useState(null)
-  const aiConnected = !!(getOpenRouterKey() && getSelectedModel()) || !!getApiKey()
-
-  const toggle = async () => {
-    const next = !open
-    setOpen(next)
-    if (next && aiConnected && info == null) {
-      setInfo('loading')
-      try {
-        const prompt = typeof buildPrompt === 'function' ? buildPrompt() : buildPrompt
-        const reply = await callAI([{ role: 'user', content: prompt }])
-        setInfo(reply.trim())
-      } catch {
-        setInfo('Erreur de connexion. Réessayez.')
-      }
-    }
-  }
-
-  return (
-    <div style={{ marginBottom: 12 }}>
-      <button onClick={toggle} className="press" style={{
-        display: 'inline-flex', alignItems: 'center', gap: 5,
-        padding: '4px 11px 4px 9px', borderRadius: 99, cursor: 'pointer',
-        background: open ? 'rgba(217,179,108,.14)' : 'rgba(217,179,108,.07)',
-        border: `1px solid ${open ? 'var(--gold-line)' : 'rgba(217,179,108,.18)'}`,
-        color: 'var(--gold)', fontSize: 11.5, fontFamily: 'var(--mono)',
-        textTransform: 'uppercase', letterSpacing: '.07em',
-      }}>
-        <IcSpark size={12} />
-        Analyse IA
-      </button>
-
-      {open && (
-        <div style={{ marginTop: 10, padding: '12px 14px', borderRadius: 13,
-          background: 'rgba(217,179,108,.04)', border: '1px solid var(--gold-line)' }}>
-          {!aiConnected ? (
-            <div style={{ display: 'flex', alignItems: 'flex-start', gap: 9 }}>
-              <IcSpark size={14} style={{ color: 'var(--faint)', flexShrink: 0, marginTop: 2, opacity: 0.5 }} />
-              <span className="body tight" style={{ fontSize: 12.5, color: 'var(--faint)', lineHeight: 1.5 }}>
-                Configurez une clé OpenRouter ou Anthropic dans les Paramètres pour activer l'analyse.
-              </span>
-            </div>
-          ) : info === 'loading' ? (
-            <div style={{ display: 'flex', gap: 5, padding: '2px 0' }}>
-              {[0, 1, 2].map(i => (
-                <span key={i} style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--gold)',
-                  animation: 'pulse 1.2s ease-in-out infinite', animationDelay: `${i * 0.18}s` }} />
-              ))}
-            </div>
-          ) : (
-            <div style={{ display: 'flex', alignItems: 'flex-start', gap: 9 }}>
-              <IcSpark size={14} style={{ color: 'var(--gold)', flexShrink: 0, marginTop: 3 }} />
-              <p style={{ margin: 0, fontSize: 13, lineHeight: 1.65, color: 'var(--dim)',
-                fontFamily: 'var(--serif)' }}>{info}</p>
-            </div>
-          )}
-        </div>
-      )}
     </div>
   )
 }

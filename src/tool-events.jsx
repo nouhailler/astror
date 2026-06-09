@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { IcSat, IcZap, IcMoon, IcComet, IcStar } from './icons'
 import { ToolPage, ToolSection, ToolSeg } from './tool-ui'
+import { AiInfoPanel } from './ui'
 import { requestPermission, getPermission, scheduleEventReminder, loadNotifPrefs, saveNotifPrefs } from './notifications'
 
 const EVT_CATS = [
@@ -91,7 +92,10 @@ export default function EventsPage({ onBack }) {
                     {e.live && <span className="dot pulse" style={{ background: 'var(--good)' }} />}{e.tag}
                   </span>
                 </div>
-                <div className="body tight" style={{ fontSize: 12.5 }}>{e.detail}</div>
+                <div className="body tight" style={{ fontSize: 12.5, marginBottom: 10 }}>{e.detail}</div>
+                <AiInfoPanel buildPrompt={`Événement astronomique : ${e.title}.
+Date : ${e.isoDate ? new Date(e.isoDate).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }) : e.date}, ${e.detail}
+En 3 à 4 phrases, explique comment préparer et observer cet événement : matériel recommandé, heure idéale, point précis dans le ciel, et conseil pratique pour ne pas le rater.`} />
               </div>
             ))}
           </div>
