@@ -17,35 +17,28 @@ function useCompass() {
     function process(e) {
       if (e.alpha == null) return
       hasData = true
-      // Android Chrome deviceorientationabsolute :
-      // alpha=0 → top du téléphone pointe vers le Nord magnétique, croît dans le sens antihoraire
-      // cap boussole (sens horaire depuis Nord) = (360 - alpha) % 360
+      // alpha=0 → Nord magnétique, croît antihoraire → cap boussole = (360 - alpha) % 360
       const heading = (360 - e.alpha + 360) % 360
-      // élévation : |beta|=90 → téléphone vertical (horizon), |beta|=0 → à plat (zénith)
+      // |beta|=90 → téléphone vertical (horizon), |beta|=0 → à plat (zénith)
       const elevation = 90 - Math.abs(e.beta ?? 0)
       setOrient({ heading, elevation })
       setSupported(true)
     }
 
-    // Événement absolu Chrome Android (priorité)
+    // Chrome Android : événement absolu (priorité). Sur certains Galaxy/Chrome,
+    // seul deviceorientation est émis même si e.absolute===false — on accepte les deux
+    // car le flag e.absolute est non fiable sur plusieurs versions de Chrome Android.
     window.addEventListener('deviceorientationabsolute', process)
+    window.addEventListener('deviceorientation', process)
 
-    // Fallback : certains navigateurs envoient deviceorientation avec absolute=true
-    function handleRelative(e) {
-      if (hasData) return
-      if (e.absolute) process(e)
-      // Si e.absolute === false → on ignore, on attend deviceorientationabsolute
-    }
-    window.addEventListener('deviceorientation', handleRelative)
-
-    // Si aucune donnée après 3 s → capteur indisponible
+    // Si aucune donnée après 5 s → capteur indisponible
     const timeout = setTimeout(() => {
       if (!hasData) setSupported(false)
-    }, 3000)
+    }, 5000)
 
     return () => {
       window.removeEventListener('deviceorientationabsolute', process)
-      window.removeEventListener('deviceorientation', handleRelative)
+      window.removeEventListener('deviceorientation', process)
       clearTimeout(timeout)
     }
   }, [])
@@ -129,7 +122,8 @@ function PointerOverlay({ object: o, onClose }) {
           </div>
           <div className="h-card" style={{ marginBottom: 10 }}>Capteur boussole indisponible</div>
           <p className="body" style={{ color: 'var(--faint)', fontSize: 13.5, maxWidth: 280, lineHeight: 1.6 }}>
-            Orientez-vous manuellement :<br />
+            Essayez d'abord d'ouvrir Google Maps et d'activer la boussole, puis revenez ici.<br /><br />
+            Sinon, orientez-vous manuellement :<br />
             Cap <strong style={{ color: 'var(--gold)' }}>{o.az}°</strong> (azimut) ·{' '}
             à <strong style={{ color: 'var(--gold)' }}>{o.alt}°</strong> au-dessus de l'horizon
           </p>

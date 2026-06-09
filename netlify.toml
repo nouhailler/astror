@@ -2,6 +2,11 @@
   command = "npm run build"
   publish = "dist"
 
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Permissions-Policy = "accelerometer=(self), gyroscope=(self), magnetometer=(self)"
+
 [[redirects]]
   from = "/*"
   to = "/index.html"
