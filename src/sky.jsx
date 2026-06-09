@@ -9,41 +9,42 @@ function angleDiff(target, current) {
 
 function useCompass() {
   const [orient, setOrient] = useState(null)
-  const [supported, setSupported] = useState(null)
+  const [supported, setSupported] = useState(null) // null=détection, true=ok, false=non dispo
 
   useEffect(() => {
-    let gotAbsolute = false
+    let hasData = false
 
-    function handleAbsolute(e) {
+    function process(e) {
       if (e.alpha == null) return
-      gotAbsolute = true
-      // On Android Chrome, alpha=0 → top of device points North, increases CCW
-      // compass heading (CW from N) = (360 - alpha) % 360
+      hasData = true
+      // Android Chrome deviceorientationabsolute :
+      // alpha=0 → top du téléphone pointe vers le Nord magnétique, croît dans le sens antihoraire
+      // cap boussole (sens horaire depuis Nord) = (360 - alpha) % 360
       const heading = (360 - e.alpha + 360) % 360
-      // elevation: |beta|=90 → upright (horizon), |beta|=0 → flat (pointing up)
+      // élévation : |beta|=90 → téléphone vertical (horizon), |beta|=0 → à plat (zénith)
       const elevation = 90 - Math.abs(e.beta ?? 0)
       setOrient({ heading, elevation })
       setSupported(true)
     }
 
-    function handleRelative(e) {
-      if (gotAbsolute || e.alpha == null) return
-      if (e.absolute) {
-        handleAbsolute(e)
-      } else {
-        setSupported(false)
-      }
-    }
+    // Événement absolu Chrome Android (priorité)
+    window.addEventListener('deviceorientationabsolute', process)
 
-    window.addEventListener('deviceorientationabsolute', handleAbsolute)
+    // Fallback : certains navigateurs envoient deviceorientation avec absolute=true
+    function handleRelative(e) {
+      if (hasData) return
+      if (e.absolute) process(e)
+      // Si e.absolute === false → on ignore, on attend deviceorientationabsolute
+    }
     window.addEventListener('deviceorientation', handleRelative)
 
+    // Si aucune donnée après 3 s → capteur indisponible
     const timeout = setTimeout(() => {
-      if (!gotAbsolute) setSupported(false)
-    }, 1500)
+      if (!hasData) setSupported(false)
+    }, 3000)
 
     return () => {
-      window.removeEventListener('deviceorientationabsolute', handleAbsolute)
+      window.removeEventListener('deviceorientationabsolute', process)
       window.removeEventListener('deviceorientation', handleRelative)
       clearTimeout(timeout)
     }
