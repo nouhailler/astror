@@ -209,8 +209,8 @@ function NewsView({ items, onPick, onDelete }) {
 }
 
 const CONF_PALETTES = [
-  ['#163350','#09192c'], ['#251442','#110824'], ['#163328','#091914'],
-  ['#38200e','#1e1007'], ['#1a2c40','#0a1620'], ['#271340','#120820'],
+  ['#1c4268','#0e2138'], ['#321a5e','#190d32'], ['#1c4030','#0e2018'],
+  ['#442610','#241408'], ['#1e3850','#0e1e2c'], ['#341852','#1c0c2c'],
 ]
 
 function confAcronym(name) {
@@ -231,10 +231,10 @@ function ConfPoster({ name, date, size = 'full' }) {
   const isSmall = size === 'small'
   return (
     <div style={{ width: '100%', height: isSmall ? 64 : 96, borderRadius: isSmall ? 8 : 12,
-      position: 'relative', overflow: 'hidden',
+      flexShrink: 0, position: 'relative', overflow: 'hidden',
       background: `linear-gradient(145deg, ${c1}, ${c2})`,
       boxShadow: isSmall ? '0 2px 8px rgba(0,0,0,.4)' : '0 4px 16px rgba(0,0,0,.5)',
-      border: '1px solid rgba(150,180,235,0.10)' }}>
+      border: '1px solid rgba(217,179,108,0.22)' }}>
       <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column',
         alignItems: 'center', justifyContent: 'center', gap: 2 }}>
         <span style={{ fontFamily: 'var(--mono)', fontSize: isSmall ? 18 : 26, fontWeight: 700,
@@ -339,9 +339,9 @@ function PeopleView({ items, onPick, onDelete }) {
 }
 
 const COVER_PALETTES = [
-  ['#182d52','#0b1628'], ['#271742','#130c28'], ['#193022','#0c1812'],
-  ['#381c1c','#1f0d0d'], ['#28220f','#171208'], ['#1c2a3c','#0c1422'],
-  ['#2b1d38','#160c22'], ['#1b2e2e','#0c1818'],
+  ['#213d6e','#111e3a'], ['#352055','#1b1030'], ['#1d4030','#0e2018'],
+  ['#4a2410','#2a1408'], ['#342a10','#1c1808'], ['#203554','#101c2e'],
+  ['#361f45','#1c1028'], ['#1f3a3a','#102020'],
 ]
 
 function titleHash(s) {
@@ -354,22 +354,22 @@ function BookCover({ title, author, size = 'full' }) {
   const [c1, c2] = COVER_PALETTES[titleHash(title) % COVER_PALETTES.length]
   const isSmall = size === 'small'
   return (
-    <div style={{ width: '100%', paddingBottom: isSmall ? '148%' : '148%', position: 'relative',
+    <div style={{ width: '100%', aspectRatio: '2/3', position: 'relative',
       borderRadius: isSmall ? 5 : 8, overflow: 'hidden',
       background: `linear-gradient(148deg, ${c1}, ${c2})`,
       boxShadow: isSmall
         ? '2px 3px 8px rgba(0,0,0,.5), inset -2px 0 4px rgba(0,0,0,.3)'
         : '4px 6px 18px rgba(0,0,0,.6), inset -3px 0 7px rgba(0,0,0,.35)',
-      border: '1px solid rgba(150,180,235,0.10)' }}>
+      border: '1px solid rgba(217,179,108,0.20)' }}>
       <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column',
         padding: isSmall ? '7px 6px' : '11px 10px' }}>
-        <div style={{ height: 2, background: 'rgba(217,179,108,0.50)', borderRadius: 1,
+        <div style={{ height: 2, background: 'rgba(217,179,108,0.60)', borderRadius: 1,
           marginBottom: isSmall ? 5 : 8 }} />
         <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <span style={{ fontFamily: 'var(--serif)', fontSize: isSmall ? 9 : 11.5,
             color: '#eef2fb', lineHeight: 1.4, textAlign: 'center', fontWeight: 500 }}>{title}</span>
         </div>
-        <div style={{ borderTop: '1px solid rgba(217,179,108,0.22)',
+        <div style={{ borderTop: '1px solid rgba(217,179,108,0.30)',
           paddingTop: isSmall ? 4 : 6, marginTop: isSmall ? 4 : 5 }}>
           <span style={{ fontFamily: 'var(--mono)', fontSize: isSmall ? 6.5 : 7.5, color: 'var(--gold)',
             letterSpacing: '.07em', display: 'block', textAlign: 'center',
