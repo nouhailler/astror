@@ -318,6 +318,60 @@ export function getUpcomingAstroEvents(monthsAhead = 18) {
   return events.sort((a, b) => new Date(a.isoDate) - new Date(b.isoDate))
 }
 
+export function getObsWindows(date = new Date(), lat = 48.8566, lng = 2.3522) {
+  const obs = new Astronomy.Observer(lat, lng, 0)
+  let dusk6 = null, duskAstro = null, dawnAstro = null
+  try { dusk6     = Astronomy.SearchAltitude(Astronomy.Body.Sun, obs, -1, date, 1,  -6) } catch {}
+  try { duskAstro = Astronomy.SearchAltitude(Astronomy.Body.Sun, obs, -1, date, 1, -18) } catch {}
+  try { dawnAstro = Astronomy.SearchAltitude(Astronomy.Body.Sun, obs, +1, date, 1, -18) } catch {}
+
+  if (!duskAstro) return []
+
+  const moonSet = Astronomy.SearchRiseSet(Astronomy.Body.Moon, obs, -1, date, 1)
+  const moonDuringNight = moonSet
+    && moonSet.date > duskAstro.date
+    && (!dawnAstro || moonSet.date < dawnAstro.date)
+
+  const windows = []
+
+  if (dusk6) {
+    windows.push({
+      t: `${fmtTime(dusk6)} – ${fmtTime(duskAstro)}`,
+      label: 'Crépuscule terminé',
+      q: 'Correct',
+      note: 'Fond de ciel encore lumineux, premières étoiles visibles',
+      val: 2,
+    })
+  }
+
+  if (moonDuringNight) {
+    windows.push({
+      t: `${fmtTime(duskAstro)} – ${fmtTime(moonSet)}`,
+      label: 'Bonne fenêtre',
+      q: 'Bon',
+      note: 'Nuit astronomique · Lune encore présente',
+      val: 3,
+    })
+    windows.push({
+      t: `${fmtTime(moonSet)} – ${fmtTime(dawnAstro)}`,
+      label: 'Fenêtre optimale',
+      q: 'Excellent',
+      note: 'Lune couchée · ciel le plus sombre',
+      val: 4,
+    })
+  } else {
+    windows.push({
+      t: `${fmtTime(duskAstro)} – ${dawnAstro ? fmtTime(dawnAstro) : 'aube'}`,
+      label: 'Nuit astronomique',
+      q: 'Excellent',
+      note: 'Ciel sombre · aucune pollution lunaire',
+      val: 4,
+    })
+  }
+
+  return windows
+}
+
 export function getPlanetPositions(date = new Date(), lat = 48.8566, lng = 2.3522) {
   const obs = new Astronomy.Observer(lat, lng, 0)
   return PLANETS.map(({ body, name, id }) => {

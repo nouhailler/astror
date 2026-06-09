@@ -1,8 +1,10 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { IcStar, IcTele, IcSky, IcMoon, IcTrash, IcCheck } from './icons'
 import { Sheet } from './ui'
 import { ToolPage, ToolSection, ToolSeg } from './tool-ui'
 import { SKY_OBJECTS } from './data'
+import { getMoonData, getSunData, getPlanetPositions, getObsWindows } from './astro'
+import { fetchWeather, useLiveData } from './api'
 import { onbLoad } from './onboarding'
 
 function IcCal({ size = 22 }) {
@@ -21,21 +23,6 @@ function QualityBar({ val, max = 4, color = 'var(--gold)' }) {
     </div>
   )
 }
-
-const OBS_WINDOWS = [
-  { t: '21:54 – 22:40', label: 'Crépuscule terminé', q: 'Correct', note: 'Lune encore haute, fond de ciel clair', val: 2 },
-  { t: '22:40 – 00:05', label: 'Bonne fenêtre', q: 'Bon', note: 'Jupiter au méridien, turbulence faible', val: 3 },
-  { t: '00:05 – 02:48', label: 'Fenêtre optimale', q: 'Excellent', note: 'Lune couchée, ciel le plus sombre', val: 4 },
-]
-
-const RISE_SET = [
-  { name: 'Soleil', Ic: IcSky, rise: '05:51', set: '21:54', accent: false },
-  { name: 'Lune', Ic: IcMoon, rise: '15:22', set: '02:48', accent: false },
-  { name: 'Vénus', Ic: IcStar, rise: '09:10', set: '20:48', accent: true },
-  { name: 'Jupiter', Ic: IcStar, rise: '18:42', set: '04:10', accent: true },
-  { name: 'Saturne', Ic: IcStar, rise: '15:30', set: '00:55', accent: true },
-  { name: 'Mars', Ic: IcStar, rise: '21:05', set: '07:30', accent: true },
-]
 
 const CATALOGS = {
   messier: { label: 'Messier', items: [
@@ -68,6 +55,8 @@ const OBS_JOURNAL_SEED = [
   { id: 's1', date: '2 juin 2026', loc: 'Paris, FR', obj: 'Jupiter & lunes galiléennes', note: 'Quatre lunes alignées, bandes nuageuses visibles au 150×. Turbulence modérée.', gear: 'Télescope 200 mm' },
   { id: 's2', date: '28 mai 2026', loc: 'Forêt de Rambouillet', obj: 'M13 — Amas d\'Hercule', note: 'Ciel Bortle 4, amas résolu jusqu\'au cœur. Magnifique aux 25 mm.', gear: 'Dobson 250 mm' },
 ]
+
+const PLANET_IDS = ['venus', 'jupiter', 'saturn', 'mars']
 
 function ObjectList({ cat, gear }) {
   let items, hint
@@ -152,11 +141,54 @@ export default function ObservePage({ onBack }) {
     try { return JSON.parse(localStorage.getItem('astror_journal_v1')) || OBS_JOURNAL_SEED } catch (e) { return OBS_JOURNAL_SEED }
   })
   const [adding, setAdding] = useState(false)
-  const profile = onbLoad()
+
+  const profile = useMemo(() => onbLoad(), [])
+  const lat = profile.location?.lat ?? 48.8566
+  const lng = profile.location?.lng ?? 2.3522
+  const city = profile.location?.city ?? 'Paris'
+  const now = useMemo(() => new Date(), [])
+
+  const { data: weather } = useLiveData(() => fetchWeather(lat, lng), 3600000)
+
+  const sun     = useMemo(() => getSunData(now, lat, lng),         [now, lat, lng])
+  const moon    = useMemo(() => getMoonData(now, lat, lng),        [now, lat, lng])
+  const planets = useMemo(() => getPlanetPositions(now, lat, lng), [now, lat, lng])
+  const windows = useMemo(() => getObsWindows(now, lat, lng),      [now, lat, lng])
+
+  const riseSet = useMemo(() => [
+    { name: 'Soleil', Ic: IcSky,  rise: sun.sunrise,   set: sun.sunset,   accent: false },
+    { name: 'Lune',   Ic: IcMoon, rise: moon.moonrise, set: moon.moonset, accent: false },
+    ...PLANET_IDS
+      .map(id => planets.find(p => p.id === id))
+      .filter(Boolean)
+      .map(p => ({ name: p.name, Ic: IcStar, rise: p.rise, set: p.set, accent: true })),
+  ], [sun, moon, planets])
+
+  // Dériver les métriques de conditions depuis la météo
+  const clouds = weather?.clouds ?? null
+  const cloudLabel = clouds === null ? '—'
+    : clouds < 10 ? 'Ciel dégagé'
+    : clouds < 25 ? 'Quelques cirrus'
+    : clouds < 50 ? 'Part. nuageux'
+    : clouds < 75 ? 'Très nuageux'
+    : 'Couvert'
+  const cloudQBar  = clouds === null ? 0 : clouds < 10 ? 4 : clouds < 25 ? 3 : clouds < 50 ? 2 : clouds < 75 ? 1 : 0
+  const cloudColor = cloudQBar >= 3 ? 'var(--good)' : cloudQBar >= 2 ? 'var(--gold)' : 'var(--warn)'
+
+  const sv = weather?.seeingVal ?? null
+  const seeingBar   = sv === null ? 0 : Math.max(1, sv - 1)
+  const seeingColor = sv !== null ? (sv >= 4 ? 'var(--good)' : sv < 3 ? 'var(--warn)' : 'var(--gold)') : 'var(--gold)'
+  const fwhm        = sv ? ['≈ 5+″', '≈ 4,5″', '≈ 3,5″', '≈ 2,5″', '≈ 1,5″'][sv - 1] + ' FWHM' : '—'
+
+  const tv = weather?.transVal ?? null
+  const transBar   = tv === null ? 0 : Math.max(1, tv - 1)
+  const transColor = tv !== null ? (tv >= 4 ? 'var(--good)' : tv < 3 ? 'var(--warn)' : 'var(--gold)') : 'var(--gold)'
+  const humidity   = weather?.humidity ?? null
+  const humidLabel = humidity === null ? '—' : humidity < 40 ? 'Faible humidité' : humidity < 70 ? 'Humidité mod.' : 'Humidité élevée'
 
   const saveJournal = (list) => { setJournal(list); try { localStorage.setItem('astror_journal_v1', JSON.stringify(list)) } catch (e) {} }
-  const addSession = (s) => saveJournal([{ id: 'j' + Date.now(), ...s }, ...journal])
-  const delSession = (id) => saveJournal(journal.filter(x => x.id !== id))
+  const addSession  = (s) => saveJournal([{ id: 'j' + Date.now(), ...s }, ...journal])
+  const delSession  = (id) => saveJournal(journal.filter(x => x.id !== id))
 
   return (
     <ToolPage title="Observer" onBack={onBack}>
@@ -165,33 +197,68 @@ export default function ObservePage({ onBack }) {
 
       {seg === 'prep' && (
         <div className="enter">
-          <ToolSection title="Conditions ce soir" style={{ paddingTop: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 18px 0', gap: 8 }}>
+            <span className="meta" style={{ color: 'var(--gold)', display: 'flex', alignItems: 'center', gap: 4 }}>
+              <IcPin size={13} /> {city}
+            </span>
+            <span className="meta">
+              {now.toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric', month: 'long', year: 'numeric' })}
+            </span>
+          </div>
+
+          <ToolSection title="Conditions ce soir" action={weather ? now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }) : null}>
             <div className="metric-grid" style={{ gridTemplateColumns: '1fr 1fr' }}>
-              <div className="metric"><div className="m-k">Couverture nuageuse</div><div className="m-v">8<span className="u">%</span></div><div className="m-sub">Ciel dégagé</div><QualityBar val={4} color="var(--good)" /></div>
-              <div className="metric"><div className="m-k">Turbulence (seeing)</div><div className="m-v">Bon</div><div className="m-sub">≈ 2,5″ FWHM</div><QualityBar val={3} /></div>
-              <div className="metric"><div className="m-k">Transparence</div><div className="m-v">Excel.</div><div className="m-sub">Faible humidité</div><QualityBar val={4} color="var(--good)" /></div>
-              <div className="metric"><div className="m-k">Pollution lumineuse</div><div className="m-v">Bortle 4</div><div className="m-sub">Ciel péri-urbain</div><QualityBar val={2} color="var(--warn)" /></div>
+              <div className="metric">
+                <div className="m-k">Couverture nuageuse</div>
+                <div className="m-v">{clouds !== null ? <>{clouds}<span className="u">%</span></> : '—'}</div>
+                <div className="m-sub">{cloudLabel}</div>
+                <QualityBar val={cloudQBar} color={cloudColor} />
+              </div>
+              <div className="metric">
+                <div className="m-k">Turbulence (seeing)</div>
+                <div className="m-v">{weather?.seeing ?? '—'}</div>
+                <div className="m-sub">{fwhm}</div>
+                <QualityBar val={seeingBar} color={seeingColor} />
+              </div>
+              <div className="metric">
+                <div className="m-k">Transparence</div>
+                <div className="m-v">{weather?.transparency ?? '—'}</div>
+                <div className="m-sub">{humidLabel}</div>
+                <QualityBar val={transBar} color={transColor} />
+              </div>
+              <div className="metric">
+                <div className="m-k">Pollution lumineuse</div>
+                <div className="m-v">Bortle 4</div>
+                <div className="m-sub">Ciel péri-urbain</div>
+                <QualityBar val={2} color="var(--warn)" />
+              </div>
             </div>
           </ToolSection>
 
           <ToolSection title="Meilleurs créneaux">
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              {OBS_WINDOWS.map((w, i) => (
-                <div key={i} style={{ display: 'flex', gap: 13, padding: 14, borderRadius: 14,
-                  background: w.val === 4 ? 'linear-gradient(180deg, rgba(132,211,169,.08), var(--surface-1))' : 'var(--surface-1)',
-                  border: '1px solid ' + (w.val === 4 ? 'rgba(132,211,169,.3)' : 'var(--line)') }}>
-                  <span style={{ width: 4, borderRadius: 9, flexShrink: 0, background: w.val === 4 ? 'var(--good)' : w.val === 3 ? 'var(--gold)' : 'var(--faint)' }} />
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
-                      <span className="data" style={{ fontSize: 14, color: 'var(--text)' }}>{w.t}</span>
-                      <span className={'tag' + (w.val === 4 ? ' live' : w.val === 2 ? ' neutral' : '')}>{w.q}</span>
+            {windows.length === 0 ? (
+              <div style={{ padding: '12px 14px', color: 'var(--faint)', fontSize: 13 }}>
+                Nuit blanche — pas de nuit astronomique ce soir à cette latitude.
+              </div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                {windows.map((w, i) => (
+                  <div key={i} style={{ display: 'flex', gap: 13, padding: 14, borderRadius: 14,
+                    background: w.val === 4 ? 'linear-gradient(180deg, rgba(132,211,169,.08), var(--surface-1))' : 'var(--surface-1)',
+                    border: '1px solid ' + (w.val === 4 ? 'rgba(132,211,169,.3)' : 'var(--line)') }}>
+                    <span style={{ width: 4, borderRadius: 9, flexShrink: 0, background: w.val === 4 ? 'var(--good)' : w.val === 3 ? 'var(--gold)' : 'var(--faint)' }} />
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+                        <span className="data" style={{ fontSize: 14, color: 'var(--text)' }}>{w.t}</span>
+                        <span className={'tag' + (w.val === 4 ? ' live' : w.val === 2 ? ' neutral' : '')}>{w.q}</span>
+                      </div>
+                      <div className="h-card" style={{ fontSize: 13.5, margin: '5px 0 3px' }}>{w.label}</div>
+                      <div className="body tight" style={{ fontSize: 12 }}>{w.note}</div>
                     </div>
-                    <div className="h-card" style={{ fontSize: 13.5, margin: '5px 0 3px' }}>{w.label}</div>
-                    <div className="body tight" style={{ fontSize: 12 }}>{w.note}</div>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </ToolSection>
 
           <ToolSection title="Lever & coucher">
@@ -201,9 +268,9 @@ export default function ObservePage({ onBack }) {
                 <span className="meta" style={{ width: 64, textAlign: 'right', textTransform: 'uppercase' }}>Lever</span>
                 <span className="meta" style={{ width: 64, textAlign: 'right', textTransform: 'uppercase' }}>Coucher</span>
               </div>
-              {RISE_SET.map((r, i) => (
+              {riseSet.map((r, i) => (
                 <div key={r.name} style={{ display: 'flex', alignItems: 'center', padding: '11px 15px',
-                  borderBottom: i < RISE_SET.length - 1 ? '1px solid var(--line)' : 0 }}>
+                  borderBottom: i < riseSet.length - 1 ? '1px solid var(--line)' : 0 }}>
                   <span style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 9 }}>
                     <span style={{ color: r.accent ? 'var(--gold)' : 'var(--dim)', display: 'flex' }}><r.Ic size={15} /></span>
                     <span className="h-card" style={{ fontSize: 13.5 }}>{r.name}</span>
@@ -253,7 +320,7 @@ export default function ObservePage({ onBack }) {
         </div>
       )}
 
-      <ObsAddSheet open={adding} onClose={() => setAdding(false)} onAdd={addSession} loc={profile.location?.city || profile.location || 'Ma position'} gear={(profile.gear || [])[0]} />
+      <ObsAddSheet open={adding} onClose={() => setAdding(false)} onAdd={addSession} loc={city} gear={(profile.gear || [])[0]} />
     </ToolPage>
   )
 }
