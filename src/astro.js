@@ -381,6 +381,7 @@ export function getPlanetPositions(date = new Date(), lat = 48.8566, lng = 2.352
       const illum = Astronomy.Illumination(body, date)
       const rise = Astronomy.SearchRiseSet(body, obs, +1, date, 1)
       const set  = Astronomy.SearchRiseSet(body, obs, -1, date, 1)
+      const mkm = Math.round(illum.geo_dist * 149.6)
       return {
         id, name,
         alt: hor.altitude.toFixed(1),
@@ -389,6 +390,7 @@ export function getPlanetPositions(date = new Date(), lat = 48.8566, lng = 2.352
         rise: fmtTime(rise),
         set:  fmtTime(set),
         visible: hor.altitude > 5,
+        distLabel: mkm >= 1000 ? `${(mkm / 1000).toFixed(1)} Mds km` : `${mkm} M km`,
       }
     } catch {
       return { id, name, alt: null, az: null, mag: null, rise: '--:--', set: '--:--', visible: false }

@@ -142,6 +142,47 @@ export async function fetchSpaceNews() {
   }))
 }
 
+export async function fetchJWSTImages() {
+  const params = new URLSearchParams({
+    action: 'query',
+    generator: 'categorymembers',
+    gcmtitle: 'Category:Images_by_the_James_Webb_Space_Telescope',
+    gcmtype: 'file',
+    gcmlimit: '30',
+    gcmsort: 'timestamp',
+    gcmdir: 'descending',
+    prop: 'imageinfo',
+    iiprop: 'url|extmetadata|mime',
+    iiurlwidth: '800',
+    format: 'json',
+    origin: '*',
+  })
+  const res = await fetch(`https://commons.wikimedia.org/w/api.php?${params}`)
+  if (!res.ok) throw new Error('Wikimedia error')
+  const data = await res.json()
+  const strip = s => (s || '').replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim()
+  return Object.values(data.query?.pages || {})
+    .map(p => {
+      const ii = p.imageinfo?.[0]
+      if (!ii?.thumburl) return null
+      if (!['image/jpeg', 'image/png', 'image/webp'].includes(ii.mime)) return null
+      const meta = ii.extmetadata || {}
+      const rawName = strip(meta.ObjectName?.value || p.title.replace('File:', '').replace(/\.[^.]+$/, ''))
+      const desc = strip(meta.ImageDescription?.value || '')
+      const date = (meta.DateTimeOriginal?.value || meta.DateTime?.value || '').slice(0, 10)
+      return {
+        id: String(p.pageid),
+        name: rawName,
+        desc: desc || rawName,
+        thumbUrl: ii.thumburl,
+        pageUrl: `https://commons.wikimedia.org/wiki/${encodeURIComponent(p.title)}`,
+        date,
+      }
+    })
+    .filter(Boolean)
+    .slice(0, 12)
+}
+
 export async function fetchLaunches() {
   const res = await fetch('https://lldev.thespacedevs.com/2.2.0/launch/upcoming/?limit=5&mode=list')
   if (!res.ok) throw new Error('Launches API error')
