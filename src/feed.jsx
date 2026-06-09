@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { IcRocket, IcEye, IcPlus, IcTrash, IcChevron, IcCheck } from './icons'
+import { IcRocket, IcEye, IcPlus, IcTrash, IcChevron, IcCheck, IcSearch, IcBook } from './icons'
 import { ScreenHeader, SettingsBtn, HeaderTools, Sheet } from './ui'
 import { CONFERENCES, PEOPLE, BOOKS, PHOTO_SITES } from './data'
 import { fetchSpaceNews, useLiveData, searchBooks } from './api'
@@ -275,14 +275,45 @@ function PeopleView({ items, onPick, onDelete }) {
   )
 }
 
-function BookSpine({ author }) {
+const COVER_PALETTES = [
+  ['#182d52','#0b1628'], ['#271742','#130c28'], ['#193022','#0c1812'],
+  ['#381c1c','#1f0d0d'], ['#28220f','#171208'], ['#1c2a3c','#0c1422'],
+  ['#2b1d38','#160c22'], ['#1b2e2e','#0c1818'],
+]
+
+function titleHash(s) {
+  let h = 0
+  for (const c of s) h = (h * 31 + c.charCodeAt(0)) | 0
+  return Math.abs(h)
+}
+
+function BookCover({ title, author, size = 'full' }) {
+  const [c1, c2] = COVER_PALETTES[titleHash(title) % COVER_PALETTES.length]
+  const isSmall = size === 'small'
   return (
-    <div style={{ width: 52, height: 74, borderRadius: 6, flexShrink: 0, position: 'relative',
-      overflow: 'hidden', backgroundImage: 'linear-gradient(135deg,#1a2647,#0c1326)',
-      boxShadow: 'inset -3px 0 6px rgba(0,0,0,.4), 0 2px 8px rgba(0,0,0,.3)', border: '1px solid var(--line-2)' }}>
-      <div style={{ position: 'absolute', left: 6, top: 0, bottom: 0, width: 2, background: 'var(--gold-line)' }} />
-      <div style={{ position: 'absolute', inset: '10px 8px', display: 'flex', alignItems: 'flex-end' }}>
-        <span className="meta" style={{ fontSize: 7.5, color: 'var(--gold)', lineHeight: 1.2 }}>{(author || '').split(' ').slice(-1)[0]}</span>
+    <div style={{ width: '100%', paddingBottom: isSmall ? '148%' : '148%', position: 'relative',
+      borderRadius: isSmall ? 5 : 8, overflow: 'hidden',
+      background: `linear-gradient(148deg, ${c1}, ${c2})`,
+      boxShadow: isSmall
+        ? '2px 3px 8px rgba(0,0,0,.5), inset -2px 0 4px rgba(0,0,0,.3)'
+        : '4px 6px 18px rgba(0,0,0,.6), inset -3px 0 7px rgba(0,0,0,.35)',
+      border: '1px solid rgba(150,180,235,0.10)' }}>
+      <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column',
+        padding: isSmall ? '7px 6px' : '11px 10px' }}>
+        <div style={{ height: 2, background: 'rgba(217,179,108,0.50)', borderRadius: 1,
+          marginBottom: isSmall ? 5 : 8 }} />
+        <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <span style={{ fontFamily: 'var(--serif)', fontSize: isSmall ? 9 : 11.5,
+            color: '#eef2fb', lineHeight: 1.4, textAlign: 'center', fontWeight: 500 }}>{title}</span>
+        </div>
+        <div style={{ borderTop: '1px solid rgba(217,179,108,0.22)',
+          paddingTop: isSmall ? 4 : 6, marginTop: isSmall ? 4 : 5 }}>
+          <span style={{ fontFamily: 'var(--mono)', fontSize: isSmall ? 6.5 : 7.5, color: 'var(--gold)',
+            letterSpacing: '.07em', display: 'block', textAlign: 'center',
+            overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            {(author || '').split(' ').filter(Boolean).pop()?.toUpperCase()}
+          </span>
+        </div>
       </div>
     </div>
   )
@@ -291,10 +322,11 @@ function BookSpine({ author }) {
 const SOURCE_LABEL = { google: 'Google Books', openlibrary: 'Open Library' }
 
 function BooksView({ items, onAdd, onDelete }) {
-  const [query, setQuery] = useState('')
+  const [query, setQuery]     = useState('')
   const [results, setResults] = useState(null)
   const [searching, setSearching] = useState(false)
   const [searchErr, setSearchErr] = useState(null)
+  const [book, setBook]       = useState(null)
   const debounceRef = useRef(null)
 
   const doSearch = (q) => {
@@ -302,32 +334,32 @@ function BooksView({ items, onAdd, onDelete }) {
     clearTimeout(debounceRef.current)
     if (q.trim().length < 3) { setResults(null); setSearchErr(null); return }
     debounceRef.current = setTimeout(async () => {
-      setSearching(true)
-      setSearchErr(null)
+      setSearching(true); setSearchErr(null)
       try {
-        const r = await searchBooks(q.trim())
-        setResults(r)
+        setResults(await searchBooks(q.trim()))
       } catch {
         setSearchErr('Erreur de recherche. Vérifiez votre connexion.')
         setResults([])
-      } finally {
-        setSearching(false)
-      }
+      } finally { setSearching(false) }
     }, 500)
   }
 
-  const addResult = (book) => {
-    onAdd({ title: book.title, author: book.author, year: book.year, note: book.note, url: book.url })
-  }
+  const addResult = (b) => onAdd({ title: b.title, author: b.author, year: b.year, note: b.note, url: b.url })
+  const alreadyAdded = (b) => items.some(x => x._user && x.title === b.title)
 
-  const alreadyAdded = (book) => items.some(b => b._user && b.title === book.title)
+  const bookIdx = (b) => items.findIndex(x => x.id === b.id)
 
   return (
     <div className="enter pad" style={{ marginTop: 8 }}>
-      <div style={{ position: 'relative', marginBottom: 14 }}>
-        <input className="input" placeholder="Rechercher un livre (3 car. min)…"
+      {/* Barre de recherche */}
+      <div style={{ position: 'relative', marginBottom: 16 }}>
+        <div style={{ position: 'absolute', left: 13, top: '50%', transform: 'translateY(-50%)',
+          color: 'var(--faint)', pointerEvents: 'none' }}>
+          <IcSearch size={15} />
+        </div>
+        <input className="input" placeholder="Rechercher un livre…"
           value={query} onChange={e => doSearch(e.target.value)}
-          style={{ paddingRight: searching ? 44 : undefined }} />
+          style={{ paddingLeft: 36, paddingRight: searching ? 44 : undefined }} />
         {searching && (
           <div style={{ position: 'absolute', right: 14, top: '50%', transform: 'translateY(-50%)', display: 'flex', gap: 3 }}>
             {[0,1,2].map(i => (
@@ -338,70 +370,106 @@ function BooksView({ items, onAdd, onDelete }) {
         )}
       </div>
 
+      {/* Résultats de recherche */}
       {results !== null && (
-        <div style={{ marginBottom: 18 }}>
+        <div style={{ marginBottom: 20 }}>
           {searchErr && <div style={{ color: 'var(--bad)', fontSize: 13, padding: '6px 2px' }}>{searchErr}</div>}
           {!searchErr && results.length === 0 && !searching && (
-            <div style={{ color: 'var(--faint)', fontSize: 13, textAlign: 'center', padding: '14px 0' }}>Aucun résultat trouvé</div>
+            <div style={{ color: 'var(--faint)', fontSize: 13, textAlign: 'center', padding: '14px 0' }}>Aucun résultat</div>
           )}
-          {results.map(book => (
-            <div key={book.id} style={{ display: 'flex', gap: 12, padding: '12px 14px', marginBottom: 8,
-              background: 'linear-gradient(180deg,var(--surface-2),var(--surface-1))',
-              border: '1px solid var(--line)', borderRadius: 'var(--r-m)', alignItems: 'flex-start' }}>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ display: 'flex', alignItems: 'flex-start', gap: 7, marginBottom: 3, flexWrap: 'wrap' }}>
-                  <span className="h-card" style={{ fontSize: 13.5, fontFamily: 'var(--serif)', flex: 1 }}>{book.title}</span>
-                  <span style={{ fontSize: 9.5, padding: '2px 7px', borderRadius: 99, flexShrink: 0, whiteSpace: 'nowrap',
-                    background: 'rgba(126,166,230,.08)', color: 'var(--blue)', border: '1px solid rgba(126,166,230,.2)',
-                    fontFamily: 'var(--mono)', letterSpacing: '.04em' }}>
-                    {SOURCE_LABEL[book.source]}
-                  </span>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {results.map(b => (
+              <div key={b.id} style={{ display: 'flex', gap: 12, padding: '12px 14px',
+                background: 'linear-gradient(180deg,var(--surface-2),var(--surface-1))',
+                border: '1px solid var(--line)', borderRadius: 'var(--r-m)', alignItems: 'flex-start' }}>
+                <div style={{ width: 38, flexShrink: 0 }}>
+                  <BookCover title={b.title} author={b.author} size="small" />
                 </div>
-                {(book.author || book.year) && (
-                  <div className="meta" style={{ color: 'var(--gold)', fontSize: 11.5, marginBottom: book.note ? 4 : 0 }}>
-                    {[book.author, book.year].filter(Boolean).join(' · ')}
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: 6, marginBottom: 3, flexWrap: 'wrap' }}>
+                    <span className="h-card" style={{ fontSize: 13, fontFamily: 'var(--serif)', flex: 1, lineHeight: 1.3 }}>{b.title}</span>
+                    <span style={{ fontSize: 9, padding: '2px 6px', borderRadius: 99, flexShrink: 0, whiteSpace: 'nowrap',
+                      background: 'rgba(126,166,230,.08)', color: 'var(--blue)', border: '1px solid rgba(126,166,230,.18)',
+                      fontFamily: 'var(--mono)', letterSpacing: '.04em', alignSelf: 'flex-start', marginTop: 1 }}>
+                      {SOURCE_LABEL[b.source]}
+                    </span>
                   </div>
-                )}
-                {book.note && <div className="body tight" style={{ fontSize: 11.5 }}>{book.note.slice(0, 120)}{book.note.length > 120 ? '…' : ''}</div>}
+                  {(b.author || b.year) && (
+                    <div className="meta" style={{ color: 'var(--gold)', fontSize: 11, marginBottom: b.note ? 4 : 0 }}>
+                      {[b.author, b.year].filter(Boolean).join(' · ')}
+                    </div>
+                  )}
+                  {b.note && <div className="body tight" style={{ fontSize: 11 }}>{b.note.slice(0, 110)}{b.note.length > 110 ? '…' : ''}</div>}
+                </div>
+                <button className={'chip' + (alreadyAdded(b) ? ' on' : '')}
+                  style={{ height: 28, fontSize: 11, flexShrink: 0, paddingInline: 10 }}
+                  disabled={alreadyAdded(b)} onClick={() => addResult(b)}>
+                  {alreadyAdded(b) ? <IcCheck size={11} /> : '+'}
+                </button>
               </div>
-              <button className={'chip' + (alreadyAdded(book) ? ' on' : '')}
-                style={{ height: 30, fontSize: 11.5, flexShrink: 0, marginTop: 2 }}
-                disabled={alreadyAdded(book)}
-                onClick={() => addResult(book)}>
-                {alreadyAdded(book) ? <><IcCheck size={11} /> Ajouté</> : '+ Ajouter'}
-              </button>
-            </div>
-          ))}
-          <div className="eyebrow dim" style={{ color: 'var(--faint)', letterSpacing: '.16em', fontSize: 10.5,
-            margin: '18px 0 10px', textAlign: 'center' }}>
-            — Sélection —
+            ))}
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '20px 0 14px' }}>
+            <div style={{ flex: 1, height: 1, background: 'var(--line)' }} />
+            <span className="eyebrow" style={{ fontSize: 10, color: 'var(--faint)', letterSpacing: '.18em' }}>Sélection</span>
+            <div style={{ flex: 1, height: 1, background: 'var(--line)' }} />
           </div>
         </div>
       )}
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-        {items.map(b => (
-          <div key={b.id} style={{ position: 'relative', display: 'flex', gap: 14,
-            background: 'linear-gradient(180deg,var(--surface-2),var(--surface-1))',
-            border: '1px solid var(--line)', borderRadius: 'var(--r-m)', padding: 14 }}>
-            {b._user && <DelBtn onClick={() => onDelete(b.id)} />}
-            <BookSpine author={b.author} />
-            <div style={{ flex: 1, minWidth: 0, paddingRight: b._user ? 22 : 0 }}>
-              <div className="h-card" style={{ fontSize: 14.5, lineHeight: 1.25, fontFamily: 'var(--serif)', fontWeight: 600 }}>{b.title}</div>
-              {(b.author || b.year) && <div className="meta" style={{ color: 'var(--gold)', margin: '4px 0 6px' }}>{[b.author, b.year].filter(Boolean).join(' · ')}</div>}
-              {b.note && <div className="body tight" style={{ fontSize: 12 }}>{b.note}</div>}
-              {b.url && (
-                <a href={b.url} target="_blank" rel="noopener noreferrer"
-                  style={{ display: 'inline-flex', alignItems: 'center', gap: 4, marginTop: 7,
-                    fontSize: 11, color: 'var(--gold)', fontFamily: 'var(--mono)',
-                    textDecoration: 'none', letterSpacing: '.05em' }}>
-                  Voir <IcArrowUpR size={12} />
-                </a>
-              )}
-            </div>
+      {/* Grille bibliothèque */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+        {items.map((b, i) => (
+          <div key={b.id} style={{ position: 'relative' }}>
+            {b._user && (
+              <button className="del-btn press" title="Supprimer"
+                onClick={e => { e.stopPropagation(); onDelete(b.id) }}
+                style={{ position: 'absolute', top: 6, right: 6, zIndex: 2 }}>
+                <IcTrash size={13} />
+              </button>
+            )}
+            <button onClick={() => setBook(b)} className="press"
+              style={{ width: '100%', background: 'none', border: 'none', cursor: 'pointer',
+                textAlign: 'left', padding: 0, display: 'flex', flexDirection: 'column' }}>
+              <BookCover title={b.title} author={b.author} />
+              <div style={{ marginTop: 9, paddingBottom: 2 }}>
+                <div className="h-card" style={{ fontSize: 12.5, lineHeight: 1.3, marginBottom: 3,
+                  fontFamily: 'var(--serif)', display: '-webkit-box', WebkitLineClamp: 2,
+                  WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{b.title}</div>
+                {b.author && (
+                  <div className="meta" style={{ fontSize: 11, color: 'var(--gold)',
+                    overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{b.author}</div>
+                )}
+                {b.year && <div className="meta" style={{ fontSize: 10.5, marginTop: 1 }}>{b.year}</div>}
+              </div>
+            </button>
           </div>
         ))}
       </div>
+
+      {/* Fiche livre */}
+      <Sheet open={!!book} onClose={() => setBook(null)}>
+        {book && (
+          <div>
+            <div style={{ display: 'flex', gap: 18, marginBottom: 22, alignItems: 'flex-start' }}>
+              <div style={{ width: 88, flexShrink: 0 }}>
+                <BookCover title={book.title} author={book.author} />
+              </div>
+              <div style={{ flex: 1, minWidth: 0, paddingTop: 4 }}>
+                <div className="h-sec" style={{ fontSize: 21, lineHeight: 1.2, marginBottom: 8 }}>{book.title}</div>
+                {book.author && <div className="meta" style={{ color: 'var(--gold)', fontSize: 13, marginBottom: 4 }}>{book.author}</div>}
+                {book.year && <div className="meta" style={{ fontSize: 12 }}>{book.year}</div>}
+              </div>
+            </div>
+            {book.note && <p className="body serif-body" style={{ fontSize: 15, lineHeight: 1.65, marginBottom: 4 }}>{book.note}</p>}
+            {book.url && (
+              <a href={book.url} target="_blank" rel="noopener noreferrer" style={WIKI_LINK_STYLE}>
+                Voir sur {SOURCE_LABEL[book.source] || 'le web'} <IcArrowUpR size={13} />
+              </a>
+            )}
+          </div>
+        )}
+      </Sheet>
     </div>
   )
 }
