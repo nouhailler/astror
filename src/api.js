@@ -1,4 +1,58 @@
 import { useState, useEffect, useRef } from 'react'
+import * as satellite from 'satellite.js'
+
+const AZ_DIRS = ['N', 'N-E', 'E', 'S-E', 'S', 'S-O', 'O', 'N-O']
+function azDir(az) { return AZ_DIRS[Math.round(az / 45) % 8] }
+
+function computePasses(tle1, tle2, lat, lng, minElDeg = 10) {
+  const satrec = satellite.twoline2satrec(tle1, tle2)
+  const obsGd = {
+    longitude: satellite.degreesToRadians(lng),
+    latitude:  satellite.degreesToRadians(lat),
+    height: 0.05,
+  }
+  const now = new Date()
+  const end = new Date(now.getTime() + 24 * 3600000)
+  const stepMs = 15000
+  const passes = []
+
+  let inPass = false, passStart = null, riseAz = 0, lastAz = 0, maxEl = 0
+
+  for (let t = new Date(now); t <= end; t = new Date(t.getTime() + stepMs)) {
+    const pv = satellite.propagate(satrec, t)
+    if (!pv.position) continue
+    const gmst = satellite.gstime(t)
+    const ecf  = satellite.eciToEcf(pv.position, gmst)
+    const look = satellite.ecfToLookAngles(obsGd, ecf)
+    const el   = satellite.radiansToDegrees(look.elevation)
+    const az   = satellite.radiansToDegrees(look.azimuth)
+
+    if (el >= minElDeg) {
+      if (!inPass) { inPass = true; passStart = new Date(t); riseAz = az; maxEl = el }
+      if (el > maxEl) maxEl = el
+      lastAz = az
+    } else if (inPass) {
+      inPass = false
+      const dur = Math.round((t.getTime() - passStart.getTime()) / 60000)
+      passes.push({
+        time:    passStart.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }),
+        isoTime: passStart.toISOString(),
+        dir:     `${azDir(riseAz)} → ${azDir(lastAz)}`,
+        alt:     `${Math.round(maxEl)}°`,
+        dur:     `${dur} min`,
+        bright:  maxEl > 40,
+      })
+    }
+  }
+  return passes
+}
+
+export async function fetchISSPasses(lat = 48.8566, lng = 2.3522) {
+  const res = await fetch('https://api.wheretheiss.at/v1/satellites/25544/tles')
+  if (!res.ok) throw new Error('TLE fetch failed')
+  const { line1, line2 } = await res.json()
+  return computePasses(line1, line2, lat, lng)
+}
 
 export function useLiveData(fetcher, intervalMs = 0) {
   const [data, setData]       = useState(null)

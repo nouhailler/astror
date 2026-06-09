@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { IcSat, IcRocket } from './icons'
 import { ToolPage, ToolSection, ToolSeg } from './tool-ui'
-import { fetchISSPosition, fetchLaunches, useLiveData } from './api'
+import { fetchISSPosition, fetchISSPasses, fetchLaunches, useLiveData } from './api'
+import { onbLoad } from './onboarding'
 
 const SAT_MISSIONS = [
   { name: 'James Webb (JWST)', org: 'NASA/ESA', status: 'En service', note: "Au point L2, à 1,5 M km. Observe l'univers en infrarouge depuis 2022.", color: 'var(--good)' },
@@ -10,12 +11,6 @@ const SAT_MISSIONS = [
   { name: 'Voyager 1', org: 'NASA', status: 'Espace interstellaire', note: 'À 24,8 milliards de km. Sonde la plus lointaine, lancée en 1977.', color: 'var(--blue)' },
 ]
 
-const SAT_PASSES = [
-  { name: 'ISS', mag: '−3,8', time: '22:41', dir: 'SO → NE', alt: '78°', dur: '6 min', bright: true },
-  { name: 'Tiangong', mag: '−1,9', time: '04:12', dir: 'SO → E', alt: '41°', dur: '4 min' },
-  { name: 'Starlink (train)', mag: '+3,5', time: '23:18', dir: 'O → E', alt: '55°', dur: '3 min' },
-  { name: 'Hubble (HST)', mag: '+2,1', time: '00:54', dir: 'SO → SE', alt: '32°', dur: '5 min' },
-]
 
 const SAT_PROBES = [
   { name: 'Voyager 1', dist: '24,8 Mds km', detail: '167 UA · interstellaire' },
@@ -56,7 +51,12 @@ function ISSLiveCard({ iss, loading }) {
 
 export default function SatellitesPage({ onBack }) {
   const [seg, setSeg] = useState('track')
+  const profile = useMemo(() => onbLoad(), [])
+  const lat = profile.location?.lat ?? 48.8566
+  const lng = profile.location?.lng ?? 2.3522
+
   const { data: iss, loading: issLoading } = useLiveData(fetchISSPosition, 10000)
+  const { data: passes, loading: passesLoading } = useLiveData(() => fetchISSPasses(lat, lng), 3600000)
   const { data: launches } = useLiveData(fetchLaunches)
 
   return (
@@ -69,25 +69,36 @@ export default function SatellitesPage({ onBack }) {
             <ISSLiveCard iss={iss} loading={issLoading} />
           </div>
 
-          <ToolSection title="Passages visibles ce soir">
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 9 }}>
-              {SAT_PASSES.map((p, i) => (
-                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 13, padding: '13px 14px', borderRadius: 13,
-                  background: p.bright ? 'linear-gradient(180deg, rgba(217,179,108,.08), var(--surface-1))' : 'var(--surface-1)',
-                  border: '1px solid ' + (p.bright ? 'var(--gold-line)' : 'var(--line)') }}>
-                  <div style={{ textAlign: 'center', width: 50, flexShrink: 0 }}>
-                    <div className="data" style={{ fontSize: 14, color: 'var(--gold)' }}>{p.time}</div>
-                    <div className="meta" style={{ marginTop: 2 }}>{p.dur}</div>
+          <ToolSection title="Passages ISS — 24 h">
+            {passesLoading && (
+              <div style={{ padding: '14px 15px', color: 'var(--faint)', fontSize: 13 }}>Calcul des passages…</div>
+            )}
+            {!passesLoading && passes && passes.length === 0 && (
+              <div style={{ padding: '14px 15px', color: 'var(--faint)', fontSize: 13 }}>Aucun passage visible depuis votre position dans les 24 prochaines heures.</div>
+            )}
+            {!passesLoading && passes && passes.length > 0 && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 9 }}>
+                {passes.map((p, i) => (
+                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 13, padding: '13px 14px', borderRadius: 13,
+                    background: p.bright ? 'linear-gradient(180deg, rgba(217,179,108,.08), var(--surface-1))' : 'var(--surface-1)',
+                    border: '1px solid ' + (p.bright ? 'var(--gold-line)' : 'var(--line)') }}>
+                    <div style={{ textAlign: 'center', width: 50, flexShrink: 0 }}>
+                      <div className="data" style={{ fontSize: 14, color: 'var(--gold)' }}>{p.time}</div>
+                      <div className="meta" style={{ marginTop: 2 }}>{p.dur}</div>
+                    </div>
+                    <span style={{ width: 1, alignSelf: 'stretch', background: 'var(--line)' }} />
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div className="h-card" style={{ fontSize: 14 }}>ISS</div>
+                      <div className="meta" style={{ marginTop: 2 }}>{p.dir} · culmine {p.alt}</div>
+                    </div>
+                    {p.bright && <span className="tag neutral" style={{ flexShrink: 0 }}>Belle passe</span>}
                   </div>
-                  <span style={{ width: 1, alignSelf: 'stretch', background: 'var(--line)' }} />
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div className="h-card" style={{ fontSize: 14 }}>{p.name}</div>
-                    <div className="meta" style={{ marginTop: 2 }}>{p.dir} · culmine {p.alt}</div>
-                  </div>
-                  <span className="data" style={{ fontSize: 13, color: 'var(--gold)' }}>mag {p.mag}</span>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
+            {!passesLoading && !passes && (
+              <div style={{ padding: '14px 15px', color: 'var(--faint)', fontSize: 13 }}>Impossible de récupérer les données de passage.</div>
+            )}
           </ToolSection>
         </div>
       )}
