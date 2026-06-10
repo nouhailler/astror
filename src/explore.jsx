@@ -1016,77 +1016,77 @@ const CONQUEST = [
 ]
 
 const CONQUEST_TIMELINE = [
-  { year:'1903', flag:'🇷🇺', event:'Tsiolkovski publie l\'équation-fusée fondamentale' },
-  { year:'1926', flag:'🇺🇸', event:'Goddard lance la première fusée à carburant liquide' },
-  { year:'1942', flag:'🇩🇪', event:'La V2 franchit la ligne de Kármán (100 km) — premier objet humain dans l\'espace' },
-  { year:'1957', flag:'🇷🇺', event:'Spoutnik 1 (4 oct.) · Laïka, premier être vivant en orbite (3 nov.)' },
-  { year:'1958', flag:'🇺🇸', event:'Création de la NASA (29 juillet)' },
-  { year:'1961', flag:'🇷🇺', event:'Youri Gagarine — premier homme dans l\'espace (12 avr.) · Kennedy lance le défi Apollo' },
-  { year:'1963', flag:'🇷🇺', event:'Valentina Terechkova — première femme dans l\'espace (Vostok 6)' },
-  { year:'1965', flag:'🇷🇺', event:'Alexeï Leonov — première sortie extravéhiculaire (EVA)' },
-  { year:'1969', flag:'🇺🇸', event:'Apollo 11 — premiers pas sur la Lune (20 juil.) · Armstrong + Aldrin' },
-  { year:'1971', flag:'🇷🇺', event:'Saliout 1 — première station spatiale habitée' },
-  { year:'1972', flag:'🇺🇸', event:'Apollo 17 — dernière mission habitée lunaire (jusqu\'à Artemis)' },
-  { year:'1975', flag:'🌍', event:'Mission Apollo-Soyouz — première coopération USA/URSS en orbite' },
-  { year:'1977', flag:'🇺🇸', event:'Lancement Voyager 1 et 2 — grand tour du système solaire' },
-  { year:'1981', flag:'🇺🇸', event:'Premier vol de la navette spatiale Columbia (STS-1)' },
-  { year:'1986', flag:'🇷🇺', event:'Station Mir en orbite (active jusqu\'en 2001)' },
-  { year:'1986', flag:'🇺🇸', event:'Catastrophe Challenger (28 jan.) — 7 morts' },
-  { year:'1990', flag:'🌍', event:'Déploiement du télescope spatial Hubble' },
-  { year:'1995', flag:'🇺🇸', event:'Sonde Galileo entre en orbite de Jupiter — découvre l\'océan d\'Europe' },
-  { year:'1997', flag:'🇺🇸', event:'Rover Sojourner sur Mars (mission Pathfinder)' },
-  { year:'1998', flag:'🌍', event:'Début de construction de l\'ISS (module Zarya)' },
-  { year:'2000', flag:'🌍', event:'ISS : début de l\'occupation humaine permanente (nov.)' },
-  { year:'2003', flag:'🇨🇳', event:'Yang Liwei — premier taikonaute chinois (Shenzhou 5)' },
-  { year:'2003', flag:'🇺🇸', event:'Catastrophe Columbia (1er fév.) — 7 morts · Rovers Spirit et Opportunity sur Mars' },
-  { year:'2004', flag:'🌍', event:'Cassini-Huygens entre en orbite de Saturne · Sonde Huygens sur Titan (2005)' },
-  { year:'2011', flag:'🇺🇸', event:'Dernier vol de la navette spatiale (STS-135, Atlantis)' },
-  { year:'2012', flag:'🇺🇸', event:'Curiosity se pose sur Mars · Voyager 1 entre dans l\'espace interstellaire' },
-  { year:'2015', flag:'🇺🇸', event:'New Horizons survole Pluton · Falcon 9 réalise le premier atterrissage vertical' },
-  { year:'2019', flag:'🇨🇳', event:'Yutu-2 sur la face cachée de la Lune (Chang\'e 4) — première mondiale' },
-  { year:'2020', flag:'🇺🇸', event:'Crew Dragon transporte des astronautes vers l\'ISS (fin de la dépendance au Soyouz)' },
-  { year:'2021', flag:'🌍', event:'JWST lancé (25 déc.) · Perseverance + Ingenuity sur Mars · Tiangong chinoise habitée' },
-  { year:'2022', flag:'🇺🇸', event:'Artemis I — tour de la Lune sans équipage (SLS + Orion)' },
-  { year:'2025', flag:'🇺🇸', event:'Artemis II — 4 astronautes en orbite lunaire (prévu)' },
-  { year:'2026', flag:'🇺🇸', event:'Artemis III — premiers humains au pôle sud lunaire (prévu)' },
-  { year:'2030s', flag:'🌍', event:'Mission habitée vers Mars — objectif SpaceX / NASA (visée)' },
+  { year:'1903', flag:'🇷🇺', event:'Tsiolkovski publie l\'équation-fusée fondamentale', wikiPage:'Konstantin_Tsiolkovski' },
+  { year:'1926', flag:'🇺🇸', event:'Goddard lance la première fusée à carburant liquide', wikiPage:'Robert_Goddard' },
+  { year:'1942', flag:'🇩🇪', event:'La V2 franchit la ligne de Kármán (100 km) — premier objet humain dans l\'espace', wikiPage:'V2_(fusée)' },
+  { year:'1957', flag:'🇷🇺', event:'Spoutnik 1 (4 oct.) · Laïka, premier être vivant en orbite (3 nov.)', wikiPage:'Spoutnik_1' },
+  { year:'1958', flag:'🇺🇸', event:'Création de la NASA (29 juillet)', wikiPage:'NASA' },
+  { year:'1961', flag:'🇷🇺', event:'Youri Gagarine — premier homme dans l\'espace (12 avr.) · Kennedy lance le défi Apollo', wikiPage:'Youri_Gagarine' },
+  { year:'1963', flag:'🇷🇺', event:'Valentina Terechkova — première femme dans l\'espace (Vostok 6)', wikiPage:'Valentina_Terechkova' },
+  { year:'1965', flag:'🇷🇺', event:'Alexeï Leonov — première sortie extravéhiculaire (EVA)', wikiPage:'Alekseï_Leonov' },
+  { year:'1969', flag:'🇺🇸', event:'Apollo 11 — premiers pas sur la Lune (20 juil.) · Armstrong + Aldrin', wikiPage:'Apollo_11' },
+  { year:'1971', flag:'🇷🇺', event:'Saliout 1 — première station spatiale habitée', wikiPage:'Saliout_1' },
+  { year:'1972', flag:'🇺🇸', event:'Apollo 17 — dernière mission habitée lunaire (jusqu\'à Artemis)', wikiPage:'Apollo_17' },
+  { year:'1975', flag:'🌍', event:'Mission Apollo-Soyouz — première coopération USA/URSS en orbite', wikiPage:'Mission_Apollo-Soyouz' },
+  { year:'1977', flag:'🇺🇸', event:'Lancement Voyager 1 et 2 — grand tour du système solaire', wikiPage:'Voyager_1' },
+  { year:'1981', flag:'🇺🇸', event:'Premier vol de la navette spatiale Columbia (STS-1)', wikiPage:'STS-1' },
+  { year:'1986', flag:'🇷🇺', event:'Station Mir en orbite (active jusqu\'en 2001)', wikiPage:'Station_spatiale_Mir' },
+  { year:'1986', flag:'🇺🇸', event:'Catastrophe Challenger (28 jan.) — 7 morts', wikiPage:'Catastrophe_de_la_navette_Challenger' },
+  { year:'1990', flag:'🌍', event:'Déploiement du télescope spatial Hubble', wikiPage:'Télescope_spatial_Hubble' },
+  { year:'1995', flag:'🇺🇸', event:'Sonde Galileo entre en orbite de Jupiter — découvre l\'océan d\'Europe', wikiPage:'Sonde_Galileo' },
+  { year:'1997', flag:'🇺🇸', event:'Rover Sojourner sur Mars (mission Pathfinder)', wikiPage:'Mars_Pathfinder' },
+  { year:'1998', flag:'🌍', event:'Début de construction de l\'ISS (module Zarya)', wikiPage:'Station_spatiale_internationale' },
+  { year:'2000', flag:'🌍', event:'ISS : début de l\'occupation humaine permanente (nov.)', wikiPage:'Station_spatiale_internationale' },
+  { year:'2003', flag:'🇨🇳', event:'Yang Liwei — premier taikonaute chinois (Shenzhou 5)', wikiPage:'Yang_Liwei' },
+  { year:'2003', flag:'🇺🇸', event:'Catastrophe Columbia (1er fév.) — 7 morts · Rovers Spirit et Opportunity sur Mars', wikiPage:'Catastrophe_de_la_navette_Columbia' },
+  { year:'2004', flag:'🌍', event:'Cassini-Huygens entre en orbite de Saturne · Sonde Huygens sur Titan (2005)', wikiPage:'Cassini-Huygens' },
+  { year:'2011', flag:'🇺🇸', event:'Dernier vol de la navette spatiale (STS-135, Atlantis)', wikiPage:'STS-135' },
+  { year:'2012', flag:'🇺🇸', event:'Curiosity se pose sur Mars · Voyager 1 entre dans l\'espace interstellaire', wikiPage:'Mars_Science_Laboratory' },
+  { year:'2015', flag:'🇺🇸', event:'New Horizons survole Pluton · Falcon 9 réalise le premier atterrissage vertical', wikiPage:'New_Horizons' },
+  { year:'2019', flag:'🇨🇳', event:'Yutu-2 sur la face cachée de la Lune (Chang\'e 4) — première mondiale', wikiPage:'Chang\'e_4' },
+  { year:'2020', flag:'🇺🇸', event:'Crew Dragon transporte des astronautes vers l\'ISS (fin de la dépendance au Soyouz)', wikiPage:'SpaceX_Crew_Dragon' },
+  { year:'2021', flag:'🌍', event:'JWST lancé (25 déc.) · Perseverance + Ingenuity sur Mars · Tiangong chinoise habitée', wikiPage:'James-Webb_(télescope_spatial)' },
+  { year:'2022', flag:'🇺🇸', event:'Artemis I — tour de la Lune sans équipage (SLS + Orion)', wikiPage:'Artemis_1' },
+  { year:'2025', flag:'🇺🇸', event:'Artemis II — 4 astronautes en orbite lunaire (prévu)', wikiPage:'Artemis_2' },
+  { year:'2026', flag:'🇺🇸', event:'Artemis III — premiers humains au pôle sud lunaire (prévu)', wikiPage:'Artemis_3' },
+  { year:'2030s', flag:'🌍', event:'Mission habitée vers Mars — objectif SpaceX / NASA (visée)', wikiPage:'Exploration_humaine_de_Mars' },
 ]
 
 const CONQUEST_GLOSSARY = [
-  { term:'Ligne de Kármán', def:'Altitude de 100 km généralement reconnue comme la frontière entre atmosphère et espace. Aux USA, la limite est fixée à 80 km.' },
-  { term:'Delta-v (Δv)', def:'Variation de vitesse nécessaire pour passer d\'une orbite à une autre. Mesure universelle du « coût » d\'une manœuvre spatiale.' },
-  { term:'EVA', def:'Extra-Vehicular Activity — sortie extravéhiculaire dans l\'espace. Les astronautes portent une combinaison pressurisée (EMU).' },
-  { term:'ICBM', def:'Missile balistique intercontinental — capable d\'atteindre n\'importe quel point du globe. La technologie ICBM a directement produit les premiers lanceurs spatiaux.' },
-  { term:'ISS', def:'Station spatiale internationale — orbite à 400 km, vitesse 7,66 km/s, 15 nations partenaires, habitée en permanence depuis 2000.' },
-  { term:'LEO', def:'Low Earth Orbit — orbite basse entre 160 et 2 000 km. ISS, navette, Starlink y évoluent.' },
-  { term:'Microgravité', def:'État d\'apesanteur apparent vécu en orbite. Non pas l\'absence de gravité, mais la chute libre permanente autour de la Terre.' },
-  { term:'Module lunaire', def:'Partie d\'un vaisseau Apollo conçue pour se poser sur la Lune et en décoller. Composée d\'un étage de descente et d\'un étage de remontée (Eagle pour Apollo 11).' },
-  { term:'Orbite géostationnaire', def:'Orbite à 35 786 km où un satellite est synchrone avec la rotation terrestre — il semble immobile. Utilisée pour la communication et la météo.' },
-  { term:'Overview Effect', def:'Expérience subjective décrite par de nombreux astronautes : la vue de la Terre depuis l\'espace provoque une prise de conscience soudaine de sa fragilité et de l\'unité de l\'humanité.' },
-  { term:'Propulsion ionique', def:'Moteur accélérant des ions par champ électrique. Très efficace sur le long terme (faible poussée, longue durée) — utilisée par Dawn, Hayabusa, SMART-1.' },
-  { term:'Rover', def:'Véhicule robotique explorant la surface d\'un autre corps céleste (Lune, Mars, et bientôt Titan avec Dragonfly en 2034).' },
-  { term:'Sievert (Sv)', def:'Unité de dose de radiation absorbée. Limite annuelle terrestre : 1 mSv. Limite nucléaire : 20 mSv/an. Voyage vers Mars aller-retour : ~1 Sv (1 000 mSv).' },
-  { term:'Taikonaute', def:'Terme officiel chinois pour astronaute — de « Taikong » (espace en mandarin) et « naute » (navigateur en grec).' },
-  { term:'Vitesse de libération', def:'Vitesse minimale pour quitter un champ gravitationnel. Terre : 11,2 km/s. Lune : 2,4 km/s. Mars : 5 km/s.' },
-  { term:'JWST', def:'James Webb Space Telescope — lancé en 2021, observe dans l\'infrarouge depuis le point de Lagrange L2 à 1,5 million de km de la Terre.' },
+  { term:'Ligne de Kármán', def:'Altitude de 100 km généralement reconnue comme la frontière entre atmosphère et espace. Aux USA, la limite est fixée à 80 km.', wikiPage:'Ligne_de_Kármán' },
+  { term:'Delta-v (Δv)', def:'Variation de vitesse nécessaire pour passer d\'une orbite à une autre. Mesure universelle du « coût » d\'une manœuvre spatiale.', wikiPage:'Delta-v' },
+  { term:'EVA', def:'Extra-Vehicular Activity — sortie extravéhiculaire dans l\'espace. Les astronautes portent une combinaison pressurisée (EMU).', wikiPage:'Activité_extravéhiculaire' },
+  { term:'ICBM', def:'Missile balistique intercontinental — capable d\'atteindre n\'importe quel point du globe. La technologie ICBM a directement produit les premiers lanceurs spatiaux.', wikiPage:'Missile_balistique_intercontinental' },
+  { term:'ISS', def:'Station spatiale internationale — orbite à 400 km, vitesse 7,66 km/s, 15 nations partenaires, habitée en permanence depuis 2000.', wikiPage:'Station_spatiale_internationale' },
+  { term:'LEO', def:'Low Earth Orbit — orbite basse entre 160 et 2 000 km. ISS, navette, Starlink y évoluent.', wikiPage:'Orbite_basse_terrestre' },
+  { term:'Microgravité', def:'État d\'apesanteur apparent vécu en orbite. Non pas l\'absence de gravité, mais la chute libre permanente autour de la Terre.', wikiPage:'Microgravité' },
+  { term:'Module lunaire', def:'Partie d\'un vaisseau Apollo conçue pour se poser sur la Lune et en décoller. Composée d\'un étage de descente et d\'un étage de remontée (Eagle pour Apollo 11).', wikiPage:'Module_lunaire_Apollo' },
+  { term:'Orbite géostationnaire', def:'Orbite à 35 786 km où un satellite est synchrone avec la rotation terrestre — il semble immobile. Utilisée pour la communication et la météo.', wikiPage:'Orbite_géostationnaire' },
+  { term:'Overview Effect', def:'Expérience subjective décrite par de nombreux astronautes : la vue de la Terre depuis l\'espace provoque une prise de conscience soudaine de sa fragilité et de l\'unité de l\'humanité.', wikiPage:'Overview_effect' },
+  { term:'Propulsion ionique', def:'Moteur accélérant des ions par champ électrique. Très efficace sur le long terme (faible poussée, longue durée) — utilisée par Dawn, Hayabusa, SMART-1.', wikiPage:'Propulseur_ionique' },
+  { term:'Rover', def:'Véhicule robotique explorant la surface d\'un autre corps céleste (Lune, Mars, et bientôt Titan avec Dragonfly en 2034).', wikiPage:'Rover_(véhicule_spatial)' },
+  { term:'Sievert (Sv)', def:'Unité de dose de radiation absorbée. Limite annuelle terrestre : 1 mSv. Limite nucléaire : 20 mSv/an. Voyage vers Mars aller-retour : ~1 Sv (1 000 mSv).', wikiPage:'Sievert' },
+  { term:'Taikonaute', def:'Terme officiel chinois pour astronaute — de « Taikong » (espace en mandarin) et « naute » (navigateur en grec).', wikiPage:'Taikonaute' },
+  { term:'Vitesse de libération', def:'Vitesse minimale pour quitter un champ gravitationnel. Terre : 11,2 km/s. Lune : 2,4 km/s. Mars : 5 km/s.', wikiPage:'Vitesse_de_libération' },
+  { term:'JWST', def:'James Webb Space Telescope — lancé en 2021, observe dans l\'infrarouge depuis le point de Lagrange L2 à 1,5 million de km de la Terre.', wikiPage:'James-Webb_(télescope_spatial)' },
 ]
 
 const CONQUEST_MISSIONS = [
-  { name:'Spoutnik 1', year:'1957', agency:'URSS', dest:'Orbite terrestre', note:'Premier satellite artificiel de la Terre — 84 kg, bip-bip, 3 mois en orbite' },
-  { name:'Vostok 1', year:'1961', agency:'URSS', dest:'Orbite terrestre', note:'Premier vol humain — Youri Gagarine (108 min, 1 orbite)' },
-  { name:'Apollo 11', year:'1969', agency:'NASA', dest:'Lune', note:'Premiers humains sur la Lune — Armstrong, Aldrin, Collins' },
-  { name:'Mariner 9', year:'1971', agency:'NASA', dest:'Mars', note:'Première sonde en orbite martienne — cartographie complète de la surface' },
-  { name:'Pioneer 10 & 11', year:'1972–73', agency:'NASA', dest:'Jupiter/Saturne', note:'Premières missions vers les planètes géantes, première plaque dorée' },
-  { name:'Viking 1 & 2', year:'1976', agency:'NASA', dest:'Mars', note:'Premiers atterrisseurs sur Mars — recherche de vie dans le sol' },
-  { name:'Voyager 1 & 2', year:'1977', agency:'NASA', dest:'Système solaire', note:'Grand tour des planètes géantes — Voyager 1 en espace interstellaire depuis 2012' },
-  { name:'Hubble (HST)', year:'1990', agency:'NASA/ESA', dest:'Orbite terrestre', note:'Télescope spatial visible/UV — 35 ans de service, révolutionne l\'astronomie' },
-  { name:'Galileo', year:'1995', agency:'NASA', dest:'Jupiter', note:'Orbite jovienne — révèle l\'océan sous-glaciaire d\'Europe' },
-  { name:'Cassini-Huygens', year:'2004', agency:'NASA/ESA', dest:'Saturne', note:'13 ans d\'orbite saturnienne, sonde Huygens sur Titan, geysers d\'Encelade' },
-  { name:'Spirit & Opportunity', year:'2004', agency:'NASA', dest:'Mars', note:'Rovers géologiques — Opportunity actif 14 ans (prévu 3 mois)' },
-  { name:'New Horizons', year:'2015', agency:'NASA', dest:'Pluton/Kuiper', note:'Premier survol de Pluton — révèle montagnes de 3 000 m et cœur de glace' },
-  { name:'JWST', year:'2021', agency:'NASA/ESA/CSA', dest:'L2 (1,5 M km)', note:'Télescope infrarouge — photographie des galaxies formées 300 Ma après le Big Bang' },
-  { name:'Perseverance + Ingenuity', year:'2021', agency:'NASA', dest:'Mars', note:'Collecte d\'échantillons, 72 vols d\'Ingenuity, production d\'O₂ (MOXIE)' },
-  { name:'Artemis I', year:'2022', agency:'NASA', dest:'Lune', note:'Test sans équipage SLS + Orion en orbite lunaire' },
+  { name:'Spoutnik 1', year:'1957', agency:'URSS', dest:'Orbite terrestre', note:'Premier satellite artificiel de la Terre — 84 kg, bip-bip, 3 mois en orbite', wikiPage:'Spoutnik_1' },
+  { name:'Vostok 1', year:'1961', agency:'URSS', dest:'Orbite terrestre', note:'Premier vol humain — Youri Gagarine (108 min, 1 orbite)', wikiPage:'Vostok_1' },
+  { name:'Apollo 11', year:'1969', agency:'NASA', dest:'Lune', note:'Premiers humains sur la Lune — Armstrong, Aldrin, Collins', wikiPage:'Apollo_11' },
+  { name:'Mariner 9', year:'1971', agency:'NASA', dest:'Mars', note:'Première sonde en orbite martienne — cartographie complète de la surface', wikiPage:'Mariner_9' },
+  { name:'Pioneer 10 & 11', year:'1972–73', agency:'NASA', dest:'Jupiter/Saturne', note:'Premières missions vers les planètes géantes, première plaque dorée', wikiPage:'Pioneer_10' },
+  { name:'Viking 1 & 2', year:'1976', agency:'NASA', dest:'Mars', note:'Premiers atterrisseurs sur Mars — recherche de vie dans le sol', wikiPage:'Programme_Viking' },
+  { name:'Voyager 1 & 2', year:'1977', agency:'NASA', dest:'Système solaire', note:'Grand tour des planètes géantes — Voyager 1 en espace interstellaire depuis 2012', wikiPage:'Voyager_1' },
+  { name:'Hubble (HST)', year:'1990', agency:'NASA/ESA', dest:'Orbite terrestre', note:'Télescope spatial visible/UV — 35 ans de service, révolutionne l\'astronomie', wikiPage:'Télescope_spatial_Hubble' },
+  { name:'Galileo', year:'1995', agency:'NASA', dest:'Jupiter', note:'Orbite jovienne — révèle l\'océan sous-glaciaire d\'Europe', wikiPage:'Sonde_Galileo' },
+  { name:'Cassini-Huygens', year:'2004', agency:'NASA/ESA', dest:'Saturne', note:'13 ans d\'orbite saturnienne, sonde Huygens sur Titan, geysers d\'Encelade', wikiPage:'Cassini-Huygens' },
+  { name:'Spirit & Opportunity', year:'2004', agency:'NASA', dest:'Mars', note:'Rovers géologiques — Opportunity actif 14 ans (prévu 3 mois)', wikiPage:'Mars_Exploration_Rover' },
+  { name:'New Horizons', year:'2015', agency:'NASA', dest:'Pluton/Kuiper', note:'Premier survol de Pluton — révèle montagnes de 3 000 m et cœur de glace', wikiPage:'New_Horizons' },
+  { name:'JWST', year:'2021', agency:'NASA/ESA/CSA', dest:'L2 (1,5 M km)', note:'Télescope infrarouge — photographie des galaxies formées 300 Ma après le Big Bang', wikiPage:'James-Webb_(télescope_spatial)' },
+  { name:'Perseverance + Ingenuity', year:'2021', agency:'NASA', dest:'Mars', note:'Collecte d\'échantillons, 72 vols d\'Ingenuity, production d\'O₂ (MOXIE)', wikiPage:'Mars_2020' },
+  { name:'Artemis I', year:'2022', agency:'NASA', dest:'Lune', note:'Test sans équipage SLS + Orion en orbite lunaire', wikiPage:'Artemis_1' },
 ]
 
 const CONQUEST_BIOS = [
@@ -1111,30 +1111,60 @@ const CONQUEST_BIOS = [
 // ─── Composants Conquête spatiale ─────────────────────────────────────────────
 
 function ConquestWikiImg({ src, alt, fallbackQuery, height }) {
-  const [wikiOk, setWikiOk] = useState(true)
-  const [nasaUrl, setNasaUrl] = useState(null)
+  const [thumbUrl, setThumbUrl] = useState(null)
+  const [loading, setLoading] = useState(true)
   const fetched = useRef(false)
 
-  const tryNasa = () => {
-    if (!fallbackQuery || fetched.current) return
+  useEffect(() => {
+    if (!src || fetched.current) return
     fetched.current = true
-    fetchNASAImages(fallbackQuery, 1)
-      .then(photos => { if (photos.length) setNasaUrl(photos[0].thumbUrl) })
-      .catch(() => {})
-  }
+    const filename = decodeURIComponent(src.split('/').pop())
+    const enc = encodeURIComponent('File:' + filename)
+    fetch(`https://commons.wikimedia.org/w/api.php?action=query&titles=${enc}&prop=imageinfo&iiprop=thumburl&iiurlwidth=480&format=json&origin=*`)
+      .then(r => r.json())
+      .then(d => {
+        const page = Object.values(d.query?.pages || {})[0]
+        const tu = page?.imageinfo?.[0]?.thumburl
+        if (tu) { setThumbUrl(tu); setLoading(false) }
+        else throw new Error('no thumb')
+      })
+      .catch(() => {
+        if (fallbackQuery) {
+          fetchNASAImages(fallbackQuery, 1)
+            .then(photos => { if (photos.length) setThumbUrl(photos[0].thumbUrl) })
+            .catch(() => {})
+            .finally(() => setLoading(false))
+        } else {
+          setThumbUrl(src)
+          setLoading(false)
+        }
+      })
+  }, [src])
 
   if (!src) return null
   const h = height || 200
   const imgStyle = { width:'100%', height:h, objectFit:'cover', borderRadius:12, marginBottom:14, display:'block' }
 
-  if (!wikiOk) {
-    if (nasaUrl) return <img src={nasaUrl} alt={alt} style={imgStyle} />
-    tryNasa()
-    return null
-  }
+  if (loading) return (
+    <div style={{ ...imgStyle, background:'var(--surface-2)', display:'flex', alignItems:'center', justifyContent:'center' }}>
+      <div style={{ display:'flex', gap:5 }}>
+        {[0,1,2].map(i => (
+          <span key={i} style={{ width:5, height:5, borderRadius:'50%', background:'var(--faint)',
+            animation:'pulse 1.2s ease-in-out infinite', animationDelay:`${i*0.18}s` }} />
+        ))}
+      </div>
+    </div>
+  )
+  if (!thumbUrl) return null
   return (
-    <img src={src} alt={alt} loading="lazy"
-      onError={() => { setWikiOk(false); tryNasa() }}
+    <img src={thumbUrl} alt={alt} loading="lazy"
+      onError={() => {
+        if (fallbackQuery && !thumbUrl?.includes('nasa')) {
+          fetchNASAImages(fallbackQuery, 1)
+            .then(photos => { if (photos.length) setThumbUrl(photos[0].thumbUrl) })
+            .catch(() => {})
+        }
+      }}
       style={imgStyle} />
   )
 }
@@ -1188,14 +1218,92 @@ function ConquestSection({ section }) {
   )
 }
 
+function WikiSummarySheet({ wikiPage, label, open, onClose }) {
+  const [data, setData] = useState(null)
+  const [loading, setLoading] = useState(false)
+  const fetched = useRef(false)
+
+  useEffect(() => {
+    if (!open) { fetched.current = false; setData(null); return }
+    if (!wikiPage || fetched.current) return
+    fetched.current = true
+    setLoading(true)
+    fetch(`https://fr.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(wikiPage)}`)
+      .then(r => r.ok ? r.json() : Promise.reject())
+      .then(d => { setData(d); setLoading(false) })
+      .catch(() => {
+        fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(wikiPage)}`)
+          .then(r => r.ok ? r.json() : Promise.reject())
+          .then(d => { setData(d); setLoading(false) })
+          .catch(() => setLoading(false))
+      })
+  }, [open, wikiPage])
+
+  return (
+    <Sheet open={open} onClose={onClose} aria-label={label || wikiPage}>
+      <div style={{ padding:'0 0 24px' }}>
+        {loading && (
+          <div style={{ display:'flex', justifyContent:'center', padding:'36px 0' }}>
+            <div style={{ display:'flex', gap:6 }}>
+              {[0,1,2].map(i => (
+                <span key={i} style={{ width:6, height:6, borderRadius:'50%', background:'var(--faint)',
+                  animation:'pulse 1.2s ease-in-out infinite', animationDelay:`${i*0.18}s` }} />
+              ))}
+            </div>
+          </div>
+        )}
+        {data && (
+          <>
+            {data.thumbnail?.source && (
+              <img src={data.thumbnail.source} alt={data.title}
+                style={{ width:'100%', maxHeight:220, objectFit:'cover', borderRadius:14, marginBottom:16, display:'block' }} />
+            )}
+            <div style={{ fontSize:18, fontWeight:700, fontFamily:'var(--sans)', color:'var(--text)', marginBottom:5 }}>
+              {data.title}
+            </div>
+            {data.description && (
+              <div style={{ fontSize:12, fontFamily:'var(--mono)', color:'var(--gold)', marginBottom:13, letterSpacing:'.03em' }}>
+                {data.description}
+              </div>
+            )}
+            {data.extract && (
+              <p className="body serif-body" style={{ fontSize:13.5, lineHeight:1.72, color:'var(--dim)', margin:'0 0 18px' }}>
+                {data.extract}
+              </p>
+            )}
+            <AiInfoPanel
+              cacheKey={`wiki_${wikiPage}`}
+              buildPrompt={`Donne-moi 3 faits fascinants et peu connus sur : ${data.title}. ${data.description ? 'Contexte : ' + data.description : ''}`}
+            />
+            {data.content_urls?.desktop?.page && (
+              <a href={data.content_urls.desktop.page} target="_blank" rel="noopener noreferrer"
+                style={{ display:'inline-block', marginTop:16, fontSize:12, fontFamily:'var(--mono)',
+                  color:'var(--gold)', textDecoration:'none', borderBottom:'1px solid var(--gold)', paddingBottom:2 }}>
+                Lire l&apos;article complet sur Wikipédia →
+              </a>
+            )}
+          </>
+        )}
+        {!loading && !data && (
+          <div style={{ textAlign:'center', padding:'36px 0', color:'var(--faint)', fontSize:13 }}>
+            Article non disponible
+          </div>
+        )}
+      </div>
+    </Sheet>
+  )
+}
+
 function ConquestAnnexes() {
   const [sub, setSub] = useState('timeline')
+  const [wikiItem, setWikiItem] = useState(null)
   const SUBS = [
     { key:'timeline', label:'Chronologie' },
     { key:'glossary', label:'Glossaire' },
     { key:'missions', label:'Missions' },
     { key:'bios', label:'Biographies' },
   ]
+  const chevron = { fontSize:11, color:'var(--faint)', marginLeft:'auto', flexShrink:0 }
   return (
     <div>
       <div style={{ display:'flex', gap:7, flexWrap:'wrap', marginBottom:18 }}>
@@ -1208,15 +1316,18 @@ function ConquestAnnexes() {
       {sub === 'timeline' && (
         <div>
           {CONQUEST_TIMELINE.map((t, i) => (
-            <div key={i} style={{ display:'flex', gap:12, padding:'10px 0',
-              borderBottom:'1px solid var(--line)', alignItems:'flex-start' }}>
+            <button key={i} onClick={() => setWikiItem({ wikiPage: t.wikiPage, label: t.event })}
+              style={{ width:'100%', textAlign:'left', background:'none', border:'none', padding:0, cursor:'pointer',
+                display:'flex', gap:12, paddingTop:10, paddingBottom:10,
+                borderBottom:'1px solid var(--line)', alignItems:'flex-start' }}>
               <div style={{ flexShrink:0, width:52 }}>
                 <div style={{ fontSize:11, fontFamily:'var(--mono)', color:'var(--gold)',
                   letterSpacing:'.06em', marginBottom:2 }}>{t.year}</div>
                 <div style={{ fontSize:16 }}>{t.flag}</div>
               </div>
-              <div className="body" style={{ fontSize:13, lineHeight:1.5, color:'var(--dim)' }}>{t.event}</div>
-            </div>
+              <div className="body" style={{ fontSize:13, lineHeight:1.5, color:'var(--dim)', flex:1 }}>{t.event}</div>
+              <span style={chevron}>›</span>
+            </button>
           ))}
         </div>
       )}
@@ -1224,11 +1335,17 @@ function ConquestAnnexes() {
       {sub === 'glossary' && (
         <div>
           {CONQUEST_GLOSSARY.map((g, i) => (
-            <div key={i} style={{ padding:'10px 0', borderBottom:'1px solid var(--line)' }}>
-              <div style={{ fontSize:13.5, fontWeight:600, fontFamily:'var(--sans)',
-                color:'var(--gold)', marginBottom:3 }}>{g.term}</div>
-              <div className="body" style={{ fontSize:13, lineHeight:1.5, color:'var(--dim)' }}>{g.def}</div>
-            </div>
+            <button key={i} onClick={() => setWikiItem({ wikiPage: g.wikiPage, label: g.term })}
+              style={{ width:'100%', textAlign:'left', background:'none', border:'none', padding:0, cursor:'pointer',
+                paddingTop:10, paddingBottom:10, borderBottom:'1px solid var(--line)',
+                display:'flex', alignItems:'flex-start', gap:8 }}>
+              <div style={{ flex:1 }}>
+                <div style={{ fontSize:13.5, fontWeight:600, fontFamily:'var(--sans)',
+                  color:'var(--gold)', marginBottom:3 }}>{g.term}</div>
+                <div className="body" style={{ fontSize:13, lineHeight:1.5, color:'var(--dim)' }}>{g.def}</div>
+              </div>
+              <span style={chevron}>›</span>
+            </button>
           ))}
         </div>
       )}
@@ -1236,16 +1353,22 @@ function ConquestAnnexes() {
       {sub === 'missions' && (
         <div>
           {CONQUEST_MISSIONS.map((m, i) => (
-            <div key={i} style={{ padding:'11px 0', borderBottom:'1px solid var(--line)' }}>
-              <div style={{ display:'flex', alignItems:'baseline', gap:8, flexWrap:'wrap', marginBottom:2 }}>
-                <span style={{ fontSize:14, fontWeight:600, fontFamily:'var(--sans)', color:'var(--text)' }}>{m.name}</span>
-                <span className="meta" style={{ fontSize:11 }}>{m.year}</span>
-                <span style={{ fontSize:10, fontFamily:'var(--mono)', padding:'1px 7px', borderRadius:99,
-                  background:'var(--surface-2)', border:'1px solid var(--line)', color:'var(--faint)' }}>{m.agency}</span>
+            <button key={i} onClick={() => setWikiItem({ wikiPage: m.wikiPage, label: m.name })}
+              style={{ width:'100%', textAlign:'left', background:'none', border:'none', padding:0, cursor:'pointer',
+                paddingTop:11, paddingBottom:11, borderBottom:'1px solid var(--line)',
+                display:'flex', alignItems:'flex-start', gap:8 }}>
+              <div style={{ flex:1 }}>
+                <div style={{ display:'flex', alignItems:'baseline', gap:8, flexWrap:'wrap', marginBottom:2 }}>
+                  <span style={{ fontSize:14, fontWeight:600, fontFamily:'var(--sans)', color:'var(--text)' }}>{m.name}</span>
+                  <span className="meta" style={{ fontSize:11 }}>{m.year}</span>
+                  <span style={{ fontSize:10, fontFamily:'var(--mono)', padding:'1px 7px', borderRadius:99,
+                    background:'var(--surface-2)', border:'1px solid var(--line)', color:'var(--faint)' }}>{m.agency}</span>
+                </div>
+                <div className="meta" style={{ color:'var(--gold)', fontSize:11, marginBottom:2 }}>{m.dest}</div>
+                <div className="body" style={{ fontSize:12.5, lineHeight:1.5, color:'var(--dim)' }}>{m.note}</div>
               </div>
-              <div className="meta" style={{ color:'var(--gold)', fontSize:11, marginBottom:2 }}>{m.dest}</div>
-              <div className="body" style={{ fontSize:12.5, lineHeight:1.5, color:'var(--dim)' }}>{m.note}</div>
-            </div>
+              <span style={chevron}>›</span>
+            </button>
           ))}
         </div>
       )}
@@ -1265,6 +1388,13 @@ function ConquestAnnexes() {
           ))}
         </div>
       )}
+
+      <WikiSummarySheet
+        open={!!wikiItem}
+        wikiPage={wikiItem?.wikiPage}
+        label={wikiItem?.label}
+        onClose={() => setWikiItem(null)}
+      />
     </div>
   )
 }
