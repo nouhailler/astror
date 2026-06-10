@@ -9,7 +9,7 @@ import {
   getOpenRouterKey, saveOpenRouterKey, fetchFreeModels, getSelectedModel, saveSelectedModel,
   callAI,
 } from './claudeApi'
-import { getGBooksKey, saveGBooksKey } from './api'
+import { getGBooksKey, saveGBooksKey, getCommunitySheetUrl, saveCommunitySheetUrl } from './api'
 
 function SettingsSection({ label }) {
   return (
@@ -222,6 +222,36 @@ function GBooksKeySection() {
   )
 }
 
+function CommunitySheetSection() {
+  const [url, setUrl] = useState(() => getCommunitySheetUrl())
+  const [status, setStatus] = useState('')
+
+  const save = () => { saveCommunitySheetUrl(url); setStatus('saved') }
+
+  return (
+    <div style={{ marginBottom: 24 }}>
+      <SettingsSection label="Communauté · Classement (Google Sheets)" />
+      <div style={{ marginBottom: 8 }}>
+        <input
+          type="url"
+          className="input"
+          placeholder="https://docs.google.com/spreadsheets/d/…"
+          value={url}
+          onChange={e => { setUrl(e.target.value); setStatus('') }}
+          aria-label="URL Google Sheets classement communauté"
+        />
+      </div>
+      <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+        <button className="chip" style={{ height: 34, fontSize: 12.5 }} onClick={save}>Enregistrer</button>
+        {status === 'saved' && <span style={{ fontSize: 12, color: 'var(--good)' }}>Enregistrée</span>}
+      </div>
+      <div className="body tight" style={{ fontSize: 11.5, marginTop: 9, color: 'var(--faint)', lineHeight: 1.5 }}>
+        URL d'une feuille Google Sheets partagée en lecture publique. Colonnes attendues (ligne 1 = en-têtes) : Rang · Auteur · Titre · Votes · Description.
+      </div>
+    </div>
+  )
+}
+
 function AlertInfoRow({ alert, isOn, onToggle, isLast }) {
   const cacheKey = `alert_${alert.k}`
   const [open, setOpen] = useState(false)
@@ -415,6 +445,8 @@ export default function SettingsSheet({ open, onClose, profile, onChange, onRepl
       <ApiKeySection />
 
       <GBooksKeySection />
+
+      <CommunitySheetSection />
 
       <div className="meta" style={{ textAlign: 'center', color: 'var(--faint)', padding: '4px 0 2px' }}>
         Astror · version 1.0 — préférences enregistrées sur cet appareil

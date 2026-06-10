@@ -423,3 +423,85 @@ export async function fetchLaunches() {
     tag: l.status?.abbrev === 'Success' ? 'réussi' : l.status?.abbrev === 'Go' ? 'confirmé' : 'à venir',
   }))
 }
+
+// ─── Communauté ───────────────────────────────────────────────────────────────
+
+const COM_SHEET_KEY = 'astror_community_sheet_v1'
+export const getCommunitySheetUrl  = () => localStorage.getItem(COM_SHEET_KEY) || ''
+export const saveCommunitySheetUrl = (u) => localStorage.setItem(COM_SHEET_KEY, u.trim())
+
+function classifyEventTag(title, cats = []) {
+  const t = (title + ' ' + cats.join(' ')).toLowerCase()
+  if (/nuit.{0,12}étoile|soirée.{0,10}obs|séance\s+d.obs/i.test(t)) return 'Soirée'
+  if (/star.?party|sortie\s+d.obs/i.test(t)) return 'Sortie'
+  if (/club|réunion|assemblée/i.test(t)) return 'Club'
+  if (/atelier|initiation|formation/i.test(t)) return 'Atelier'
+  if (/conférence|congrès|symposium/i.test(t)) return 'Conférence'
+  return 'Actualité'
+}
+
+const RSS_FEEDS = [
+  { url: 'https://www.saf-astronomie.fr/feed/',                          source: 'SAF' },
+  { url: 'https://www.futura-sciences.com/rss/sciences/astronomie.xml', source: 'Futura Sciences' },
+]
+
+export async function fetchAstroClubEvents() {
+  const settled = await Promise.allSettled(RSS_FEEDS.map(async ({ url, source }) => {
+    const r = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(url)}&count=6`)
+    if (!r.ok) throw new Error()
+    const d = await r.json()
+    if (d.status !== 'ok' || !d.items?.length) throw new Error()
+    return d.items.map(item => {
+      const desc = (item.description || item.content || '')
+        .replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 180)
+      const pubDate = item.pubDate ? new Date(item.pubDate) : null
+      return {
+        title: item.title || '',
+        link:  item.link  || '',
+        date:  pubDate ? pubDate.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }) : '',
+        _iso:  pubDate ? pubDate.toISOString() : '',
+        place: source,
+        desc,
+        tag: classifyEventTag(item.title, item.categories),
+      }
+    })
+  }))
+  const items = settled.flatMap(r => r.status === 'fulfilled' ? r.value : [])
+  if (!items.length) throw new Error('no-events')
+  return items.sort((a, b) => b._iso.localeCompare(a._iso)).slice(0, 10)
+}
+
+function parseCsvLine(line) {
+  const cols = []; let cur = '', inQ = false
+  for (const c of line) {
+    if (c === '"') inQ = !inQ
+    else if (c === ',' && !inQ) { cols.push(cur.trim()); cur = '' }
+    else cur += c
+  }
+  cols.push(cur.trim())
+  return cols
+}
+
+export async function fetchCommunityRanking(sheetUrl) {
+  if (!sheetUrl) throw new Error('no-sheet')
+  const m = sheetUrl.match(/\/spreadsheets\/d\/([a-zA-Z0-9_-]+)/)
+  if (!m) throw new Error('invalid-url')
+  const csvUrl = `https://docs.google.com/spreadsheets/d/${m[1]}/gviz/tq?tqx=out:csv`
+  let csv
+  try {
+    const r = await fetch(csvUrl)
+    if (!r.ok) throw new Error()
+    csv = await r.text()
+  } catch {
+    const r = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(csvUrl)}`)
+    if (!r.ok) throw new Error('sheet-error')
+    csv = await r.text()
+  }
+  if (csv.charCodeAt(0) === 0xFEFF) csv = csv.slice(1)
+  const lines = csv.split('\n').map(l => l.trim()).filter(Boolean)
+  if (lines.length < 2) throw new Error('empty-sheet')
+  return lines.slice(1).map((line, i) => {
+    const [rankStr = '', user = '', title = '', votesStr = '0', desc = ''] = parseCsvLine(line)
+    return { rank: parseInt(rankStr) || i + 1, user, title, votes: parseInt(votesStr) || 0, desc }
+  }).filter(r => r.title).slice(0, 10)
+}
