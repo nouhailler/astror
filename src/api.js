@@ -324,6 +324,21 @@ export async function fetchJWSTImages() {
     .slice(0, 12)
 }
 
+export async function fetchAPODArticle() {
+  const res = await fetch('https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY')
+  if (!res.ok) throw new Error('APOD error')
+  const d = await res.json()
+  return {
+    cat: 'NASA · APOD',
+    title: d.title,
+    read: '3 min',
+    body: d.explanation || '',
+    date: new Date(d.date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }),
+    imageUrl: d.media_type === 'image' ? d.url : null,
+    isToday: true,
+  }
+}
+
 export async function fetchLaunches() {
   const res = await fetch('https://lldev.thespacedevs.com/2.2.0/launch/upcoming/?limit=5&mode=list')
   if (!res.ok) throw new Error('Launches API error')
