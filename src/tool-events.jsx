@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useRef } from 'react'
 import { IcSat, IcZap, IcMoon, IcComet, IcStar } from './icons'
 import { ToolPage, ToolSection, ToolSeg } from './tool-ui'
 import { AiInfoPanel } from './ui'
@@ -44,22 +44,29 @@ export default function EventsPage({ onBack }) {
   const recentEvents = useMemo(() => getRecentAstroEvents(7), [])
   const list = cat === 'all' ? allEvents : allEvents.filter(e => e.cat === cat)
 
-  useEffect(() => { saveNotifPrefs(notif) }, [notif])
+  // Skip the very first effect run (initial mount) to avoid overwriting a user's real prefs
+  // with the hardcoded defaults before they've had a chance to interact.
+  const isMounted = useRef(false)
+  useEffect(() => {
+    if (!isMounted.current) { isMounted.current = true; return }
+    saveNotifPrefs(notif)
+  }, [notif])
 
   const toggleNotif = async (k, newVal) => {
     if (newVal && permission !== 'granted') {
-      const perm = await requestPermission()
-      setPermission(perm)
-      if (perm !== 'granted') return
-    }
-    setNotif(v => {
-      const next = { ...v, [k]: newVal }
-      if (newVal && k !== 'iss') {
-        const evt = allEvents.find(e => e.cat === k && e.isoDate)
-        if (evt) scheduleEventReminder(evt.title, evt.isoDate, 60)
+      try {
+        const perm = await requestPermission()
+        setPermission(perm)
+        if (perm !== 'granted') return
+      } catch {
+        return
       }
-      return next
-    })
+    }
+    setNotif(prev => ({ ...prev, [k]: newVal }))
+    if (newVal && k !== 'iss') {
+      const evt = allEvents.find(e => e.cat === k && e.isoDate)
+      if (evt) scheduleEventReminder(evt.title, evt.isoDate, 60)
+    }
   }
 
   return (

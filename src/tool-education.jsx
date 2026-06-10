@@ -600,38 +600,13 @@ const GLOSSAIRE = [
     detail: "Le zodiaque est une bande de ±8–9° de latitude écliptique, correspondant aux orbites des planètes connues de l'Antiquité (jusqu'à Saturne) et de la Lune. Les 12 constellations zodiacales (définie par l'IAU en 1930) occupent des portions inégales de l'écliptique : Vierge couvre ~45°, Scorpion seulement ~7°. L'ophiuchus est traversé par l'écliptique mais n'est pas une constellation du zodiaque au sens traditionnel. La précession des équinoxes a décalé de ~1 signe le Soleil printanier depuis l'Antiquité : le signe astrologique du Bélier correspond désormais astronomiquement aux Poissons. Les planètes du système solaire ne s'éloignent jamais de plus de quelques degrés de l'écliptique, ce qui rend le zodiaque indispensable au repérage planétaire." },
 ].sort((a, b) => a.term.localeCompare(b.term, 'fr'))
 
-function GlossaireView() {
-  const [q, setQ]               = useState('')
-  const [selected, setSelected] = useState(null)
-  const [aiAnswer, setAiAnswer] = useState(null)
-  const [aiLoading, setAiLoading] = useState(false)
+function GlossaireView({ onSelect }) {
+  const [q, setQ] = useState('')
 
   const filtered = useMemo(() => {
     const s = q.trim().toLowerCase()
     return s ? GLOSSAIRE.filter(g => g.term.toLowerCase().includes(s) || g.def.toLowerCase().includes(s)) : GLOSSAIRE
   }, [q])
-
-  function openTerm(g) { setSelected(g); setAiAnswer(null); setAiLoading(false) }
-
-  async function askAIGlossaire(term, def, detail) {
-    setAiLoading(true)
-    setAiAnswer(null)
-    try {
-      const messages = [
-        { role: 'user', content: 'Tu es un expert en astronomie et astrophysique. Réponds toujours en français, de façon très approfondie et pédagogique (8 à 10 phrases). Inclus des formules, des ordres de grandeur, des exemples concrets et les liens avec d\'autres concepts clés.' },
-        { role: 'assistant', content: 'Compris, je réponds en expert avec formules et ordres de grandeur.' },
-        { role: 'user', content: `Donne-moi une explication exhaustive du concept astronomique suivant.\n\nTerme : ${term}\nDéfinition courte : ${def}\nDétails connus : ${detail}\n\nApprofondis encore davantage : curiosités, histoire de la découverte, applications actuelles, et questions encore ouvertes sur ce sujet.` },
-      ]
-      const reply = await callAI(messages)
-      setAiAnswer((reply || '').trim() || '…')
-    } catch (e) {
-      setAiAnswer(e.message === 'no-key'
-        ? "Configurez une clé API dans les Paramètres pour activer les réponses IA."
-        : "Erreur de connexion. Vérifiez votre clé API dans les Paramètres.")
-    } finally {
-      setAiLoading(false)
-    }
-  }
 
   return (
     <div className="enter pad" style={{ paddingTop: 14 }}>
@@ -658,7 +633,7 @@ function GlossaireView() {
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 9 }}>
         {filtered.map(g => (
-          <button key={g.term} onClick={() => openTerm(g)} className="press"
+          <button key={g.term} onClick={() => onSelect(g)} className="press"
             style={{ textAlign: 'left', padding: '13px 15px', borderRadius: 13, cursor: 'pointer',
               background: 'var(--surface-1)', border: '1px solid var(--line)',
               display: 'flex', alignItems: 'flex-start', gap: 10 }}>
@@ -676,73 +651,6 @@ function GlossaireView() {
       <div className="meta" style={{ textAlign: 'center', marginTop: 18, color: 'var(--faint)' }}>
         {filtered.length} terme{filtered.length > 1 ? 's' : ''}
       </div>
-
-      {/* ── Sheet détail + IA ── */}
-      <Sheet open={!!selected} onClose={() => setSelected(null)}>
-        {selected && (
-          <div>
-            <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 99, fontFamily: 'var(--mono)',
-              background: 'var(--surface-2)', border: '1px solid var(--line)',
-              color: 'var(--faint)', letterSpacing: '.06em' }}>{selected.cat}</span>
-
-            <div className="h-sec" style={{ fontSize: 26, marginTop: 12, marginBottom: 10, lineHeight: 1.15 }}>
-              {selected.term}
-            </div>
-
-            <p className="body serif-body" style={{ fontSize: 14, lineHeight: 1.6, color: 'var(--dim)',
-              fontStyle: 'italic', marginBottom: 20, paddingBottom: 18, borderBottom: '1px solid var(--line)' }}>
-              {selected.def}
-            </p>
-
-            <p className="body serif-body" style={{ fontSize: 14.5, lineHeight: 1.7, marginBottom: 0 }}>
-              {selected.detail}
-            </p>
-
-            {/* ── Bouton IA ── */}
-            <div style={{ marginTop: 28, paddingTop: 22, borderTop: '1px solid var(--line)' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
-                <span style={{ width: 26, height: 26, borderRadius: '50%', flexShrink: 0, display: 'flex',
-                  alignItems: 'center', justifyContent: 'center', color: '#1a130a',
-                  background: 'linear-gradient(180deg,var(--gold-2),var(--gold))' }}>
-                  <IcSpark size={14} />
-                </span>
-                <span className="eyebrow">Aller encore plus loin</span>
-              </div>
-
-              <button
-                onClick={() => askAIGlossaire(selected.term, selected.def, selected.detail)}
-                disabled={aiLoading}
-                style={{ width: '100%', padding: '12px 16px', borderRadius: 13,
-                  cursor: aiLoading ? 'default' : 'pointer', opacity: aiLoading ? 0.5 : 1,
-                  background: 'var(--gold-soft)', border: '1px solid var(--gold-line)',
-                  color: 'var(--gold)', fontSize: 14, fontFamily: 'var(--mono)',
-                  letterSpacing: '.04em', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-                <IcSpark size={15} />
-                Approfondir avec l'IA
-              </button>
-
-              {aiLoading && (
-                <div style={{ marginTop: 14, padding: '12px 16px', borderRadius: 12,
-                  background: 'rgba(217,179,108,0.07)', border: '1px solid var(--gold-line)',
-                  display: 'flex', gap: 5 }}>
-                  {[0, 1, 2].map(i => (
-                    <span key={i} style={{ width: 7, height: 7, borderRadius: '50%', background: 'var(--gold)',
-                      animation: 'pulse 1.2s ease-in-out infinite', animationDelay: i * 0.18 + 's' }} />
-                  ))}
-                </div>
-              )}
-
-              {aiAnswer && !aiLoading && (
-                <div style={{ marginTop: 14, padding: '14px 16px', borderRadius: 12,
-                  background: 'rgba(217,179,108,0.07)', border: '1px solid var(--gold-line)',
-                  fontSize: 14, lineHeight: 1.68, color: 'var(--text)', fontFamily: 'var(--serif)' }}>
-                  {aiAnswer}
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-      </Sheet>
     </div>
   )
 }
@@ -996,8 +904,32 @@ export default function EducationPage({ onBack }) {
   const [aiQ, setAiQ]         = useState('')
   const [aiAnswer, setAiAnswer] = useState(null)
   const [aiLoading, setAiLoading] = useState(false)
+  const [openGlossaire, setOpenGlossaire] = useState(null)
+  const [glossAiAnswer, setGlossAiAnswer] = useState(null)
+  const [glossAiLoading, setGlossAiLoading] = useState(false)
 
   useEffect(() => { setAiQ(''); setAiAnswer(null); setAiLoading(false) }, [read])
+  useEffect(() => { setGlossAiAnswer(null); setGlossAiLoading(false) }, [openGlossaire])
+
+  async function askAIGlossaire(term, def, detail) {
+    setGlossAiLoading(true)
+    setGlossAiAnswer(null)
+    try {
+      const messages = [
+        { role: 'user', content: 'Tu es un expert en astronomie et astrophysique. Réponds toujours en français, de façon très approfondie et pédagogique (8 à 10 phrases). Inclus des formules, des ordres de grandeur, des exemples concrets et les liens avec d\'autres concepts clés.' },
+        { role: 'assistant', content: 'Compris, je réponds en expert avec formules et ordres de grandeur.' },
+        { role: 'user', content: `Donne-moi une explication exhaustive du concept astronomique suivant.\n\nTerme : ${term}\nDéfinition courte : ${def}\nDétails connus : ${detail}\n\nApprofondis encore davantage : curiosités, histoire de la découverte, applications actuelles, et questions encore ouvertes sur ce sujet.` },
+      ]
+      const reply = await callAI(messages)
+      setGlossAiAnswer((reply || '').trim() || '…')
+    } catch (e) {
+      setGlossAiAnswer(e.message === 'no-key'
+        ? "Configurez une clé API dans les Paramètres pour activer les réponses IA."
+        : "Erreur de connexion. Vérifiez votre clé API dans les Paramètres.")
+    } finally {
+      setGlossAiLoading(false)
+    }
+  }
 
   async function askAI(question, article) {
     if (!question || !article) return
@@ -1215,7 +1147,73 @@ export default function EducationPage({ onBack }) {
         </div>
       )}
 
-      {seg === 'glossaire' && <GlossaireView />}
+      {seg === 'glossaire' && <GlossaireView onSelect={setOpenGlossaire} />}
+
+      {/* ── Sheet : détail glossaire + IA ── */}
+      <Sheet open={!!openGlossaire} onClose={() => setOpenGlossaire(null)}>
+        {openGlossaire && (
+          <div>
+            <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 99, fontFamily: 'var(--mono)',
+              background: 'var(--surface-2)', border: '1px solid var(--line)',
+              color: 'var(--faint)', letterSpacing: '.06em' }}>{openGlossaire.cat}</span>
+
+            <div className="h-sec" style={{ fontSize: 26, marginTop: 12, marginBottom: 10, lineHeight: 1.15 }}>
+              {openGlossaire.term}
+            </div>
+
+            <p className="body serif-body" style={{ fontSize: 14, lineHeight: 1.6, color: 'var(--dim)',
+              fontStyle: 'italic', marginBottom: 20, paddingBottom: 18, borderBottom: '1px solid var(--line)' }}>
+              {openGlossaire.def}
+            </p>
+
+            <p className="body serif-body" style={{ fontSize: 14.5, lineHeight: 1.7, marginBottom: 0 }}>
+              {openGlossaire.detail}
+            </p>
+
+            <div style={{ marginTop: 28, paddingTop: 22, borderTop: '1px solid var(--line)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
+                <span style={{ width: 26, height: 26, borderRadius: '50%', flexShrink: 0, display: 'flex',
+                  alignItems: 'center', justifyContent: 'center', color: '#1a130a',
+                  background: 'linear-gradient(180deg,var(--gold-2),var(--gold))' }}>
+                  <IcSpark size={14} />
+                </span>
+                <span className="eyebrow">Aller encore plus loin</span>
+              </div>
+
+              <button
+                onClick={() => askAIGlossaire(openGlossaire.term, openGlossaire.def, openGlossaire.detail)}
+                disabled={glossAiLoading}
+                style={{ width: '100%', padding: '12px 16px', borderRadius: 13,
+                  cursor: glossAiLoading ? 'default' : 'pointer', opacity: glossAiLoading ? 0.5 : 1,
+                  background: 'var(--gold-soft)', border: '1px solid var(--gold-line)',
+                  color: 'var(--gold)', fontSize: 14, fontFamily: 'var(--mono)',
+                  letterSpacing: '.04em', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                <IcSpark size={15} />
+                Approfondir avec l'IA
+              </button>
+
+              {glossAiLoading && (
+                <div style={{ marginTop: 14, padding: '12px 16px', borderRadius: 12,
+                  background: 'rgba(217,179,108,0.07)', border: '1px solid var(--gold-line)',
+                  display: 'flex', gap: 5 }}>
+                  {[0, 1, 2].map(i => (
+                    <span key={i} style={{ width: 7, height: 7, borderRadius: '50%', background: 'var(--gold)',
+                      animation: 'pulse 1.2s ease-in-out infinite', animationDelay: i * 0.18 + 's' }} />
+                  ))}
+                </div>
+              )}
+
+              {glossAiAnswer && !glossAiLoading && (
+                <div style={{ marginTop: 14, padding: '14px 16px', borderRadius: 12,
+                  background: 'rgba(217,179,108,0.07)', border: '1px solid var(--gold-line)',
+                  fontSize: 14, lineHeight: 1.68, color: 'var(--text)', fontFamily: 'var(--serif)' }}>
+                  {glossAiAnswer}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+      </Sheet>
 
       {/* ── Sheet : liste des leçons d'un parcours ── */}
       <Sheet open={!!openParcours && !openLesson} onClose={() => setOpenParcours(null)}>
