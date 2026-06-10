@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo, useRef } from 'react'
-import { IcOrbit, IcChevron, IcArrowLeft, IcWave, IcSpark, IcRocket } from './icons'
+import { createPortal } from 'react-dom'
+import { IcOrbit, IcChevron, IcArrowLeft, IcWave, IcSpark, IcRocket, IcClose } from './icons'
 import { ScreenHeader, SettingsBtn, DataRow, Sheet, AiInfoPanel } from './ui'
 import { PLANETS, ANOMALIES, THEORIES } from './data'
 import { getPlanetPositions } from './astro'
@@ -1239,58 +1240,82 @@ function WikiSummarySheet({ wikiPage, label, open, onClose }) {
       })
   }, [open, wikiPage])
 
-  return (
-    <Sheet open={open} onClose={onClose} aria-label={label || wikiPage}>
-      <div style={{ padding:'0 0 24px' }}>
-        {loading && (
-          <div style={{ display:'flex', justifyContent:'center', padding:'36px 0' }}>
-            <div style={{ display:'flex', gap:6 }}>
-              {[0,1,2].map(i => (
-                <span key={i} style={{ width:6, height:6, borderRadius:'50%', background:'var(--faint)',
-                  animation:'pulse 1.2s ease-in-out infinite', animationDelay:`${i*0.18}s` }} />
-              ))}
-            </div>
-          </div>
-        )}
-        {data && (
-          <>
-            {data.thumbnail?.source && (
-              <img src={data.thumbnail.source} alt={data.title}
-                style={{ width:'100%', maxHeight:220, objectFit:'cover', borderRadius:14, marginBottom:16, display:'block' }} />
-            )}
-            <div style={{ fontSize:18, fontWeight:700, fontFamily:'var(--sans)', color:'var(--text)', marginBottom:5 }}>
-              {data.title}
-            </div>
-            {data.description && (
-              <div style={{ fontSize:12, fontFamily:'var(--mono)', color:'var(--gold)', marginBottom:13, letterSpacing:'.03em' }}>
-                {data.description}
+  useEffect(() => {
+    if (!open) return
+    const onKey = (e) => e.key === 'Escape' && onClose()
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [open, onClose])
+
+  if (!open) return null
+  const root = document.getElementById('root')
+  if (!root) return null
+
+  return createPortal(
+    <>
+      <div className="sheet-backdrop" onClick={onClose} aria-hidden="true" />
+      <div className="sheet" role="dialog" aria-modal="true" aria-label={label || wikiPage}>
+        <div className="sheet-grip" />
+        <button onClick={onClose} aria-label="Fermer"
+          style={{ position:'absolute', top:14, right:16, width:32, height:32, borderRadius:999,
+            border:'1px solid var(--line-2)', background:'rgba(255,255,255,.03)', color:'var(--dim)',
+            display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer' }}>
+          <IcClose size={16} />
+        </button>
+        <div className="sheet-scroll">
+          <div style={{ padding:'0 0 24px' }}>
+            {loading && (
+              <div style={{ display:'flex', justifyContent:'center', padding:'36px 0' }}>
+                <div style={{ display:'flex', gap:6 }}>
+                  {[0,1,2].map(i => (
+                    <span key={i} style={{ width:6, height:6, borderRadius:'50%', background:'var(--faint)',
+                      animation:'pulse 1.2s ease-in-out infinite', animationDelay:`${i*0.18}s` }} />
+                  ))}
+                </div>
               </div>
             )}
-            {data.extract && (
-              <p className="body serif-body" style={{ fontSize:13.5, lineHeight:1.72, color:'var(--dim)', margin:'0 0 18px' }}>
-                {data.extract}
-              </p>
+            {data && (
+              <>
+                {data.thumbnail?.source && (
+                  <img src={data.thumbnail.source} alt={data.title}
+                    style={{ width:'100%', maxHeight:220, objectFit:'cover', borderRadius:14, marginBottom:16, display:'block' }} />
+                )}
+                <div style={{ fontSize:18, fontWeight:700, fontFamily:'var(--sans)', color:'var(--text)', marginBottom:5 }}>
+                  {data.title}
+                </div>
+                {data.description && (
+                  <div style={{ fontSize:12, fontFamily:'var(--mono)', color:'var(--gold)', marginBottom:13, letterSpacing:'.03em' }}>
+                    {data.description}
+                  </div>
+                )}
+                {data.extract && (
+                  <p className="body serif-body" style={{ fontSize:13.5, lineHeight:1.72, color:'var(--dim)', margin:'0 0 18px' }}>
+                    {data.extract}
+                  </p>
+                )}
+                <AiInfoPanel
+                  cacheKey={`wiki_${wikiPage}`}
+                  buildPrompt={`Donne-moi 3 faits fascinants et peu connus sur : ${data.title}. ${data.description ? 'Contexte : ' + data.description : ''}`}
+                />
+                {data.content_urls?.desktop?.page && (
+                  <a href={data.content_urls.desktop.page} target="_blank" rel="noopener noreferrer"
+                    style={{ display:'inline-block', marginTop:16, fontSize:12, fontFamily:'var(--mono)',
+                      color:'var(--gold)', textDecoration:'none', borderBottom:'1px solid var(--gold)', paddingBottom:2 }}>
+                    Lire l&apos;article complet sur Wikipédia →
+                  </a>
+                )}
+              </>
             )}
-            <AiInfoPanel
-              cacheKey={`wiki_${wikiPage}`}
-              buildPrompt={`Donne-moi 3 faits fascinants et peu connus sur : ${data.title}. ${data.description ? 'Contexte : ' + data.description : ''}`}
-            />
-            {data.content_urls?.desktop?.page && (
-              <a href={data.content_urls.desktop.page} target="_blank" rel="noopener noreferrer"
-                style={{ display:'inline-block', marginTop:16, fontSize:12, fontFamily:'var(--mono)',
-                  color:'var(--gold)', textDecoration:'none', borderBottom:'1px solid var(--gold)', paddingBottom:2 }}>
-                Lire l&apos;article complet sur Wikipédia →
-              </a>
+            {!loading && !data && (
+              <div style={{ textAlign:'center', padding:'36px 0', color:'var(--faint)', fontSize:13 }}>
+                Article non disponible
+              </div>
             )}
-          </>
-        )}
-        {!loading && !data && (
-          <div style={{ textAlign:'center', padding:'36px 0', color:'var(--faint)', fontSize:13 }}>
-            Article non disponible
           </div>
-        )}
+        </div>
       </div>
-    </Sheet>
+    </>,
+    root
   )
 }
 
