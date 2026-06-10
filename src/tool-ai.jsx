@@ -194,37 +194,40 @@ export default function AiPage({ onBack }) {
         </button>
       </div>
 
+      {/* Panel suggestions — hors de la zone de scroll, toujours visible en haut */}
+      {msgs.length <= 1 && (
+        <div style={{ flexShrink: 0, overflowY: 'auto', maxHeight: '55vh',
+          padding: '12px 18px 10px', borderBottom: '1px solid var(--line)' }}>
+          <div className="eyebrow dim" style={{ marginBottom: 10 }}>Suggestions</div>
+          {/* Chips catégories */}
+          <div style={{ display: 'flex', gap: 7, flexWrap: 'wrap', marginBottom: 12 }}>
+            {AI_CATEGORIES.map(c => (
+              <button key={c.label} onClick={() => setSuggestCat(c.label)}
+                style={{ fontSize: 11, padding: '4px 10px', borderRadius: 99, cursor: 'pointer',
+                  fontFamily: 'var(--mono)', letterSpacing: '.04em',
+                  background: suggestCat === c.label ? 'var(--gold-soft)' : 'var(--surface-1)',
+                  border: '1px solid ' + (suggestCat === c.label ? 'var(--gold-line)' : 'var(--line)'),
+                  color: suggestCat === c.label ? 'var(--gold)' : 'var(--faint)' }}>
+                {c.label}
+              </button>
+            ))}
+          </div>
+          {/* Questions de la catégorie active */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {(AI_CATEGORIES.find(c => c.label === suggestCat)?.questions ?? []).map((s, i) => (
+              <button key={i} onClick={() => send(s)} className="press"
+                style={{ textAlign: 'left', padding: '11px 14px', borderRadius: 12,
+                  background: 'var(--surface-1)', border: '1px solid var(--line-2)',
+                  color: 'var(--dim)', fontSize: 13, cursor: 'pointer', fontFamily: 'var(--serif)' }}>
+                {s}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       <div ref={scrollRef} style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '16px 18px 8px' }}>
         {msgs.map((m, i) => <AiBubble key={i} m={m} />)}
-        {msgs.length <= 1 && (
-          <div style={{ marginTop: 8 }}>
-            <div className="eyebrow dim" style={{ marginBottom: 10 }}>Suggestions</div>
-            {/* Chips catégories */}
-            <div style={{ display: 'flex', gap: 7, flexWrap: 'wrap', marginBottom: 12 }}>
-              {AI_CATEGORIES.map(c => (
-                <button key={c.label} onClick={() => setSuggestCat(c.label)}
-                  style={{ fontSize: 11, padding: '4px 10px', borderRadius: 99, cursor: 'pointer',
-                    fontFamily: 'var(--mono)', letterSpacing: '.04em',
-                    background: suggestCat === c.label ? 'var(--gold-soft)' : 'var(--surface-1)',
-                    border: '1px solid ' + (suggestCat === c.label ? 'var(--gold-line)' : 'var(--line)'),
-                    color: suggestCat === c.label ? 'var(--gold)' : 'var(--faint)' }}>
-                  {c.label}
-                </button>
-              ))}
-            </div>
-            {/* Questions de la catégorie active */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-              {(AI_CATEGORIES.find(c => c.label === suggestCat)?.questions ?? []).map((s, i) => (
-                <button key={i} onClick={() => send(s)} className="press"
-                  style={{ textAlign: 'left', padding: '11px 14px', borderRadius: 12,
-                    background: 'var(--surface-1)', border: '1px solid var(--line-2)',
-                    color: 'var(--dim)', fontSize: 13, cursor: 'pointer', fontFamily: 'var(--serif)' }}>
-                  {s}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
       </div>
 
       <div style={{ flexShrink: 0, padding: '10px 16px calc(22px + var(--sab))', borderTop: '1px solid var(--line)', background: 'rgba(6,9,18,.7)' }}>

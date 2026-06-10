@@ -196,35 +196,38 @@ export default function AssistantScreen() {
       </div>
       <hr className="hair" />
 
+      {/* Panel suggestions — hors de la zone de scroll, toujours visible en haut */}
+      {msgs.length <= 1 && (
+        <div style={{ flexShrink: 0, overflowY: 'auto', maxHeight: '55vh',
+          padding: '12px 18px 10px', borderBottom: '1px solid var(--line)' }}>
+          <div className="meta" style={{ marginBottom: 10, textTransform: 'uppercase', letterSpacing: '.12em' }}>Suggestions</div>
+          {/* Chips catégories */}
+          <div style={{ display: 'flex', gap: 7, flexWrap: 'wrap', marginBottom: 12 }}>
+            {CATEGORIES.map(c => (
+              <button key={c.label} onClick={() => setActiveCat(c.label)}
+                style={{ fontSize: 11, padding: '4px 10px', borderRadius: 99, cursor: 'pointer',
+                  fontFamily: 'var(--mono)', letterSpacing: '.04em',
+                  background: activeCat === c.label ? 'var(--gold-soft)' : 'var(--surface-1)',
+                  border: '1px solid ' + (activeCat === c.label ? 'var(--gold-line)' : 'var(--line)'),
+                  color: activeCat === c.label ? 'var(--gold)' : 'var(--faint)' }}>
+                {c.label}
+              </button>
+            ))}
+          </div>
+          {/* Questions de la catégorie active */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {(CATEGORIES.find(c => c.label === activeCat)?.questions ?? []).map(s => (
+              <button key={s} className="press" onClick={() => send(s)} style={{ textAlign: 'left',
+                padding: '11px 14px', borderRadius: 13, cursor: 'pointer', fontSize: 13,
+                color: 'var(--dim)', background: 'rgba(255,255,255,0.02)', border: '1px solid var(--line-2)',
+                fontFamily: 'var(--serif)' }}>{s}</button>
+            ))}
+          </div>
+        </div>
+      )}
+
       <div ref={scrollRef} className="screen" style={{ flex: 1, padding: '16px 18px 8px' }}>
         {msgs.map((m, i) => <Bubble key={i} m={m} />)}
-        {msgs.length <= 1 && (
-          <div style={{ marginTop: 8 }}>
-            <div className="meta" style={{ marginBottom: 10, textTransform: 'uppercase', letterSpacing: '.12em' }}>Suggestions</div>
-            {/* Chips catégories */}
-            <div style={{ display: 'flex', gap: 7, flexWrap: 'wrap', marginBottom: 12 }}>
-              {CATEGORIES.map(c => (
-                <button key={c.label} onClick={() => setActiveCat(c.label)}
-                  style={{ fontSize: 11, padding: '4px 10px', borderRadius: 99, cursor: 'pointer',
-                    fontFamily: 'var(--mono)', letterSpacing: '.04em',
-                    background: activeCat === c.label ? 'var(--gold-soft)' : 'var(--surface-1)',
-                    border: '1px solid ' + (activeCat === c.label ? 'var(--gold-line)' : 'var(--line)'),
-                    color: activeCat === c.label ? 'var(--gold)' : 'var(--faint)' }}>
-                  {c.label}
-                </button>
-              ))}
-            </div>
-            {/* Questions de la catégorie active */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-              {(CATEGORIES.find(c => c.label === activeCat)?.questions ?? []).map(s => (
-                <button key={s} className="press" onClick={() => send(s)} style={{ textAlign: 'left',
-                  padding: '11px 14px', borderRadius: 13, cursor: 'pointer', fontSize: 13,
-                  color: 'var(--dim)', background: 'rgba(255,255,255,0.02)', border: '1px solid var(--line-2)',
-                  fontFamily: 'var(--serif)' }}>{s}</button>
-              ))}
-            </div>
-          </div>
-        )}
       </div>
 
       <div style={{ padding: '10px 16px calc(14px + var(--sab))', borderTop: '1px solid var(--line)',
