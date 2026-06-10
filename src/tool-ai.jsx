@@ -5,6 +5,21 @@ import { callAI } from './claudeApi'
 
 const AI_CATEGORIES = [
   {
+    label: 'Utilisation de Astror',
+    questions: [
+      "À quoi sert l'onglet Ciel et comment lire la carte du ciel ?",
+      "Comment configurer ma position et mon matériel dans Astror ?",
+      "Comment fonctionne le journal d'observation et comment l'utiliser ?",
+      "Que calcule l'outil Éphémérides et quelles données sont en temps réel ?",
+      "Comment prédire un passage de l'ISS au-dessus de chez moi ?",
+      "Comment utiliser l'outil Astrophoto pour planifier une session ?",
+      "Comment activer les notifications pour les événements célestes ?",
+      "Quelle différence entre l'onglet Assistant et l'outil Assistant IA ?",
+      "Comment fonctionne le quiz dans l'onglet Apprendre ?",
+      "Astror fonctionne-t-il sans connexion internet ?",
+    ],
+  },
+  {
     label: 'Observer',
     questions: [
       'Que puis-je observer ce soir avec un Dobson 200 mm ?',
@@ -131,7 +146,7 @@ export default function AiPage({ onBack }) {
   const [msgs, setMsgs] = useState([{ role: 'bot', text: `Bonsoir. Je connais votre ciel (${city}) et votre matériel — demandez-moi quoi observer ce soir, comment trouver un objet, ou si les conditions sont bonnes.` }])
   const [input, setInput] = useState('')
   const [busy, setBusy] = useState(false)
-  const [suggestCat, setSuggestCat] = useState(AI_CATEGORIES[0].label)
+  const [suggestCat, setSuggestCat] = useState('Utilisation de Astror')
   const scrollRef = useRef(null)
 
   useEffect(() => { const el = scrollRef.current; if (el) el.scrollTop = el.scrollHeight }, [msgs, busy])
