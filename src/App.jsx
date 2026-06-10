@@ -65,7 +65,7 @@ export default function App() {
   return (
     <div className="app-root">
       <div className="safe-top" />
-      <TopBar onHelp={() => setHelpKey(HELP_KEYS[tab])} />
+      <TopBar onHelp={() => setHelpKey(HELP_KEYS[tab])} onHome={() => setTab('sky')} />
       <div className="screen-area">
         {tab === 'sky' && <SkyScreen />}
         {tab === 'eph' && <EphScreen />}
