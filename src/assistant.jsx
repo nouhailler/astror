@@ -5,12 +5,102 @@ import { callAI } from './claudeApi'
 
 const PRIME = "Tu es Astror, un assistant expert en astronomie, astrophysique et cosmologie, intégré à une application pour astronomes amateurs confirmés. Réponds toujours en français, de façon précise, rigoureuse et concise (4 à 6 phrases maximum). Emploie des données chiffrées et des termes techniques quand c'est pertinent, sans jargon inutile. Si la question sort de l'astronomie, ramène poliment au sujet."
 
-const SUGGESTIONS = [
-  'Comment observer Saturne ce soir ?',
-  'Explique la tension de Hubble simplement',
-  'Quelle est la différence entre matière et énergie noire ?',
-  "Pourquoi le ciel profond demande-t-il l'obscurité ?",
-  'Conseille-moi un télescope pour les nébuleuses',
+const CATEGORIES = [
+  {
+    label: 'Utilisation de Astror',
+    questions: [
+      "À quoi sert l'onglet Ciel et comment lire la carte du ciel ?",
+      "Comment configurer ma position et mon matériel dans Astror ?",
+      "Comment fonctionne le journal d'observation et comment l'utiliser ?",
+      "Que calcule l'outil Éphémérides et quelles données sont en temps réel ?",
+      "Comment prédire un passage de l'ISS au-dessus de chez moi ?",
+      "Comment utiliser l'outil Astrophoto pour planifier une session ?",
+      "Comment activer les notifications pour les événements célestes ?",
+      "Quelle différence entre l'onglet Assistant et l'outil Assistant IA ?",
+      "Comment fonctionne le quiz dans l'onglet Apprendre ?",
+      "Astror fonctionne-t-il sans connexion internet ?",
+    ],
+  },
+  {
+    label: 'Observer',
+    questions: [
+      'Que puis-je observer ce soir avec un Dobson 200 mm ?',
+      'Quels objets sont visibles depuis ma position à 23 h ?',
+      "Comment trouver la galaxie d'Andromède ce soir ?",
+    ],
+  },
+  {
+    label: 'Instruments',
+    questions: [
+      "Quelle monture choisir pour débuter l'astrophoto avec un budget de 500 € ?",
+      "Quelle est la différence entre un télescope Newton et un Schmidt-Cassegrain ?",
+      "Comment collimater un télescope Newton 150/750 ?",
+    ],
+  },
+  {
+    label: 'Astrophoto',
+    questions: [
+      "Le ciel est-il bon pour l'astrophoto cette nuit ?",
+      "Quel temps de pose pour M42 avec un APS-C à f/5 ?",
+      "Comment réduire le bruit de fond sur une photo de nébuleuse ?",
+    ],
+  },
+  {
+    label: 'Système solaire',
+    questions: [
+      "Quand Saturne sera-t-il en opposition cette année ?",
+      "Quelle est la meilleure période pour observer Mars ?",
+      "Comment distinguer une comète d'un astéroïde au télescope ?",
+    ],
+  },
+  {
+    label: 'Ciel profond',
+    questions: [
+      "Conseille-moi 3 cibles faciles pour débuter l'observation du ciel profond.",
+      "Quelle est la différence entre un amas ouvert et un amas globulaire ?",
+      "Quelles nébuleuses sont visibles à l'œil nu depuis une zone Bortle 4 ?",
+    ],
+  },
+  {
+    label: 'Astrophysique',
+    questions: [
+      "Comment se forme un trou noir stellaire ?",
+      "Quelle est la différence entre une naine blanche et une étoile à neutrons ?",
+      "Pourquoi les étoiles massives vivent-elles moins longtemps que les naines rouges ?",
+    ],
+  },
+  {
+    label: 'Cosmologie',
+    questions: [
+      "Qu'est-ce que la matière noire et comment sait-on qu'elle existe ?",
+      "Quelle est la différence entre le Big Bang et l'inflation cosmique ?",
+      "Comment JWST observe-t-il les premières galaxies de l'univers ?",
+    ],
+  },
+  {
+    label: 'Conquête spatiale',
+    questions: [
+      "Quelles sont les prochaines missions habitées vers la Lune ?",
+      "Comment fonctionne la vie à bord de l'ISS ?",
+      "Quelles sont les avancées récentes du programme Artemis de la NASA ?",
+    ],
+  },
+  {
+    label: 'Agences spatiales',
+    questions: [
+      "Quelle est la différence entre la NASA, l'ESA et Roscosmos en termes de missions ?",
+      "Quelles missions l'ESA prépare-t-elle pour 2025–2030 ?",
+      "Comment SpaceX a-t-il changé l'industrie spatiale depuis 2015 ?",
+    ],
+  },
+  {
+    label: 'Fusées & lanceurs',
+    questions: [
+      "Quelle est la différence entre Ariane 6 et le Falcon 9 de SpaceX ?",
+      "Comment fonctionne le système de récupération des premiers étages de fusée ?",
+      "Quels sont les lanceurs capables d'atteindre la Lune aujourd'hui ?",
+    ],
+  },
 ]
 
 function Typing() {
@@ -53,6 +143,7 @@ export default function AssistantScreen() {
   ])
   const [input, setInput] = useState('')
   const [busy, setBusy] = useState(false)
+  const [activeCat, setActiveCat] = useState('Utilisation de Astror')
   const scrollRef = useRef(null)
 
   useEffect(() => {
@@ -110,11 +201,25 @@ export default function AssistantScreen() {
         {msgs.length <= 1 && (
           <div style={{ marginTop: 8 }}>
             <div className="meta" style={{ marginBottom: 10, textTransform: 'uppercase', letterSpacing: '.12em' }}>Suggestions</div>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-              {SUGGESTIONS.map(s => (
+            {/* Chips catégories */}
+            <div style={{ display: 'flex', gap: 7, flexWrap: 'wrap', marginBottom: 12 }}>
+              {CATEGORIES.map(c => (
+                <button key={c.label} onClick={() => setActiveCat(c.label)}
+                  style={{ fontSize: 11, padding: '4px 10px', borderRadius: 99, cursor: 'pointer',
+                    fontFamily: 'var(--mono)', letterSpacing: '.04em',
+                    background: activeCat === c.label ? 'var(--gold-soft)' : 'var(--surface-1)',
+                    border: '1px solid ' + (activeCat === c.label ? 'var(--gold-line)' : 'var(--line)'),
+                    color: activeCat === c.label ? 'var(--gold)' : 'var(--faint)' }}>
+                  {c.label}
+                </button>
+              ))}
+            </div>
+            {/* Questions de la catégorie active */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {(CATEGORIES.find(c => c.label === activeCat)?.questions ?? []).map(s => (
                 <button key={s} className="press" onClick={() => send(s)} style={{ textAlign: 'left',
-                  padding: '10px 14px', borderRadius: 13, cursor: 'pointer', fontSize: 12.8, color: 'var(--dim)',
-                  background: 'rgba(255,255,255,0.02)', border: '1px solid var(--line-2)',
+                  padding: '11px 14px', borderRadius: 13, cursor: 'pointer', fontSize: 13,
+                  color: 'var(--dim)', background: 'rgba(255,255,255,0.02)', border: '1px solid var(--line-2)',
                   fontFamily: 'var(--serif)' }}>{s}</button>
               ))}
             </div>
