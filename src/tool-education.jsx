@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect, useRef } from 'react'
 import { IcTrophy, IcFlame, IcCheckCircle, IcClose, IcPlay } from './icons'
 import { Sheet } from './ui'
 import { ToolPage, ToolSection, ToolSeg } from './tool-ui'
-import { useLiveData, fetchAPODArticle } from './api'
+import { useLiveData, fetchAPODArticle, fetchEduNews } from './api'
 
 // ─── Quiz pool : 40 questions avec catégories ───────────────────────────────
 
@@ -374,13 +374,13 @@ function markLessonRead(parcours, parcoursId, lessonId) {
 
 const EDU_CONTENT = [
   { cat: 'Histoire', title: 'De Galilée au télescope spatial', read: '6 min',
-    body: 'En 1609, Galilée pointe une lunette vers le ciel et découvre les cratères de la Lune, les phases de Vénus et les quatre lunes de Jupiter. Quatre siècles plus tard, le James Webb observe les premières galaxies de l\'univers. Cette page retrace les grandes étapes instrumentales qui ont transformé notre regard sur le cosmos.' },
+    body: 'En 1609, Galilée pointe sa lunette vers le ciel et bouleverse l\'astronomie : les cratères de la Lune, les phases de Vénus et les quatre lunes de Jupiter — Io, Europe, Ganymède, Callisto — prouvent que tous les astres ne tournent pas autour de la Terre.\n\nDeux siècles plus tard, William Herschel cartographie la Voie Lactée et découvre Uranus (1781), première planète identifiée à l\'instrument. En 1924, Hubble mesure la distance d\'Andromède et révèle que l\'univers est peuplé de milliards de galaxies.\n\nL\'ère spatiale s\'ouvre en 1957 avec Spoutnik, puis Hubble Space Telescope (1990) montre des galaxies à 12 milliards d\'années-lumière. En 2022, James Webb franchit une nouvelle frontière : infrarouge, cryogénie à −233 °C, miroir de 6,5 m déployé à 1,5 million de km de la Terre. Il capture la lumière des tout premières galaxies formées 300 millions d\'années après le Big Bang.\n\nChaque génération d\'instruments agrandit l\'univers observable. Ce qui était invisible devient visible — et chaque nouvelle fenêtre révèle que la réalité dépasse toujours les modèles.' },
   { cat: 'Cosmologie', title: 'Le Big Bang en cinq idées', read: '7 min',
-    body: 'L\'univers est en expansion depuis 13,8 milliards d\'années à partir d\'un état chaud et dense. Trois piliers le confirment : la fuite des galaxies, le fond diffus cosmologique à 2,7 K, et l\'abondance des éléments légers forgés dans les premières minutes.' },
+    body: 'L\'univers a commencé par un état extrêmement chaud et dense il y a 13,8 milliards d\'années. Ce n\'est pas une explosion dans l\'espace, mais une expansion de l\'espace lui-même.\n\n1. La fuite des galaxies. Hubble (1929) mesure que toutes les galaxies lointaines s\'éloignent de nous à une vitesse proportionnelle à leur distance. Rembobinons : tout converge vers une singularité.\n\n2. Le fond diffus cosmologique. En 1965, Penzias et Wilson captent accidentellement un rayonnement à 2,7 K uniforme dans tout le ciel. C\'est la chaleur résiduelle du Big Bang, émise 380 000 ans après le début quand l\'univers est devenu transparent.\n\n3. La nucléosynthèse primordiale. Dans les trois premières minutes, les protons et neutrons fusionnent et forgent hydrogène (75 %), hélium-4 (25 %) et des traces de lithium — exactement l\'abondance observée dans les étoiles les plus vieilles.\n\n4. L\'inflation cosmique. Une microseconde après le Big Bang, l\'univers aurait subi une expansion exponentielle fulgurante, expliquant son homogénéité et sa platitude géométrique.\n\n5. L\'énergie noire. Depuis 1998, les supernovas Ia révèlent que l\'expansion accélère. Une énergie mystérieuse (68 % du contenu de l\'univers) contrecarre la gravité. Sa nature reste inconnue.' },
   { cat: 'Astrophysique', title: 'Comment naissent les étoiles', read: '5 min',
-    body: 'Dans les nuages moléculaires froids, la gravité effondre des grumeaux de gaz jusqu\'à allumer la fusion de l\'hydrogène. Une étoile naît, équilibre entre gravité et pression de radiation, pour des millions à des milliards d\'années.' },
+    body: 'Les étoiles naissent dans les nuages moléculaires géants — de vastes réservoirs de gaz froid (∼10 K) et de poussière qui s\'étendent sur des centaines d\'années-lumière. La nébuleuse d\'Orion, visible à l\'œil nu, en est l\'exemple le plus proche à 1 350 al.\n\nUnder des perturbations (onde de choc de supernova, collision galactique), une région du nuage s\'effondre sous l\'effet de la gravité. Elle se fragmente en grumeaux qui s\'échauffent en se contractant : c\'est la proto-étoile, encore entourée d\'une enveloppe de gaz et de poussière qui formera un disque protoplanétaire.\n\nQuand la température au cœur atteint 10 millions de kelvins, la fusion de l\'hydrogène s\'amorce. La pression de radiation équilibre la gravité : l\'étoile entre dans la séquence principale — le stade stable qui durera de quelques millions d\'années (pour les plus massives) à des dizaines de milliards d\'années (pour les naines rouges).\n\nNotre Soleil est une étoile de type G2V, à mi-vie depuis 4,6 milliards d\'années. Dans 5 milliards d\'années, il gonflera en géante rouge, engloutissant peut-être la Terre, avant de finir en nébuleuse planétaire puis naine blanche.' },
   { cat: 'Découvertes', title: 'La tension de Hubble', read: '6 min',
-    body: 'Deux méthodes de mesure de l\'expansion de l\'univers donnent des valeurs incompatibles : 67,4 contre 73 km/s/Mpc. Cet écart de plus de 5σ est l\'un des plus grands mystères de la cosmologie actuelle — erreur systématique ou physique nouvelle ?' },
+    body: 'Comment mesure-t-on l\'expansion de l\'univers ? La constante de Hubble H₀ donne le taux d\'expansion en km/s par mégaparsec (Mpc). Deux méthodes indépendantes donnent aujourd\'hui des valeurs statistiquement incompatibles.\n\nMéthode 1 — l\'échelle de distances cosmiques. On enchaîne des indicateurs : parallaxe stellaire → Céphéides → supernovas Ia. La collaboration SH0ES (2022) obtient H₀ = 73,0 ± 1,0 km/s/Mpc.\n\nMéthode 2 — le fond diffus cosmologique. Le satellite Planck mesure les fluctuations du CMB (carte de l\'univers à 380 000 ans) et extrapole H₀ = 67,4 ± 0,5 km/s/Mpc en utilisant le modèle ΛCDM standard.\n\nL\'écart est de ~5σ. En science, 5σ, c\'est le seuil de découverte. Si ce n\'est pas une erreur systématique (biais dans les mesures de distance, contamination du CMB), cela signifierait que la physique standard est incomplète : énergie noire variable, interactions avec des neutrinos stériles, ou nouvelle physique dans l\'univers primordial.\n\nJWST apporte de nouvelles mesures des Céphéides. Les résultats préliminaires confortent la valeur haute (∼73). Le mystère reste entier — et passionnant.' },
 ]
 
 // ─── Glossaire astronomique ──────────────────────────────────────────────────
@@ -727,6 +727,7 @@ export default function EducationPage({ onBack }) {
 
   const defi = getTodayDefi()
   const { data: apodArticle } = useLiveData(fetchAPODArticle)
+  const { data: eduNews, loading: eduNewsLoading } = useLiveData(fetchEduNews)
 
   const onQuizComplete = (score, total, bonusXp) => {
     setQuizStats(quizLoad())
@@ -742,6 +743,7 @@ export default function EducationPage({ onBack }) {
 
   const allContent = [
     ...(apodArticle ? [apodArticle] : []),
+    ...(eduNews || []),
     ...EDU_CONTENT,
   ]
 
@@ -874,6 +876,21 @@ export default function EducationPage({ onBack }) {
 
       {seg === 'content' && (
         <div className="enter pad" style={{ paddingTop: 14, display: 'flex', flexDirection: 'column', gap: 11 }}>
+          {eduNewsLoading && !eduNews && [0, 1, 2].map(i => (
+            <div key={i} style={{ borderRadius: 16, overflow: 'hidden',
+              background: 'var(--surface-1)', border: '1px solid var(--line)' }}>
+              <div style={{ height: 100, background: 'var(--surface-2)',
+                animation: 'pulse 1.4s ease-in-out infinite', animationDelay: i * 0.15 + 's' }} />
+              <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 9 }}>
+                <div style={{ height: 10, width: '40%', borderRadius: 6, background: 'var(--surface-2)',
+                  animation: 'pulse 1.4s ease-in-out infinite', animationDelay: i * 0.15 + 's' }} />
+                <div style={{ height: 14, width: '85%', borderRadius: 6, background: 'var(--surface-2)',
+                  animation: 'pulse 1.4s ease-in-out infinite', animationDelay: i * 0.2 + 's' }} />
+                <div style={{ height: 10, width: '60%', borderRadius: 6, background: 'var(--surface-2)',
+                  animation: 'pulse 1.4s ease-in-out infinite', animationDelay: i * 0.25 + 's' }} />
+              </div>
+            </div>
+          ))}
           {allContent.map((c, i) => (
             <button key={i} onClick={() => setRead(c)} className="press" style={{ textAlign: 'left',
               background: 'linear-gradient(180deg,var(--surface-2),var(--surface-1))',
@@ -894,7 +911,7 @@ export default function EducationPage({ onBack }) {
                 </div>
                 <div className="h-card" style={{ fontSize: 16, fontFamily: 'var(--serif)', marginBottom: 5 }}>{c.title}</div>
                 {c.date && <div className="meta" style={{ color: 'var(--gold)', marginBottom: 5 }}>{c.date}</div>}
-                <div className="body tight" style={{ fontSize: 12.5 }}>{c.body.slice(0, 96)}…</div>
+                <div className="body tight" style={{ fontSize: 12.5 }}>{(c.body || '').slice(0, 96)}…</div>
               </div>
             </button>
           ))}
@@ -996,7 +1013,7 @@ export default function EducationPage({ onBack }) {
         {read && (
           <div>
             {read.imageUrl && (
-              <img src={read.imageUrl} alt={read.title}
+              <img src={read.imageUrl} alt={read.title} loading="lazy"
                 style={{ width: '100%', height: 200, objectFit: 'cover', borderRadius: 14, marginBottom: 18 }} />
             )}
             <div className="tag" style={{ marginBottom: 12 }}>{read.cat}</div>
@@ -1004,7 +1021,18 @@ export default function EducationPage({ onBack }) {
             <div className="meta" style={{ color: 'var(--gold)', marginBottom: 16 }}>
               {read.date || read.read + ' de lecture'}
             </div>
-            <p className="body serif-body" style={{ fontSize: 15, lineHeight: 1.62 }}>{read.body}</p>
+            {(read.body || '').split('\n\n').map((para, i) => (
+              <p key={i} className="body serif-body" style={{ fontSize: 15, lineHeight: 1.62, marginBottom: 14 }}>{para}</p>
+            ))}
+            {read.url && (
+              <a href={read.url} target="_blank" rel="noopener noreferrer"
+                style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                  marginTop: 8, padding: '13px 18px', borderRadius: 13, textDecoration: 'none',
+                  background: 'var(--gold-soft)', border: '1px solid var(--gold-line)',
+                  color: 'var(--gold)', fontSize: 13.5, fontFamily: 'var(--mono)', letterSpacing: '.04em' }}>
+                Lire l'article complet →
+              </a>
+            )}
           </div>
         )}
       </Sheet>

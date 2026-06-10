@@ -324,6 +324,32 @@ export async function fetchJWSTImages() {
     .slice(0, 12)
 }
 
+export async function fetchEduNews() {
+  const res = await fetch('https://api.spaceflightnewsapi.net/v4/articles/?limit=8&ordering=-published_at')
+  if (!res.ok) throw new Error('EduNews error')
+  const d = await res.json()
+  return (d.results || []).map(a => {
+    const s = (a.title + ' ' + (a.summary || '')).toLowerCase()
+    let cat = 'Actualité spatiale'
+    if (s.includes('webb') || s.includes('jwst') || s.includes('hubble') || s.includes('telescope')) cat = 'Télescopes'
+    else if (s.includes('artemis') || s.includes('moon') || s.includes('lune')) cat = 'Lune'
+    else if (s.includes('mars') || s.includes('perseverance') || s.includes('curiosity')) cat = 'Mars'
+    else if (s.includes('iss') || s.includes('space station') || s.includes('astronaut')) cat = 'ISS'
+    else if (s.includes('spacex') || s.includes('falcon') || s.includes('starship') || s.includes('rocket') || s.includes('launch')) cat = 'Lanceurs'
+    else if (s.includes('galaxy') || s.includes('galaxie') || s.includes('nebula') || s.includes('nébuleuse') || s.includes('star ') || s.includes('étoile')) cat = 'Astronomie'
+    else if (s.includes('exoplanet') || s.includes('exoplanète')) cat = 'Exoplanètes'
+    return {
+      cat,
+      title: a.title,
+      read: '3 min',
+      body: a.summary || '',
+      date: new Date(a.published_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }),
+      imageUrl: a.image_url || null,
+      url: a.url || null,
+    }
+  })
+}
+
 export async function fetchAPODArticle() {
   const res = await fetch('https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY')
   if (!res.ok) throw new Error('APOD error')
