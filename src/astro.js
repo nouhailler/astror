@@ -187,6 +187,126 @@ function toISO(date) {
   return date.toISOString().slice(0, 10)
 }
 
+function relTimeLabel(date) {
+  const diffMs = Date.now() - date.getTime()
+  const diffM  = Math.floor(diffMs / 60000)
+  const diffH  = Math.floor(diffMs / 3600000)
+  const diffD  = Math.floor(diffMs / 86400000)
+  if (diffM < 2)  return 'à l\'instant'
+  if (diffM < 60) return `il y a ${diffM} min`
+  if (diffH < 24) return `il y a ${diffH}h`
+  if (diffD === 1) return 'hier'
+  return `il y a ${diffD} j.`
+}
+
+export function getRecentAstroEvents(daysBack = 7) {
+  const now   = new Date()
+  const start = new Date(now.getTime() - daysBack * 86400000)
+  const inRange = d => d >= start && d <= now
+  const events = []
+
+  // ── Phases de Lune ──────────────────────────────────────────────────────────
+  const PHASES = [
+    { deg: 0,   title: 'Nouvelle Lune',    iconKey: 'moon',   body: 'Ciel à son obscurité maximale — nuit idéale pour le ciel profond et la Voie Lactée.' },
+    { deg: 90,  title: 'Premier quartier', iconKey: 'moon',   body: 'Lune visible le soir jusqu\'à minuit. Terminateur parfait pour les détails de relief.' },
+    { deg: 180, title: 'Pleine Lune',      iconKey: 'moon',   body: 'Nuit lumineuse — idéale pour observer la Lune en détail, défavorable au ciel profond.' },
+    { deg: 270, title: 'Dernier quartier', iconKey: 'moon',   body: 'Lune visible en seconde moitié de nuit, ciel profond en début de nuit.' },
+  ]
+  for (const p of PHASES) {
+    try {
+      const r = Astronomy.SearchMoonPhase(p.deg, start, daysBack + 2)
+      if (r && inRange(r.date)) {
+        events.push({ iconKey: p.iconKey, title: p.title, date: r.date,
+          relTime: relTimeLabel(r.date), body: p.body, tag: null })
+      }
+    } catch {}
+  }
+
+  // ── Superlunes ───────────────────────────────────────────────────────────────
+  try {
+    let t = new Date(start.getTime() - 16 * 86400000)
+    for (let g = 0; g < 2; g++) {
+      const fm = Astronomy.SearchMoonPhase(180, t, 35)
+      if (!fm) break
+      let ap = Astronomy.SearchLunarApsis(new Date(fm.date.getTime() - 16 * 86400000))
+      for (let j = 0; j < 3; j++) {
+        if (ap.kind === 0) {
+          const diff = Math.abs(fm.date.getTime() - ap.time.date.getTime()) / 86400000
+          if (diff <= 1.5 && ap.dist_km < 360000 && inRange(fm.date)) {
+            events.push({ iconKey: 'moon', title: 'Superlune',
+              date: fm.date, relTime: relTimeLabel(fm.date),
+              body: `Pleine Lune au périgée à ${Math.round(ap.dist_km).toLocaleString('fr-FR')} km — ~14 % plus grande et ~30 % plus lumineuse qu'à l'apogée.`,
+              tag: 'Périgée' })
+          }
+          break
+        }
+        ap = Astronomy.NextLunarApsis(ap)
+      }
+      t = new Date(fm.date.getTime() + 26 * 86400000)
+    }
+  } catch {}
+
+  // ── Éclipses lunaires ────────────────────────────────────────────────────────
+  try {
+    const e = Astronomy.SearchLunarEclipse(start)
+    if (e && inRange(e.peak.date) && (e.kind === 'total' || e.kind === 'partial')) {
+      const dur = e.kind === 'total' ? Math.round(e.sd_total * 2) : Math.round(e.sd_partial * 2)
+      events.push({ iconKey: 'eclipse',
+        title: e.kind === 'total' ? 'Éclipse totale de Lune' : 'Éclipse partielle de Lune',
+        date: e.peak.date, relTime: relTimeLabel(e.peak.date),
+        body: e.kind === 'total'
+          ? `Lune de sang. Totalité de ${dur} min, maximum à ${fmtUtc(e.peak.date)}.`
+          : `Ombrage partiel. Maximum à ${fmtUtc(e.peak.date)}.`,
+        tag: e.kind === 'total' ? 'Totale' : 'Partielle' })
+    }
+  } catch {}
+
+  // ── Éclipses solaires ────────────────────────────────────────────────────────
+  try {
+    const s = Astronomy.SearchGlobalSolarEclipse(start)
+    if (s && inRange(s.peak.date) && (s.kind === 'total' || s.kind === 'annular')) {
+      events.push({ iconKey: 'eclipse',
+        title: s.kind === 'total' ? 'Éclipse totale de Soleil' : 'Éclipse annulaire de Soleil',
+        date: s.peak.date, relTime: relTimeLabel(s.peak.date),
+        body: `Maximum à ${fmtUtc(s.peak.date)}. Protection solaire obligatoire hors totalité.`,
+        tag: s.kind === 'total' ? 'Totale' : 'Annulaire' })
+    }
+  } catch {}
+
+  // ── Oppositions planétaires ──────────────────────────────────────────────────
+  for (const [body, name] of [
+    [Astronomy.Body.Mars, 'Mars'], [Astronomy.Body.Jupiter, 'Jupiter'],
+    [Astronomy.Body.Saturn, 'Saturne'], [Astronomy.Body.Uranus, 'Uranus'],
+    [Astronomy.Body.Neptune, 'Neptune'],
+  ]) {
+    try {
+      const opp = Astronomy.SearchRelativeLongitude(body, 180, start)
+      if (opp && inRange(opp.date)) {
+        const illum = Astronomy.Illumination(body, opp.date)
+        events.push({ iconKey: 'planet', title: `Opposition de ${name}`,
+          date: opp.date, relTime: relTimeLabel(opp.date),
+          body: `${name} était à sa distance minimale de la Terre (mag ${illum.mag.toFixed(1)}) — la meilleure nuit pour l'observer.`,
+          tag: `mag ${illum.mag.toFixed(1)}` })
+      }
+    } catch {}
+  }
+
+  // ── Pluies de météores (pics annuels fixes) ──────────────────────────────────
+  const yr = now.getFullYear()
+  for (const shower of METEOR_SHOWERS) {
+    for (const y of [yr - 1, yr]) {
+      const d = new Date(y, shower.mm - 1, shower.dd)
+      if (inRange(d)) {
+        events.push({ iconKey: 'meteor', title: `${shower.name} — pic du maximum`,
+          date: d, relTime: relTimeLabel(d),
+          body: shower.detail, tag: shower.tag })
+      }
+    }
+  }
+
+  return events.sort((a, b) => b.date - a.date) // plus récent en premier
+}
+
 export function getUpcomingAstroEvents(monthsAhead = 18) {
   const now = new Date()
   const end = new Date(now)

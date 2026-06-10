@@ -3,7 +3,14 @@ import { IcSat, IcZap, IcMoon, IcComet, IcStar } from './icons'
 import { ToolPage, ToolSection, ToolSeg } from './tool-ui'
 import { AiInfoPanel } from './ui'
 import { requestPermission, getPermission, scheduleEventReminder, loadNotifPrefs, saveNotifPrefs } from './notifications'
-import { getUpcomingAstroEvents } from './astro'
+import { getUpcomingAstroEvents, getRecentAstroEvents } from './astro'
+
+const RECENT_ICON = {
+  moon:    { Ic: IcMoon,  color: 'var(--good)' },
+  meteor:  { Ic: IcZap,   color: 'var(--violet)' },
+  planet:  { Ic: IcStar,  color: 'var(--gold)' },
+  eclipse: { Ic: IcComet, color: 'var(--blue)' },
+}
 
 const EVT_CATS = [
   { key: 'all',     label: 'Tout' },
@@ -20,13 +27,6 @@ const CAT_ICON = {
   special: IcStar,
 }
 
-const NOTIFS_RECENT = [
-  { Ic: IcStar, color: 'var(--gold)',   title: 'Jupiter bien placé',       body: "Jupiter passe au méridien dans 15 minutes — l'instant idéal pour l'observer.", time: 'il y a 2 min' },
-  { Ic: IcSat,  color: 'var(--blue)',   title: 'ISS visible à 22:14',       body: 'Passage brillant (mag −3,2) au-dessus de Paris, direction sud-ouest.',          time: 'il y a 1 h' },
-  { Ic: IcZap,  color: 'var(--violet)', title: 'Pic des Perséides cette nuit', body: "Jusqu'à 100 météores/h après minuit. Éloignez-vous des lumières.",            time: "aujourd'hui" },
-  { Ic: IcMoon, color: 'var(--good)',   title: 'Lune couchée à 02:48',      body: 'Le ciel atteint son obscurité maximale — parfait pour le ciel profond.',        time: 'hier' },
-]
-
 const NOTIF_SETTINGS = [
   { k: 'iss',     label: "Passages de l'ISS" },
   { k: 'planet',  label: 'Planètes bien placées' },
@@ -40,7 +40,8 @@ export default function EventsPage({ onBack }) {
   const [notif, setNotif] = useState(() => ({ iss: true, planet: true, meteor: true, eclipse: false, ...loadNotifPrefs() }))
   const [permission, setPermission] = useState(() => getPermission())
 
-  const allEvents = useMemo(() => getUpcomingAstroEvents(18), [])
+  const allEvents    = useMemo(() => getUpcomingAstroEvents(18), [])
+  const recentEvents = useMemo(() => getRecentAstroEvents(7), [])
   const list = cat === 'all' ? allEvents : allEvents.filter(e => e.cat === cat)
 
   useEffect(() => { saveNotifPrefs(notif) }, [notif])
@@ -113,25 +114,42 @@ En 3 à 4 phrases, explique comment préparer et observer cet événement : mat�
             </div>
           )}
 
-          <ToolSection title="Notifications récentes" style={{ paddingTop: 4 }}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              {NOTIFS_RECENT.map((n, i) => (
-                <div key={i} style={{ display: 'flex', gap: 12, padding: 14, borderRadius: 15,
-                  background: 'var(--surface-1)', border: '1px solid var(--line)' }}>
-                  <span style={{ width: 38, height: 38, borderRadius: 11, flexShrink: 0, display: 'flex', alignItems: 'center',
-                    justifyContent: 'center', color: n.color, background: 'rgba(255,255,255,.03)', border: '1px solid var(--line-2)' }}>
-                    <n.Ic size={19} />
-                  </span>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8, alignItems: 'baseline' }}>
-                      <span className="h-card" style={{ fontSize: 14 }}>{n.title}</span>
-                      <span className="meta" style={{ flexShrink: 0 }}>{n.time}</span>
+          <ToolSection title="Événements des 7 derniers jours" style={{ paddingTop: 4 }}>
+            {recentEvents.length === 0 ? (
+              <div style={{ padding: '16px 15px', color: 'var(--faint)', fontSize: 13, textAlign: 'center' }}>
+                Aucun événement notable ces 7 derniers jours.
+              </div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                {recentEvents.map((n, i) => {
+                  const { Ic, color } = RECENT_ICON[n.iconKey] || RECENT_ICON.planet
+                  return (
+                    <div key={i} style={{ display: 'flex', gap: 12, padding: 14, borderRadius: 15,
+                      background: 'linear-gradient(180deg,var(--surface-2),var(--surface-1))',
+                      border: '1px solid var(--line)' }}>
+                      <span style={{ width: 38, height: 38, borderRadius: 11, flexShrink: 0, display: 'flex',
+                        alignItems: 'center', justifyContent: 'center',
+                        color, background: 'rgba(255,255,255,.03)', border: '1px solid var(--line-2)' }}>
+                        <Ic size={19} />
+                      </span>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8, alignItems: 'baseline' }}>
+                          <span className="h-card" style={{ fontSize: 14 }}>{n.title}</span>
+                          <span className="meta" style={{ flexShrink: 0, color: 'var(--gold)' }}>{n.relTime}</span>
+                        </div>
+                        {n.tag && (
+                          <span style={{ display: 'inline-block', fontSize: 10, padding: '1px 7px',
+                            borderRadius: 99, marginTop: 3, marginBottom: 4, fontFamily: 'var(--mono)',
+                            background: 'var(--surface-2)', border: '1px solid var(--line)',
+                            color: 'var(--faint)' }}>{n.tag}</span>
+                        )}
+                        <div className="body tight" style={{ fontSize: 12.5, marginTop: 2 }}>{n.body}</div>
+                      </div>
                     </div>
-                    <div className="body tight" style={{ fontSize: 12.5, marginTop: 3 }}>{n.body}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
+                  )
+                })}
+              </div>
+            )}
           </ToolSection>
 
           <ToolSection title="M'avertir pour…">
