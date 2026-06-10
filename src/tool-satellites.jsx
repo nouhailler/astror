@@ -1,24 +1,9 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { IcSat, IcRocket, IcPin } from './icons'
 import { ToolPage, ToolSection, ToolSeg } from './tool-ui'
 import { AiInfoPanel } from './ui'
-import { fetchISSPosition, fetchISSPasses, fetchLaunches, useLiveData } from './api'
+import { fetchISSPosition, fetchISSPasses, fetchLaunches, fetchMissionsNews, computeProbeDistances, useLiveData } from './api'
 import { onbLoad } from './onboarding'
-
-const SAT_MISSIONS = [
-  { name: 'James Webb (JWST)', org: 'NASA/ESA', status: 'En service', note: "Au point L2, à 1,5 M km. Observe l'univers en infrarouge depuis 2022.", color: 'var(--good)' },
-  { name: 'Perseverance', org: 'NASA', status: 'Active', note: "Cratère Jezero, Mars. Collecte d'échantillons pour retour futur.", color: 'var(--good)' },
-  { name: 'JUICE', org: 'ESA', status: 'En transit', note: 'Survol de Vénus en 2026, arrivée dans le système de Jupiter en 2031.', color: 'var(--warn)' },
-  { name: 'Voyager 1', org: 'NASA', status: 'Espace interstellaire', note: 'À 24,8 milliards de km. Sonde la plus lointaine, lancée en 1977.', color: 'var(--blue)' },
-]
-
-
-const SAT_PROBES = [
-  { name: 'Voyager 1', dist: '24,8 Mds km', detail: '167 UA · interstellaire' },
-  { name: 'Voyager 2', dist: '20,6 Mds km', detail: '138 UA · interstellaire' },
-  { name: 'New Horizons', dist: '8,9 Mds km', detail: '60 UA · ceinture de Kuiper' },
-  { name: 'Parker Solar Probe', dist: '0,05 UA', detail: 'Périhélie · couronne solaire' },
-]
 
 function ISSLiveCard({ iss, loading }) {
   return (
@@ -61,6 +46,12 @@ export default function SatellitesPage({ onBack }) {
   const { data: iss, loading: issLoading } = useLiveData(fetchISSPosition, 10000)
   const { data: passes, loading: passesLoading } = useLiveData(() => fetchISSPasses(lat, lng), 3600000)
   const { data: launches } = useLiveData(fetchLaunches)
+  const { data: missions, loading: missionsLoading } = useLiveData(fetchMissionsNews)
+  const [probes, setProbes] = useState(() => computeProbeDistances())
+  useEffect(() => {
+    const t = setInterval(() => setProbes(computeProbeDistances()), 1000)
+    return () => clearInterval(t)
+  }, [])
 
   return (
     <ToolPage title="Satellites" onBack={onBack}>
@@ -132,14 +123,45 @@ Pour chaque satellite, indique des horaires approximatifs ou les ressources fiab
         <div className="enter">
           <ToolSection title="Missions en cours" style={{ paddingTop: 4 }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              {SAT_MISSIONS.map(m => (
-                <div key={m.name} style={{ padding: 14, borderRadius: 14, background: 'linear-gradient(180deg,var(--surface-2),var(--surface-1))', border: '1px solid var(--line)' }}>
+              {missionsLoading && !missions && [0, 1, 2, 3].map(i => (
+                <div key={i} style={{ padding: 14, borderRadius: 14, background: 'var(--surface-1)', border: '1px solid var(--line)' }}>
+                  <div style={{ display: 'flex', gap: 8, marginBottom: 10 }}>
+                    <div style={{ height: 14, flex: 1, borderRadius: 6, background: 'var(--surface-2)',
+                      animation: 'pulse 1.4s ease-in-out infinite', animationDelay: i * 0.12 + 's' }} />
+                    <div style={{ height: 14, width: 60, borderRadius: 6, background: 'var(--surface-2)',
+                      animation: 'pulse 1.4s ease-in-out infinite', animationDelay: i * 0.12 + 's' }} />
+                  </div>
+                  <div style={{ height: 11, width: '40%', borderRadius: 6, marginBottom: 8, background: 'var(--surface-2)',
+                    animation: 'pulse 1.4s ease-in-out infinite', animationDelay: i * 0.18 + 's' }} />
+                  <div style={{ height: 10, width: '90%', borderRadius: 6, background: 'var(--surface-2)',
+                    animation: 'pulse 1.4s ease-in-out infinite', animationDelay: i * 0.22 + 's' }} />
+                </div>
+              ))}
+              {(missions || []).map(m => (
+                <div key={m.name} style={{ padding: 14, borderRadius: 14,
+                  background: 'linear-gradient(180deg,var(--surface-2),var(--surface-1))', border: '1px solid var(--line)' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 7 }}>
                     <span className="h-card" style={{ fontSize: 14.5, flex: 1 }}>{m.name}</span>
-                    <span className="tag neutral" style={{ borderColor: m.color, color: m.color }}>{m.status}</span>
+                    <span className="tag neutral" style={{ borderColor: m.color, color: m.color, flexShrink: 0 }}>{m.status}</span>
                   </div>
-                  <div className="meta" style={{ color: 'var(--gold)', marginBottom: 5 }}>{m.org}</div>
-                  <div className="body tight" style={{ fontSize: 12.5 }}>{m.note}</div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                    <span className="meta" style={{ color: 'var(--gold)' }}>{m.org}</span>
+                    {m.newsDate && (
+                      <span style={{ fontSize: 10, padding: '2px 7px', borderRadius: 99,
+                        background: 'rgba(132,211,169,.08)', border: '1px solid rgba(132,211,169,.25)',
+                        color: 'var(--good)', fontFamily: 'var(--mono)' }}>
+                        {m.newsDate}
+                      </span>
+                    )}
+                  </div>
+                  {m.note && <div className="body tight" style={{ fontSize: 12.5, marginBottom: m.newsUrl ? 10 : 0 }}>{m.note}</div>}
+                  {m.newsUrl && (
+                    <a href={m.newsUrl} target="_blank" rel="noopener noreferrer"
+                      style={{ fontSize: 11.5, color: 'var(--gold)', fontFamily: 'var(--mono)',
+                        textDecoration: 'none', letterSpacing: '.04em' }}>
+                      Lire l'article →
+                    </a>
+                  )}
                 </div>
               ))}
             </div>
@@ -169,15 +191,23 @@ Pour chaque satellite, indique des horaires approximatifs ou les ressources fiab
           </ToolSection>
 
           <ToolSection title="Sondes dans l'espace lointain">
+            <div style={{ marginBottom: 10, display: 'flex', alignItems: 'center', gap: 6 }}>
+              <span className="dot pulse" style={{ background: 'var(--good)', width: 7, height: 7 }} />
+              <span className="meta" style={{ color: 'var(--good)', fontSize: 11 }}>distances en temps réel</span>
+            </div>
             <div className="card-2" style={{ overflow: 'hidden' }}>
-              {SAT_PROBES.map((p, i) => (
-                <div key={p.name} style={{ display: 'flex', alignItems: 'center', padding: '12px 15px',
-                  borderBottom: i < SAT_PROBES.length - 1 ? '1px solid var(--line)' : 0 }}>
-                  <span style={{ flex: 1 }}>
+              {probes.map((p, i) => (
+                <div key={p.name} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 15px',
+                  borderBottom: i < probes.length - 1 ? '1px solid var(--line)' : 0 }}>
+                  <span style={{ flex: 1, minWidth: 0 }}>
                     <span className="h-card" style={{ fontSize: 13.5, display: 'block' }}>{p.name}</span>
                     <span className="meta" style={{ marginTop: 2 }}>{p.detail}</span>
                   </span>
-                  <span className="data" style={{ fontSize: 13, color: 'var(--gold)' }}>{p.dist}</span>
+                  <span style={{ textAlign: 'right', flexShrink: 0 }}>
+                    <span className="data" style={{ fontSize: 13, color: 'var(--gold)', display: 'block',
+                      fontVariantNumeric: 'tabular-nums' }}>{p.dist}</span>
+                    {p.speed && <span className="meta" style={{ marginTop: 2, fontSize: 10.5 }}>{p.speed}</span>}
+                  </span>
                 </div>
               ))}
             </div>

@@ -350,6 +350,53 @@ export async function fetchEduNews() {
   })
 }
 
+const AU_KM = 149_597_870.7
+const PROBE_REF_MS = 1749513600000 // 2026-06-10T00:00:00Z — distances de référence
+
+export function computeProbeDistances() {
+  const dt = (Date.now() - PROBE_REF_MS) / 1000
+  const fmt = km => (km / 1e9).toFixed(2).replace('.', ',') + ' Mds km'
+  const au  = km => (km / AU_KM).toFixed(1).replace('.', ',') + ' UA'
+  const v1  = 24_800_000_000 + 17.04 * dt
+  const v2  = 20_600_000_000 + 15.41 * dt
+  const nh  =  8_900_000_000 + 14.00 * dt
+  return [
+    { name: 'Voyager 1',          dist: fmt(v1), detail: au(v1) + ' · interstellaire',     speed: '17,0 km/s' },
+    { name: 'Voyager 2',          dist: fmt(v2), detail: au(v2) + ' · interstellaire',     speed: '15,4 km/s' },
+    { name: 'New Horizons',       dist: fmt(nh), detail: au(nh) + ' · ceinture de Kuiper', speed: '14,0 km/s' },
+    { name: 'Parker Solar Probe', dist: '0,046 UA min', detail: 'Orbite solaire · périhélie 6,9 M km', speed: '692 km/s max' },
+  ]
+}
+
+const MISSION_DEFS = [
+  { name: 'James Webb (JWST)', org: 'NASA / ESA / CSA', status: 'En service',          color: 'var(--good)', search: 'James+Webb+Space+Telescope' },
+  { name: 'Perseverance',      org: 'NASA · Mars 2020', status: 'Active',              color: 'var(--good)', search: 'Perseverance+Mars' },
+  { name: 'JUICE',             org: 'ESA',              status: 'En transit',           color: 'var(--warn)', search: 'JUICE+ESA' },
+  { name: 'Artemis',           org: 'NASA',             status: 'Prép. Artemis III',    color: 'var(--blue)', search: 'Artemis+NASA+Moon' },
+]
+
+export async function fetchMissionsNews() {
+  return Promise.all(MISSION_DEFS.map(async m => {
+    try {
+      const res = await fetch(
+        `https://api.spaceflightnewsapi.net/v4/articles/?limit=1&ordering=-published_at&search=${m.search}`
+      )
+      if (!res.ok) throw new Error()
+      const d = await res.json()
+      const a = d.results?.[0]
+      if (!a) return { ...m }
+      return {
+        ...m,
+        note: a.summary || '',
+        newsDate: new Date(a.published_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' }),
+        newsUrl: a.url,
+      }
+    } catch {
+      return { ...m }
+    }
+  }))
+}
+
 export async function fetchAPODArticle() {
   const res = await fetch('https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY')
   if (!res.ok) throw new Error('APOD error')
