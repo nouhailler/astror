@@ -1,8 +1,9 @@
 import { useState, useMemo, useEffect, useRef } from 'react'
-import { IcTrophy, IcFlame, IcCheckCircle, IcClose, IcPlay } from './icons'
+import { IcTrophy, IcFlame, IcCheckCircle, IcClose, IcPlay, IcSpark } from './icons'
 import { Sheet } from './ui'
 import { ToolPage, ToolSection, ToolSeg } from './tool-ui'
 import { useLiveData, fetchAPODArticle, fetchEduNews } from './api'
+import { callAI } from './claudeApi'
 
 // ─── Quiz pool : 40 questions avec catégories ───────────────────────────────
 
@@ -374,12 +375,36 @@ function markLessonRead(parcours, parcoursId, lessonId) {
 
 const EDU_CONTENT = [
   { cat: 'Histoire', title: 'De Galilée au télescope spatial', read: '6 min',
+    questions: [
+      "Quelles découvertes de Galilée ont le plus bouleversé la science de son époque ?",
+      "Comment le télescope Hubble a-t-il changé notre vision de l'univers ?",
+      "En quoi James Webb est-il supérieur à Hubble, concrètement ?",
+      "Quels sont les grands jalons de l'histoire de l'instrumentation astronomique ?",
+    ],
     body: 'En 1609, Galilée pointe sa lunette vers le ciel et bouleverse l\'astronomie : les cratères de la Lune, les phases de Vénus et les quatre lunes de Jupiter — Io, Europe, Ganymède, Callisto — prouvent que tous les astres ne tournent pas autour de la Terre.\n\nDeux siècles plus tard, William Herschel cartographie la Voie Lactée et découvre Uranus (1781), première planète identifiée à l\'instrument. En 1924, Hubble mesure la distance d\'Andromède et révèle que l\'univers est peuplé de milliards de galaxies.\n\nL\'ère spatiale s\'ouvre en 1957 avec Spoutnik, puis Hubble Space Telescope (1990) montre des galaxies à 12 milliards d\'années-lumière. En 2022, James Webb franchit une nouvelle frontière : infrarouge, cryogénie à −233 °C, miroir de 6,5 m déployé à 1,5 million de km de la Terre. Il capture la lumière des tout premières galaxies formées 300 millions d\'années après le Big Bang.\n\nChaque génération d\'instruments agrandit l\'univers observable. Ce qui était invisible devient visible — et chaque nouvelle fenêtre révèle que la réalité dépasse toujours les modèles.' },
   { cat: 'Cosmologie', title: 'Le Big Bang en cinq idées', read: '7 min',
+    questions: [
+      "Que s'est-il passé dans les toutes premières secondes après le Big Bang ?",
+      "Comment le fond diffus cosmologique (CMB) prouve-t-il le Big Bang ?",
+      "Qu'est-ce que l'inflation cosmique et pourquoi est-elle nécessaire au modèle ?",
+      "Quelle est la différence entre matière ordinaire, matière noire et énergie noire ?",
+    ],
     body: 'L\'univers a commencé par un état extrêmement chaud et dense il y a 13,8 milliards d\'années. Ce n\'est pas une explosion dans l\'espace, mais une expansion de l\'espace lui-même.\n\n1. La fuite des galaxies. Hubble (1929) mesure que toutes les galaxies lointaines s\'éloignent de nous à une vitesse proportionnelle à leur distance. Rembobinons : tout converge vers une singularité.\n\n2. Le fond diffus cosmologique. En 1965, Penzias et Wilson captent accidentellement un rayonnement à 2,7 K uniforme dans tout le ciel. C\'est la chaleur résiduelle du Big Bang, émise 380 000 ans après le début quand l\'univers est devenu transparent.\n\n3. La nucléosynthèse primordiale. Dans les trois premières minutes, les protons et neutrons fusionnent et forgent hydrogène (75 %), hélium-4 (25 %) et des traces de lithium — exactement l\'abondance observée dans les étoiles les plus vieilles.\n\n4. L\'inflation cosmique. Une microseconde après le Big Bang, l\'univers aurait subi une expansion exponentielle fulgurante, expliquant son homogénéité et sa platitude géométrique.\n\n5. L\'énergie noire. Depuis 1998, les supernovas Ia révèlent que l\'expansion accélère. Une énergie mystérieuse (68 % du contenu de l\'univers) contrecarre la gravité. Sa nature reste inconnue.' },
   { cat: 'Astrophysique', title: 'Comment naissent les étoiles', read: '5 min',
+    questions: [
+      "Combien de temps met une étoile comme le Soleil à se former complètement ?",
+      "Qu'est-ce qu'un disque protoplanétaire et comment les planètes s'y forment-elles ?",
+      "Pourquoi les étoiles très massives vivent-elles bien moins longtemps que les naines rouges ?",
+      "Quelle sera la fin de vie du Soleil dans 5 milliards d'années ?",
+    ],
     body: 'Les étoiles naissent dans les nuages moléculaires géants — de vastes réservoirs de gaz froid (∼10 K) et de poussière qui s\'étendent sur des centaines d\'années-lumière. La nébuleuse d\'Orion, visible à l\'œil nu, en est l\'exemple le plus proche à 1 350 al.\n\nUnder des perturbations (onde de choc de supernova, collision galactique), une région du nuage s\'effondre sous l\'effet de la gravité. Elle se fragmente en grumeaux qui s\'échauffent en se contractant : c\'est la proto-étoile, encore entourée d\'une enveloppe de gaz et de poussière qui formera un disque protoplanétaire.\n\nQuand la température au cœur atteint 10 millions de kelvins, la fusion de l\'hydrogène s\'amorce. La pression de radiation équilibre la gravité : l\'étoile entre dans la séquence principale — le stade stable qui durera de quelques millions d\'années (pour les plus massives) à des dizaines de milliards d\'années (pour les naines rouges).\n\nNotre Soleil est une étoile de type G2V, à mi-vie depuis 4,6 milliards d\'années. Dans 5 milliards d\'années, il gonflera en géante rouge, engloutissant peut-être la Terre, avant de finir en nébuleuse planétaire puis naine blanche.' },
   { cat: 'Découvertes', title: 'La tension de Hubble', read: '6 min',
+    questions: [
+      "Qu'est-ce que la constante de Hubble et pourquoi est-elle si importante ?",
+      "Pourquoi l'écart de 5σ entre les deux mesures de H₀ est-il si troublant ?",
+      "Les mesures de JWST sur les Céphéides ont-elles résolu la tension de Hubble ?",
+      "Quelles nouvelles théories physiques pourraient expliquer cet écart ?",
+    ],
     body: 'Comment mesure-t-on l\'expansion de l\'univers ? La constante de Hubble H₀ donne le taux d\'expansion en km/s par mégaparsec (Mpc). Deux méthodes indépendantes donnent aujourd\'hui des valeurs statistiquement incompatibles.\n\nMéthode 1 — l\'échelle de distances cosmiques. On enchaîne des indicateurs : parallaxe stellaire → Céphéides → supernovas Ia. La collaboration SH0ES (2022) obtient H₀ = 73,0 ± 1,0 km/s/Mpc.\n\nMéthode 2 — le fond diffus cosmologique. Le satellite Planck mesure les fluctuations du CMB (carte de l\'univers à 380 000 ans) et extrapole H₀ = 67,4 ± 0,5 km/s/Mpc en utilisant le modèle ΛCDM standard.\n\nL\'écart est de ~5σ. En science, 5σ, c\'est le seuil de découverte. Si ce n\'est pas une erreur systématique (biais dans les mesures de distance, contamination du CMB), cela signifierait que la physique standard est incomplète : énergie noire variable, interactions avec des neutrinos stériles, ou nouvelle physique dans l\'univers primordial.\n\nJWST apporte de nouvelles mesures des Céphéides. Les résultats préliminaires confortent la valeur haute (∼73). Le mystère reste entier — et passionnant.' },
 ]
 
@@ -724,6 +749,34 @@ export default function EducationPage({ onBack }) {
   const [chronoMode, setChronoMode] = useState(false)
   const [openParcours, setOpenParcours] = useState(null)
   const [openLesson, setOpenLesson]     = useState(null)
+  const [aiQ, setAiQ]         = useState('')
+  const [aiAnswer, setAiAnswer] = useState(null)
+  const [aiLoading, setAiLoading] = useState(false)
+
+  useEffect(() => { setAiQ(''); setAiAnswer(null); setAiLoading(false) }, [read])
+
+  async function askAI(question, article) {
+    if (!question || !article) return
+    setAiQ(question)
+    setAiLoading(true)
+    setAiAnswer(null)
+    try {
+      const ctx = `Article : "${article.title}"\n\n${(article.body || '').slice(0, 800)}`
+      const messages = [
+        { role: 'user', content: 'Tu es Astror, expert en astronomie et astrophysique. Réponds toujours en français, de façon précise et approfondie (6 à 8 phrases), avec des données chiffrées si pertinent.' },
+        { role: 'assistant', content: 'Compris, je réponds en expert.' },
+        { role: 'user', content: `${ctx}\n\nQuestion : ${question}` },
+      ]
+      const reply = await callAI(messages)
+      setAiAnswer((reply || '').trim() || '…')
+    } catch (e) {
+      setAiAnswer(e.message === 'no-key'
+        ? "Configurez une clé API dans les Paramètres pour activer les réponses IA."
+        : "Erreur de connexion. Vérifiez votre clé API dans les Paramètres.")
+    } finally {
+      setAiLoading(false)
+    }
+  }
 
   const defi = getTodayDefi()
   const { data: apodArticle } = useLiveData(fetchAPODArticle)
@@ -1024,6 +1077,7 @@ export default function EducationPage({ onBack }) {
             {(read.body || '').split('\n\n').map((para, i) => (
               <p key={i} className="body serif-body" style={{ fontSize: 15, lineHeight: 1.62, marginBottom: 14 }}>{para}</p>
             ))}
+
             {read.url && (
               <a href={read.url} target="_blank" rel="noopener noreferrer"
                 style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
@@ -1033,6 +1087,76 @@ export default function EducationPage({ onBack }) {
                 Lire l'article complet →
               </a>
             )}
+
+            {/* ── Section IA ── */}
+            <div style={{ marginTop: 28, paddingTop: 22, borderTop: '1px solid var(--line)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
+                <span style={{ width: 26, height: 26, borderRadius: '50%', flexShrink: 0, display: 'flex',
+                  alignItems: 'center', justifyContent: 'center', color: '#1a130a',
+                  background: 'linear-gradient(180deg,var(--gold-2),var(--gold))' }}>
+                  <IcSpark size={14} />
+                </span>
+                <span className="eyebrow">Approfondir avec l'IA</span>
+              </div>
+
+              {/* Combobox questions */}
+              {read.questions?.length > 0 && (
+                <div style={{ marginBottom: 12 }}>
+                  <select
+                    value={aiQ}
+                    onChange={e => askAI(e.target.value, read)}
+                    style={{ width: '100%', padding: '11px 14px', borderRadius: 12, cursor: 'pointer',
+                      background: 'var(--surface-1)', border: '1px solid var(--line-2)',
+                      color: aiQ ? 'var(--text)' : 'var(--faint)',
+                      fontSize: 13.5, fontFamily: 'var(--sans)', outline: 'none',
+                      appearance: 'none', WebkitAppearance: 'none' }}>
+                    <option value="">Choisir une question…</option>
+                    {read.questions.map((q, i) => (
+                      <option key={i} value={q}>{q}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
+              {/* Bouton Plus d'informations */}
+              <button
+                onClick={() => askAI(`Développe et approfondis le sujet de cet article de façon détaillée, en donnant des exemples concrets, des chiffres précis et les découvertes les plus récentes liées à : ${read.title}`, read)}
+                disabled={aiLoading}
+                style={{ width: '100%', padding: '11px 14px', borderRadius: 12, cursor: aiLoading ? 'default' : 'pointer',
+                  background: 'var(--surface-1)', border: '1px solid var(--line-2)',
+                  color: 'var(--dim)', fontSize: 13.5, fontFamily: 'var(--sans)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7,
+                  opacity: aiLoading ? 0.5 : 1 }}>
+                <IcSpark size={14} style={{ color: 'var(--gold)' }} />
+                Plus d'informations
+              </button>
+
+              {/* Loading */}
+              {aiLoading && (
+                <div style={{ marginTop: 14, padding: '12px 16px', borderRadius: 12,
+                  background: 'rgba(217,179,108,0.07)', border: '1px solid var(--gold-line)',
+                  display: 'flex', gap: 5 }}>
+                  {[0, 1, 2].map(i => (
+                    <span key={i} style={{ width: 7, height: 7, borderRadius: '50%', background: 'var(--gold)',
+                      animation: 'pulse 1.2s ease-in-out infinite', animationDelay: i * 0.18 + 's' }} />
+                  ))}
+                </div>
+              )}
+
+              {/* Réponse IA */}
+              {aiAnswer && !aiLoading && (
+                <div style={{ marginTop: 14 }}>
+                  {aiQ && read.questions?.includes(aiQ) && (
+                    <div className="eyebrow dim" style={{ marginBottom: 8 }}>{aiQ}</div>
+                  )}
+                  <div style={{ padding: '14px 16px', borderRadius: 12,
+                    background: 'rgba(217,179,108,0.07)', border: '1px solid var(--gold-line)',
+                    fontSize: 14, lineHeight: 1.62, color: 'var(--text)', fontFamily: 'var(--serif)' }}>
+                    {aiAnswer}
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         )}
       </Sheet>
