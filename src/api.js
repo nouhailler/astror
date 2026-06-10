@@ -441,13 +441,13 @@ function classifyEventTag(title, cats = []) {
 }
 
 const RSS_FEEDS = [
-  { url: 'https://www.saf-astronomie.fr/feed/',                          source: 'SAF' },
-  { url: 'https://www.futura-sciences.com/rss/sciences/astronomie.xml', source: 'Futura Sciences' },
+  { url: 'https://www.saf-astronomie.fr/feed/',             source: 'SAF' },
+  { url: 'https://www.lemonde.fr/espace/rss_full.xml',      source: 'Le Monde Espace' },
 ]
 
 export async function fetchAstroClubEvents() {
   const settled = await Promise.allSettled(RSS_FEEDS.map(async ({ url, source }) => {
-    const r = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(url)}&count=6`)
+    const r = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(url)}`)
     if (!r.ok) throw new Error()
     const d = await r.json()
     if (d.status !== 'ok' || !d.items?.length) throw new Error()
