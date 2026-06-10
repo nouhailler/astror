@@ -1294,9 +1294,8 @@ function WikiSummarySheet({ wikiPage, label, open, onClose }) {
   )
 }
 
-function ConquestAnnexes() {
+function ConquestAnnexes({ onWikiOpen }) {
   const [sub, setSub] = useState('timeline')
-  const [wikiItem, setWikiItem] = useState(null)
   const SUBS = [
     { key:'timeline', label:'Chronologie' },
     { key:'glossary', label:'Glossaire' },
@@ -1316,7 +1315,7 @@ function ConquestAnnexes() {
       {sub === 'timeline' && (
         <div>
           {CONQUEST_TIMELINE.map((t, i) => (
-            <button key={i} onClick={() => setWikiItem({ wikiPage: t.wikiPage, label: t.event })}
+            <button key={i} onClick={() => onWikiOpen({ wikiPage: t.wikiPage, label: t.event })}
               style={{ width:'100%', textAlign:'left', background:'none', border:'none', padding:0, cursor:'pointer',
                 display:'flex', gap:12, paddingTop:10, paddingBottom:10,
                 borderBottom:'1px solid var(--line)', alignItems:'flex-start' }}>
@@ -1335,7 +1334,7 @@ function ConquestAnnexes() {
       {sub === 'glossary' && (
         <div>
           {CONQUEST_GLOSSARY.map((g, i) => (
-            <button key={i} onClick={() => setWikiItem({ wikiPage: g.wikiPage, label: g.term })}
+            <button key={i} onClick={() => onWikiOpen({ wikiPage: g.wikiPage, label: g.term })}
               style={{ width:'100%', textAlign:'left', background:'none', border:'none', padding:0, cursor:'pointer',
                 paddingTop:10, paddingBottom:10, borderBottom:'1px solid var(--line)',
                 display:'flex', alignItems:'flex-start', gap:8 }}>
@@ -1353,7 +1352,7 @@ function ConquestAnnexes() {
       {sub === 'missions' && (
         <div>
           {CONQUEST_MISSIONS.map((m, i) => (
-            <button key={i} onClick={() => setWikiItem({ wikiPage: m.wikiPage, label: m.name })}
+            <button key={i} onClick={() => onWikiOpen({ wikiPage: m.wikiPage, label: m.name })}
               style={{ width:'100%', textAlign:'left', background:'none', border:'none', padding:0, cursor:'pointer',
                 paddingTop:11, paddingBottom:11, borderBottom:'1px solid var(--line)',
                 display:'flex', alignItems:'flex-start', gap:8 }}>
@@ -1389,12 +1388,6 @@ function ConquestAnnexes() {
         </div>
       )}
 
-      <WikiSummarySheet
-        open={!!wikiItem}
-        wikiPage={wikiItem?.wikiPage}
-        label={wikiItem?.label}
-        onClose={() => setWikiItem(null)}
-      />
     </div>
   )
 }
@@ -1453,7 +1446,7 @@ function ConquestCard({ chapter, onOpen }) {
   )
 }
 
-function ConquestDetail({ chapter }) {
+function ConquestDetail({ chapter, onWikiOpen }) {
   if (!chapter) return null
   const accent = CONQUEST_CHAPTER_COLORS[chapter.id] || '#4a7b9e'
   return (
@@ -1485,7 +1478,7 @@ function ConquestDetail({ chapter }) {
         <div className="meta" style={{ marginBottom:20, color:'var(--faint)' }}>{chapter.sub}</div>
       )}
       {chapter.id === 'annexes'
-        ? <ConquestAnnexes />
+        ? <ConquestAnnexes onWikiOpen={onWikiOpen} />
         : chapter.sections.map((s, i) => <ConquestSection key={i} section={s} />)
       }
     </div>
@@ -1494,6 +1487,7 @@ function ConquestDetail({ chapter }) {
 
 function ConquestView() {
   const [selected, setSelected] = useState(null)
+  const [wikiItem, setWikiItem] = useState(null)
   return (
     <div className="enter">
       <p className="body" style={{ padding:'6px 18px 10px', fontSize:12.5, color:'var(--faint)' }}>
@@ -1505,8 +1499,14 @@ function ConquestView() {
         ))}
       </div>
       <Sheet open={!!selected} onClose={() => setSelected(null)}>
-        {selected && <ConquestDetail chapter={selected} />}
+        {selected && <ConquestDetail chapter={selected} onWikiOpen={setWikiItem} />}
       </Sheet>
+      <WikiSummarySheet
+        open={!!wikiItem}
+        wikiPage={wikiItem?.wikiPage}
+        label={wikiItem?.label}
+        onClose={() => setWikiItem(null)}
+      />
     </div>
   )
 }
