@@ -3,7 +3,21 @@ import { IcSky, IcMoon, IcStar, IcPin } from './icons'
 import { ToolPage, ToolSection, ToolSeg } from './tool-ui'
 import { AiInfoPanel } from './ui'
 import { getAstrophotoData } from './astro'
+import { fetchWeather, useLiveData } from './api'
 import { onbLoad } from './onboarding'
+
+function ScoreDots({ val, max = 5 }) {
+  const color = val >= 4 ? 'var(--good)' : val === 3 ? 'var(--gold)' : 'var(--bad)'
+  return (
+    <span style={{ display: 'flex', gap: 3, alignItems: 'center' }}>
+      {Array.from({ length: max }, (_, i) => (
+        <span key={i} style={{ width: 9, height: 9, borderRadius: '50%', flexShrink: 0,
+          background: i < val ? color : 'var(--surface-2)',
+          border: `1px solid ${i < val ? color : 'var(--line)'}` }} />
+      ))}
+    </span>
+  )
+}
 
 function IcCloud({ size = 22 }) {
   return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M7.5 18a4 4 0 0 1-.5-8 5.5 5.5 0 0 1 10.6 1.3A3.6 3.6 0 0 1 17 18Z"/></svg>
@@ -54,6 +68,8 @@ export default function AstrophotoPage({ onBack }) {
   const now  = useMemo(() => new Date(), [])
   const ap   = useMemo(() => getAstrophotoData(now, lat, lng), [lat, lng, now])
 
+  const { data: weather, loading: wxLoading } = useLiveData(() => fetchWeather(lat, lng))
+
   const s = AP_SENSORS.find(x => x.key === sensor)
   const expo = Math.round((500 / (focal * s.crop)) * 10) / 10
   const npf  = Math.round((300 / (focal * s.crop)) * 10) / 10
@@ -92,6 +108,80 @@ export default function AstrophotoPage({ onBack }) {
               <div className="h-sec" style={{ fontSize: 24 }}>{ap.nightWindow}</div>
               <div className="body tight" style={{ fontSize: 12.5, marginTop: 6 }}>{ap.nightDesc}</div>
             </div>
+          </div>
+
+          {/* ── Carte météo / seeing ── */}
+          <div className="pad" style={{ paddingTop: 0 }}>
+            {wxLoading && !weather && (
+              <div style={{ padding: 16, borderRadius: 18, background: 'var(--surface-1)', border: '1px solid var(--line)' }}>
+                <div style={{ height: 12, width: '50%', borderRadius: 6, marginBottom: 14,
+                  background: 'var(--surface-2)', animation: 'pulse 1.4s ease-in-out infinite' }} />
+                {[0, 1].map(i => (
+                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
+                    <div style={{ height: 11, width: 80, borderRadius: 6, background: 'var(--surface-2)',
+                      animation: 'pulse 1.4s ease-in-out infinite', animationDelay: i * 0.15 + 's' }} />
+                    <div style={{ display: 'flex', gap: 3 }}>
+                      {[0,1,2,3,4].map(j => <span key={j} style={{ width: 9, height: 9, borderRadius: '50%',
+                        background: 'var(--surface-2)', animation: 'pulse 1.4s ease-in-out infinite', animationDelay: j * 0.08 + 's' }} />)}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+            {weather && (() => {
+              const good = weather.seeingVal >= 4 && weather.clouds < 25
+              const mid  = weather.seeingVal >= 3 && weather.clouds < 60
+              const verdict = good ? 'Excellentes conditions' : mid ? 'Conditions correctes' : 'Conditions difficiles'
+              const verdictColor = good ? 'var(--good)' : mid ? 'var(--gold)' : 'var(--bad)'
+              const bg  = good
+                ? 'linear-gradient(180deg,rgba(132,211,169,.1),var(--surface-1))'
+                : mid
+                  ? 'linear-gradient(180deg,rgba(217,179,108,.08),var(--surface-1))'
+                  : 'linear-gradient(180deg,rgba(226,141,126,.08),var(--surface-1))'
+              const bd  = good ? 'rgba(132,211,169,.3)' : mid ? 'var(--gold-line)' : 'rgba(226,141,126,.3)'
+              return (
+                <div style={{ padding: 16, borderRadius: 18, background: bg, border: `1px solid ${bd}` }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 9, marginBottom: 16 }}>
+                    <div className="eyebrow" style={{ flex: 1 }}>Conditions ce soir</div>
+                    <span style={{ fontSize: 10, padding: '2px 9px', borderRadius: 99, fontFamily: 'var(--mono)',
+                      color: verdictColor, background: `${verdictColor}18`, border: `1px solid ${verdictColor}44` }}>
+                      {verdict}
+                    </span>
+                  </div>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 11, marginBottom: 16 }}>
+                    {[
+                      { label: 'Seeing',       val: weather.seeingVal,  text: weather.seeing },
+                      { label: 'Transparence', val: weather.transVal,   text: weather.transparency },
+                    ].map(row => {
+                      const c = row.val >= 4 ? 'var(--good)' : row.val === 3 ? 'var(--gold)' : 'var(--bad)'
+                      return (
+                        <div key={row.label} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                          <span className="m-k" style={{ width: 90, flexShrink: 0 }}>{row.label}</span>
+                          <ScoreDots val={row.val} />
+                          <span className="data" style={{ fontSize: 12.5, color: c, marginLeft: 4 }}>{row.text}</span>
+                        </div>
+                      )
+                    })}
+                  </div>
+
+                  <div style={{ display: 'flex', gap: 0, borderRadius: 12, overflow: 'hidden', border: '1px solid var(--line)' }}>
+                    {[
+                      { k: 'Nuages',    v: weather.clouds + '%' },
+                      { k: 'Humidité', v: weather.humidity + '%' },
+                      { k: 'Temp.',    v: weather.temp + '°C' },
+                    ].map((m, i, arr) => (
+                      <div key={m.k} style={{ flex: 1, padding: '10px 0', textAlign: 'center',
+                        borderRight: i < arr.length - 1 ? '1px solid var(--line)' : 0,
+                        background: 'var(--surface-1)' }}>
+                        <div className="m-k" style={{ marginBottom: 3 }}>{m.k}</div>
+                        <div className="data" style={{ fontSize: 15 }}>{m.v}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )
+            })()}
           </div>
 
           <ToolSection title="Lumière du soir">
@@ -137,14 +227,14 @@ export default function AstrophotoPage({ onBack }) {
 
           <div className="pad" style={{ marginTop: -8 }}>
             <AiInfoPanel
-              cacheKey={`astrophoto_plan_${new Date().toISOString().slice(0, 10)}`}
-              buildPrompt={`Conditions astrophoto ce soir :
+              cacheKey={`astrophoto_plan_${new Date().toISOString().slice(0, 10)}_wx${weather?.clouds ?? 'x'}`}
+              buildPrompt={`Conditions astrophoto ce soir à ${city} :
 - Fenêtre de nuit astronomique : ${ap.nightWindow} (${ap.nightLen})
 - Lune : ${ap.moonLabel} (${ap.illum}% illuminée)
 - Centre galactique : ${ap.gcDir}, ${ap.gcSub}
 - Saison Voie Lactée : ${ap.seasonLabel}
-- Heure bleue : ${ap.blueHour}
-En 4 phrases, quels objets recommandes-tu de photographier ce soir (galaxies, nébuleuses, planètes, Voie Lactée) ? Quel réglage ISO/temps de pose convient selon la durée de la fenêtre et la Lune ?`}
+- Météo : ${weather ? `nuages ${weather.clouds}%, humidité ${weather.humidity}%, ${weather.temp}°C, seeing ${weather.seeing}, transparence ${weather.transparency}` : 'données indisponibles'}
+En 4 phrases, quels objets recommandes-tu de photographier ce soir (galaxies, nébuleuses, planètes, Voie Lactée) selon ces conditions ? Quel réglage ISO/temps de pose convient ?`}
             />
           </div>
         </div>
