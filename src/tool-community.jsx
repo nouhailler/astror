@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react'
 import { IcTrophy, IcStar, IcSpark, IcUsers, IcPin } from './icons'
 import { ToolPage, ToolSection, ToolSeg } from './tool-ui'
-import { fetchAstroClubEvents, fetchCommunityRanking, getCommunitySheetUrl, useLiveData } from './api'
+import { fetchAstroClubEvents, fetchCommunityRanking, fetchCommunityFeed, getCommunitySheetUrl, useLiveData } from './api'
 
 // ─── Données statiques (fallback) ────────────────────────────────────────────
 
@@ -130,6 +130,9 @@ export default function CommunityPage({ onBack }) {
 
   const sheetUrl = useMemo(() => getCommunitySheetUrl(), [])
 
+  const { data: feedData, loading: feedLoading, error: feedError } =
+    useLiveData(fetchCommunityFeed)
+
   const { data: eventsData, loading: eventsLoading, error: eventsError } =
     useLiveData(fetchAstroClubEvents)
 
@@ -146,10 +149,25 @@ export default function CommunityPage({ onBack }) {
         value={seg} onChange={setSeg}
       />
 
-      {/* ── Fil (statique) ── */}
+      {/* ── Fil (Mastodon #astrophotography) ── */}
       {seg === 'feed' && (
         <div className="enter pad" style={{ paddingTop: 14, display: 'flex', flexDirection: 'column', gap: 14 }}>
-          {COM_POSTS.map((p, i) => (
+          {feedLoading && !feedData && [0, 1, 2].map(i => <SkeletonCard key={i} />)}
+
+          {!feedLoading && feedError && (
+            <StatusBanner bg="rgba(226,141,126,.06)" border="rgba(226,141,126,.28)" color="var(--faint)">
+              Fil en direct indisponible — publications de démonstration affichées.
+            </StatusBanner>
+          )}
+
+          {feedData && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
+              <span className="dot pulse" style={{ background: 'var(--good)', width: 7, height: 7 }} />
+              <span className="meta" style={{ color: 'var(--good)', fontSize: 11 }}>en direct · Mastodon · #astrophotography</span>
+            </div>
+          )}
+
+          {(feedData || COM_POSTS).map((p, i) => (
             <div key={i} style={{ borderRadius: 18, overflow: 'hidden',
               background: 'linear-gradient(180deg,var(--surface-2),var(--surface-1))', border: '1px solid var(--line)' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 11, padding: '13px 14px' }}>
@@ -159,16 +177,25 @@ export default function CommunityPage({ onBack }) {
                   border: '1px solid var(--gold-line)' }}>{p.init}</span>
                 <div style={{ flex: 1 }}>
                   <div className="h-card" style={{ fontSize: 14 }}>{p.user}</div>
-                  <div className="meta" style={{ marginTop: 1 }}>{p.when} · {p.gear}</div>
+                  <div className="meta" style={{ marginTop: 1 }}>{p.when}{p.gear ? ` · ${p.gear}` : ''}</div>
                 </div>
                 {p.top && <span className="tag"><IcTrophy size={11} /> Top</span>}
               </div>
-              <div className="ph" style={{ height: 168, borderLeft: 0, borderRight: 0, borderRadius: 0,
-                display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <span className="meta" style={{ fontSize: 10, color: 'var(--faint)' }}>{p.label}</span>
-              </div>
+
+              {p.imgUrl ? (
+                <img src={p.imgUrl} alt={p.label || 'astrophoto'}
+                  style={{ width: '100%', height: 200, objectFit: 'cover', display: 'block' }} />
+              ) : (
+                <div className="ph" style={{ height: 168, borderLeft: 0, borderRight: 0, borderRadius: 0,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <span className="meta" style={{ fontSize: 10, color: 'var(--faint)' }}>{p.label}</span>
+                </div>
+              )}
+
               <div style={{ padding: '12px 14px' }}>
-                <div className="h-card" style={{ fontSize: 14, marginBottom: 10, fontFamily: 'var(--serif)' }}>{p.obj}</div>
+                {p.obj && (
+                  <div className="h-card" style={{ fontSize: 14, marginBottom: 10, fontFamily: 'var(--serif)' }}>{p.obj}</div>
+                )}
                 <div style={{ display: 'flex', alignItems: 'center', gap: 18 }}>
                   <button onClick={() => toggleLike(i)} className="press"
                     style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'none', border: 0,
@@ -180,6 +207,13 @@ export default function CommunityPage({ onBack }) {
                     fontFamily: 'var(--mono)', fontSize: 12.5 }}>
                     <IcSpark size={15} /> {p.comments}
                   </span>
+                  {p.link && (
+                    <a href={p.link} target="_blank" rel="noopener noreferrer"
+                      style={{ marginLeft: 'auto', fontSize: 11.5, color: 'var(--gold)',
+                        fontFamily: 'var(--mono)', textDecoration: 'none', letterSpacing: '.04em' }}>
+                      Voir le post →
+                    </a>
+                  )}
                 </div>
               </div>
             </div>

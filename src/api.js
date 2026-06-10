@@ -424,7 +424,66 @@ export async function fetchLaunches() {
   }))
 }
 
-// ─── Communauté ───────────────────────────────────────────────────────────────
+// ─── Communauté ──────────────────────────────────────────────────────────────
+
+function relTime(iso) {
+  const s = (Date.now() - new Date(iso).getTime()) / 1000
+  if (s < 60)     return 'à l\'instant'
+  if (s < 3600)   return `il y a ${Math.round(s / 60)} min`
+  if (s < 86400)  return `il y a ${Math.round(s / 3600)} h`
+  if (s < 604800) return `il y a ${Math.round(s / 86400)} j`
+  return new Date(iso).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })
+}
+
+function stripHtml(html) {
+  return (html || '').replace(/<br\s*\/?>/gi, ' ').replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim()
+}
+
+function initials(name) {
+  const p = name.trim().split(/\s+/)
+  return p.length >= 2 ? (p[0][0] + p[1][0]).toUpperCase() : name.slice(0, 2).toUpperCase()
+}
+
+export async function fetchCommunityFeed() {
+  const r = await fetch('https://mastodon.social/api/v1/timelines/tag/astrophotography?limit=8&only_media=true')
+  if (!r.ok) throw new Error('mastodon error')
+  const posts = await r.json()
+  if (!Array.isArray(posts) || !posts.length) throw new Error('no posts')
+
+  return posts.map(p => {
+    const name = p.account.display_name || p.account.acct.split('@')[0]
+    const text = stripHtml(p.content)
+    const tags = (p.tags || []).map(t => t.name.toLowerCase())
+    const imgs = (p.media_attachments || []).filter(a => a.type === 'image')
+
+    let label = 'astrophotographie'
+    if (tags.some(t => ['moon','lune'].includes(t)))              label = 'Lune'
+    else if (tags.some(t => ['galaxy','galaxie'].includes(t)))    label = 'galaxie'
+    else if (tags.some(t => ['nebula','nébuleuse'].includes(t)))  label = 'nébuleuse'
+    else if (tags.some(t => ['milkyway','voielactee'].includes(t))) label = 'Voie Lactée'
+    else if (tags.includes('jupiter'))  label = 'Jupiter'
+    else if (tags.some(t => ['saturn','saturne'].includes(t)))    label = 'Saturne'
+    else if (tags.includes('mars'))     label = 'Mars'
+    else if (tags.includes('sun') || tags.includes('soleil')) label = 'Soleil'
+    else if (text) label = text.split(' ').slice(0, 3).join(' ')
+
+    return {
+      user:     name,
+      init:     initials(name),
+      when:     relTime(p.created_at),
+      obj:      text.slice(0, 140),
+      imgUrl:   imgs[0]?.preview_url || null,
+      likes:    p.favourites_count,
+      comments: p.replies_count,
+      reblogs:  p.reblogs_count,
+      label:    'photo · ' + label,
+      link:     p.url,
+      top:      p.favourites_count >= 5 || p.reblogs_count >= 3,
+    }
+  })
+}
+
+// ─── Communauté · Sorties & Classement ───────────────────────────────────────
 
 const COM_SHEET_KEY = 'astror_community_sheet_v1'
 export const getCommunitySheetUrl  = () => localStorage.getItem(COM_SHEET_KEY) || ''
