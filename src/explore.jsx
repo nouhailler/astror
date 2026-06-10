@@ -856,33 +856,33 @@ const CONQUEST = [
   { id:'intro', num:'', label:'Introduction', badge:'Intro',
     title:'Pourquoi explorer l\'espace ?', sub:'Définition · Guerre froide · Enjeux',
     color:'#3d6b9e',
-    heroImg:'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a4/NASA-Apollo8-Dec24-Earthrise.jpg/480px-NASA-Apollo8-Dec24-Earthrise.jpg',
+    heroImg:'https://upload.wikimedia.org/wikipedia/commons/a/a8/NASA-Apollo8-Dec24-Earthrise.jpg',
     sections:[
       { heading:'La conquête spatiale, qu\'est-ce que c\'est ?',
         text:'La conquête spatiale désigne l\'ensemble des activités humaines visant à explorer et comprendre l\'espace au-delà de l\'atmosphère. Elle se divise en deux branches : le vol habité (astronautes en orbite, sur la Lune, demain sur Mars) et l\'exploration robotique (sondes, rovers, télescopes spatiaux). Depuis Spoutnik en 1957, plus de 600 humains ont voyagé dans l\'espace et des centaines de sondes ont exploré chaque recoin du système solaire. La conquête spatiale est à la fois une aventure scientifique, technologique et profondément humaine.',
-        wikiImg:'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a4/NASA-Apollo8-Dec24-Earthrise.jpg/480px-NASA-Apollo8-Dec24-Earthrise.jpg',
+        wikiImg:'https://upload.wikimedia.org/wikipedia/commons/a/a8/NASA-Apollo8-Dec24-Earthrise.jpg',
         aiKey:'intro_def', aiPrompt:'Qu\'est-ce que la conquête spatiale dans toute sa dimension (vols habités, sondes robotiques, télescopes) ? Pourquoi est-elle considérée comme l\'une des plus grandes aventures de l\'humanité, et quelle différence existe-t-il entre exploration spatiale et colonisation ? 4 phrases captivantes.' },
       { heading:'Guerre froide — moteur de la course à l\'espace',
         text:'La conquête spatiale naît de la rivalité entre les États-Unis et l\'URSS pendant la Guerre froide (1947–1991). Chaque exploit spatial est une victoire idéologique : le premier satellite, le premier homme en orbite, la première marche sur la Lune. Cette compétition nourrie par la peur et l\'orgueil national a produit en moins de 15 ans les avancées technologiques les plus spectaculaires du XXe siècle. À partir des années 1970, la rivalité a cédé la place à une coopération progressive, incarnée aujourd\'hui par la Station spatiale internationale.',
-        wikiImg:'https://upload.wikimedia.org/wikipedia/commons/thumb/9/97/The_Earth_seen_from_Apollo_17.jpg/480px-The_Earth_seen_from_Apollo_17.jpg',
+        wikiImg:'https://upload.wikimedia.org/wikipedia/commons/9/97/The_Earth_seen_from_Apollo_17.jpg',
         aiKey:'intro_cold', aiPrompt:'Comment la Guerre froide a-t-elle été le moteur de la conquête spatiale ? Pourquoi cette rivalité USA/URSS a-t-elle paradoxalement produit les plus grandes avancées spatiales de l\'histoire, et comment la coopération internationale (ISS) a-t-elle changé le modèle ? 4 phrases.' },
       { heading:'Des enjeux multiples',
         text:'Les enjeux sont scientifiques (comprendre l\'univers, l\'origine de la vie), politiques (prestige national, soft power), économiques (GPS, satellites météo, internet, matériaux composites) et philosophiques. La vision de la Terre depuis l\'espace engendre ce que les astronautes appellent l\'« Overview Effect » — une prise de conscience soudaine de la fragilité et de l\'unicité de notre planète. Plus de 45 % des astronautes ayant vécu cette expérience déclarent avoir profondément changé de regard sur le monde. La conquête spatiale est aussi, fondamentalement, un acte d\'espoir.',
-        wikiImg:'https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/International_Space_Station_after_undocking_of_STS-132.jpg/480px-International_Space_Station_after_undocking_of_STS-132.jpg',
+        wikiImg:'https://upload.wikimedia.org/wikipedia/commons/0/04/International_Space_Station_after_undocking_of_STS-132.jpg',
         aiKey:'intro_stakes', aiPrompt:'Quels sont les enjeux réels de la conquête spatiale (scientifiques, économiques, politiques, philosophiques) ? Parle de l\'Overview Effect (la perception de la Terre qui transforme les astronautes) et des technologies du quotidien nées de la course à l\'espace. 4 phrases.' },
     ] },
   { id:'ch1', num:'01', label:'Chapitre 1', badge:'Ch. 1',
     title:'Les prémisses (avant 1957)', sub:'Tsiolkovski · Goddard · V2 · Course aux missiles',
     color:'#7b4a9e',
-    heroImg:'https://upload.wikimedia.org/wikipedia/commons/thumb/7/74/Goddard_and_Rocket.jpg/480px-Goddard_and_Rocket.jpg',
+    heroImg:'https://upload.wikimedia.org/wikipedia/commons/7/7c/Goddard_and_Rocket.jpg',
     sections:[
       { heading:'Les pionniers théoriques',
         text:'Trois visionnaires ont posé les bases du voyage spatial. Konstantin Tsiolkovski (1857–1935), instituteur russe sourd, formule dès 1903 l\'équation-fusée fondamentale et le principe de propulsion par réaction. Robert Goddard (1882–1945) lance la première fusée à carburant liquide le 16 mars 1926 dans un champ du Massachusetts — elle monte à 12 mètres, mais prouve le concept. Hermann Oberth (1894–1989) publie en 1923 « Die Rakete zu den Planetenräumen », inspirant une génération d\'ingénieurs dont le jeune Wernher von Braun. Ces trois pionniers théorisèrent et expérimentèrent dans l\'indifférence quasi générale.',
-        wikiImg:'https://upload.wikimedia.org/wikipedia/commons/thumb/7/74/Goddard_and_Rocket.jpg/480px-Goddard_and_Rocket.jpg',
+        wikiImg:'https://upload.wikimedia.org/wikipedia/commons/7/7c/Goddard_and_Rocket.jpg',
         aiKey:'ch1_pioneers', aiPrompt:'Tsiolkovski, Goddard et Oberth — les trois pionniers de l\'astronautique. Pourquoi leurs travaux, souvent moqués de leur vivant, sont-ils devenus la fondation de toute exploration spatiale ? Qu\'est-ce que l\'équation de Tsiolkovski et pourquoi est-elle encore utilisée sur chaque lancement aujourd\'hui ? 4 phrases.' },
       { heading:'La V2 — première fusée à atteindre l\'espace',
         text:'En Allemagne nazie, sous la direction de Wernher von Braun depuis Peenemünde, la V2 (Vergeltungswaffe 2) franchit pour la première fois la limite de l\'espace le 3 octobre 1942. Arme de terreur, plus de 3 000 V2 s\'abattent sur Londres, Anvers et d\'autres villes en 1944–1945, tuant 9 000 civils. La sinistre réalité : ces fusées étaient fabriquées par des détenus du camp de Dora, dont 12 000 périront à la tâche. À la capitulation, les deux superpuissances s\'emparent des plans et recrutent les ingénieurs allemands (Opération Paperclip côté américain).',
-        nasaQuery:'V2 rocket launch history World War',
+        wikiImg:'https://upload.wikimedia.org/wikipedia/commons/f/ff/Wernher_von_Braun.jpg',
         aiKey:'ch1_v2', aiPrompt:'La fusée V2 allemande : comment une arme de destruction est-elle devenue la mère de toutes les fusées spatiales ? Quelle est la part d\'ombre (travail forcé, crimes de guerre) et la part d\'héritage technologique ? Qu\'est devenu Wernher von Braun après la guerre ? 4 phrases nuancées.' },
       { heading:'La course aux missiles balistiques',
         text:'Après 1945, les deux superpuissances comprennent vite que la V2, améliorée, peut placer un engin en orbite. En URSS, Sergueï Korolev — brillant ingénieur survivant du Goulag — développe le R-7, premier ICBM réussi (août 1957). Son identité reste classifiée jusqu\'à sa mort en 1966 pour le protéger des espions. C\'est ce même R-7 qui lancera Spoutnik deux mois plus tard. Aux États-Unis, von Braun travaille pour l\'armée sur les missiles Redstone, mais reste sous-financé jusqu\'au « choc Spoutnik ».',
@@ -892,33 +892,33 @@ const CONQUEST = [
   { id:'ch2', num:'02', label:'Chapitre 2', badge:'Ch. 2',
     title:'La course à l\'espace (1957–1975)', sub:'Spoutnik · Gagarine · Apollo · Animaux · Apollo-Soyouz',
     color:'#4a9e6b',
-    heroImg:'https://upload.wikimedia.org/wikipedia/commons/thumb/b/be/Sputnik_asm.jpg/480px-Sputnik_asm.jpg',
+    heroImg:'https://upload.wikimedia.org/wikipedia/commons/b/be/Sputnik_asm.jpg',
     sections:[
       { heading:'Spoutnik 1 — le choc mondial (1957)',
         text:'Le 4 octobre 1957, l\'URSS lance Spoutnik 1, premier satellite artificiel de la Terre. Cette sphère de 84 kg émet un simple bip-bip capté par des amateurs du monde entier — et provoque un traumatisme politique aux États-Unis. La NASA est créée en réponse directe en juillet 1958. Un mois après Spoutnik 1, Spoutnik 2 emporte Laïka, premier être vivant en orbite — un aller simple, sans retour prévu. Le mot « spoutnik » (compagnon de voyage) entre dans toutes les langues du monde.',
-        wikiImg:'https://upload.wikimedia.org/wikipedia/commons/thumb/b/be/Sputnik_asm.jpg/480px-Sputnik_asm.jpg',
+        wikiImg:'https://upload.wikimedia.org/wikipedia/commons/b/be/Sputnik_asm.jpg',
         aiKey:'ch2_sputnik', aiPrompt:'Spoutnik 1 (1957) : pourquoi ce satellite de 84 kg a-t-il provoqué un traumatisme géopolitique aux États-Unis ? Qu\'est-ce que le « Spoutnik choc » a changé à l\'éducation américaine, à la politique de défense et à la création de la NASA ? Quel a été le sort de Laïka ? 4 phrases.' },
       { heading:'Gagarine et les premiers humains dans l\'espace (1961)',
         text:'Le 12 avril 1961, Youri Gagarine (27 ans) effectue le premier vol humain : 108 minutes, une orbite. En descendant dans l\'atmosphère, il radiodiffuse : « Le ciel est d\'un noir profond. La Terre est bleue. Quelle beauté ! » Trois semaines plus tard, Alan Shepard réalise le premier vol suborbital américain (15 minutes). En 1963, Valentina Terechkova devient la première femme dans l\'espace à bord de Vostok 6. Stimulé par ces défaites en série, Kennedy lance en 1961 le défi Apollo : un Américain sur la Lune avant 1970.',
-        nasaQuery:'Yuri Gagarin Vostok first human spaceflight',
+        wikiImg:'https://upload.wikimedia.org/wikipedia/commons/e/e5/Yuri_Gagarin_%281961%29_-_Restoration.jpg',
         aiKey:'ch2_gagarin', aiPrompt:'Youri Gagarine : qu\'a-t-il vécu lors de ses 108 minutes historiques ? Quelle était l\'atmosphère en URSS ce jour-là, et comment le monde a-t-il réagi ? Pourquoi la mort de Gagarine en 1968 dans un accident d\'avion reste-t-elle entourée de mystère ? 4 phrases.' },
       { heading:'Les animaux précurseurs',
         text:'Avant d\'envoyer des humains, les deux superpuissances testent l\'espace avec des animaux. L\'URSS envoie des chiens : Laïka (1957, mourut de surchauffe quelques heures après le lancement), puis Belka et Strelka (1960), premières à revenir vivantes. Les États-Unis envoient des singes et chimpanzés, dont Ham (janvier 1961), premier chimpanzé en espace suborbital. Ces vols valident les systèmes de survie et démontrent que la vie peut supporter l\'apesanteur et les forces de lancement — ouvrant concrètement la voie aux vols humains.',
-        wikiImg:'https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/Laika_-_1957.jpg/480px-Laika_-_1957.jpg',
+        wikiImg:'https://upload.wikimedia.org/wikipedia/commons/9/9f/Laika_experimental_space_dog_space_suit.jpg',
         aiKey:'ch2_animals', aiPrompt:'Les animaux dans l\'espace : comment ont-ils contribué à rendre le vol humain possible ? Était-ce éthique d\'envoyer Laïka sans retour possible ? Quelles espèces ont voyagé dans l\'espace depuis (araignées, poissons, méduses, tardigrades) et pourquoi ? 4 phrases.' },
       { heading:'Apollo 11 — premiers pas sur la Lune (1969)',
         text:'Le 20 juillet 1969, le module Eagle se pose sur la Mer de la Tranquillité. Neil Armstrong pose le pied sur la Lune à 02:56 UTC : « C\'est un petit pas pour un homme, un bond de géant pour l\'humanité. » Buzz Aldrin le rejoint 19 minutes plus tard ; Michael Collins orbit. 600 millions de personnes regardent en direct — l\'audience la plus large de l\'histoire à ce moment. Les 6 missions Apollo qui alunissent (1969–1972) rapportent 382 kg de roches lunaires. Apollo 13 (1970), après une explosion du service module, revient sain et sauf grâce à une improvisation d\'ingénierie remarquable.',
-        wikiImg:'https://upload.wikimedia.org/wikipedia/commons/thumb/9/98/Aldrin_Apollo_11_original.jpg/480px-Aldrin_Apollo_11_original.jpg',
+        wikiImg:'https://upload.wikimedia.org/wikipedia/commons/9/98/Aldrin_Apollo_11_original.jpg',
         aiKey:'ch2_apollo', aiPrompt:'Apollo 11 : comment l\'humanité a-t-elle accompli en seulement 8 ans ce qui semblait impossible ? Qu\'a-t-on appris sur la Lune grâce aux 382 kg de roches rapportées ? Et pourquoi n\'y est-on pas retourné depuis Apollo 17 (1972) jusqu\'à Artemis ? 4 phrases.' },
       { heading:'Mission Apollo-Soyouz — première poignée de main (1975)',
         text:'En juillet 1975, un vaisseau Apollo américain et un Soyouz soviétique s\'ariment en orbite. Thomas Stafford et Alexeï Leonov se serrent la main dans l\'espace pour la première fois — symbole fort de la détente internationale. La mission révèle les défis de la coopération technique entre deux systèmes incompatibles, préfigurant les compromis qui permettront l\'ISS. L\'anglais et le russe deviennent officiellement les deux langues de la coopération spatiale. C\'est le dernier vol habité américain avant la navette spatiale en 1981.',
-        nasaQuery:'Apollo Soyuz Test Project 1975 docking handshake',
+        wikiImg:'https://upload.wikimedia.org/wikipedia/commons/9/90/ASTP_handshake_-_cropped.jpg',
         aiKey:'ch2_apollo_soyuz', aiPrompt:'La mission Apollo-Soyouz (1975) : pourquoi cette poignée de main dans l\'espace était-elle si symbolique dans le contexte de la Guerre froide ? Quels obstacles techniques ont dû être résolus pour l\'arrimage ? Comment a-t-elle préfiguré l\'ISS 25 ans plus tard ? 4 phrases.' },
     ] },
   { id:'ch3', num:'03', label:'Chapitre 3', badge:'Ch. 3',
     title:'L\'exploration robotique du système solaire', sub:'Voyager · Rovers martiens · Cassini · Télescopes',
     color:'#6b9e4a',
-    heroImg:'https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/OSIRIS_Mars_true_color.jpg/480px-OSIRIS_Mars_true_color.jpg',
+    heroImg:'https://upload.wikimedia.org/wikipedia/commons/0/02/OSIRIS_Mars_true_color.jpg',
     sections:[
       { heading:'Sondes lunaires et vénusiennes — les premières',
         text:'Avant Apollo, les sondes robotiques préparent le terrain. Le programme Luna soviétique (1959–1976) accumule les premières : premier impact lunaire (Luna 2), premières photos du côté caché (Luna 3), premier alunissage en douceur (Luna 9, 1966), premier retour d\'échantillons automatique (Luna 16, 1970). Les sondes Surveyor américaines valident les sites d\'atterrissage d\'Apollo. Sur Vénus, les sondes Venera soviétiques (1970–1983) révèlent un enfer de 465 °C et 92 atm — et transmettent les premières photos couleur d\'une autre surface planétaire.',
@@ -926,73 +926,73 @@ const CONQUEST = [
         aiKey:'ch3_lunar', aiPrompt:'Les premières sondes robotiques lunaires et vénusiennes (Luna, Surveyor, Venera) : comment ont-elles transformé des corps célestes inconnus en destinations explorées ? Qu\'ont révélé les Venera sur Vénus, et pourquoi la surface vénusienne est-elle si difficile à explorer encore aujourd\'hui ? 4 phrases.' },
       { heading:'Voyager — les ambassadeurs interstellaires (1977)',
         text:'Lancées en 1977 pour profiter d\'un alignement planétaire exceptionnel (une fois tous les 176 ans), Voyager 1 et 2 survolent les 4 planètes géantes et révèlent les volcans de Io, l\'anneau de Jupiter, les lunes actives de Saturne, les anneaux d\'Uranus et les tempêtes de Neptune. Depuis 2012, Voyager 1 évolue dans l\'espace interstellaire — à plus de 23 milliards de km, le plus loin qu\'un objet humain ait jamais atteint. Chaque sonde porte un « Disque d\'or » encodant sons, images et langues de la Terre, message pour d\'éventuelles civilisations extraterrestres.',
-        nasaQuery:'Voyager spacecraft solar system outer planets interstellar',
+        wikiImg:'https://upload.wikimedia.org/wikipedia/commons/4/4f/Voyager_1_entering_heliosheath_region.jpg',
         aiKey:'ch3_voyager', aiPrompt:'Les sondes Voyager : comment ont-elles révolutionné notre connaissance du système solaire externe en un seul voyage ? Qu\'est-ce que le Disque d\'or contient, et pourquoi certains scientifiques pensent-ils que l\'envoyer représente un risque (en révélant notre existence) ? 4 phrases.' },
       { heading:'Les rovers martiens — géologues sur Mars',
         text:'Depuis 1997, des rovers de plus en plus sophistiqués explorent Mars. Sojourner (1997, 10 kg, 83 jours) prouve la viabilité du concept. Spirit et Opportunity (2004), prévus pour 90 jours, ont respectivement résisté 6 et 14 ans. Curiosity (2012, 1 tonne, toujours actif) confirme que Mars a abrité des lacs liquides il y a 3,5 milliards d\'années. Perseverance (2021) constitue des dépôts d\'échantillons en attente de retour terrestre, tandis qu\'Ingenuity réalise les premiers vols motorisés sur une autre planète (72 vols). L\'expérience MOXIE produit de l\'oxygène depuis le CO₂ martien.',
-        wikiImg:'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/Curiosity_Self-Portrait_at_%27Big_Sky%27_Drilling_Site.jpg/480px-Curiosity_Self-Portrait_at_%27Big_Sky%27_Drilling_Site.jpg',
+        wikiImg:'https://upload.wikimedia.org/wikipedia/commons/f/f3/Curiosity_Self-Portrait_at_%27Big_Sky%27_Drilling_Site.jpg',
         aiKey:'ch3_rovers', aiPrompt:'Les rovers martiens : qu\'a apporté chaque génération (Sojourner → Curiosity → Perseverance) à notre compréhension de Mars ? Ingenuity a réalisé les premiers vols motorisés sur une autre planète — pourquoi est-ce une avancée révolutionnaire pour les missions futures ? 4 phrases.' },
       { heading:'Galileo, Cassini-Huygens, New Horizons',
         text:'Galileo (1995–2003) révèle l\'océan sous-glaciaire d\'Europe et les volcans de Io. Cassini-Huygens (2004–2017) tourne autour de Saturne pendant 13 ans : elle découvre les geysers d\'Encelade (eau liquide + organiques = candidat à la vie), et la sonde Huygens se pose sur Titan en 2005 (lacs de méthane, rivières d\'éthane). New Horizons survole Pluton en 2015 et révèle montagnes de 3 000 m et cœur de glace géant. OSIRIS-REx rapporte en 2023 250 g de l\'astéroïde Bennu — plus grande collecte d\'échantillons extraterrestres depuis Apollo.',
-        nasaQuery:'Cassini Saturn Enceladus Titan plumes rings',
+        wikiImg:'https://upload.wikimedia.org/wikipedia/commons/b/b2/Cassini_Saturn_Orbit_Insertion.jpg',
         aiKey:'ch3_outer', aiPrompt:'Cassini, Galileo, New Horizons : quelles découvertes vous ont le plus surpris ? Pourquoi l\'entrée finale de Cassini dans l\'atmosphère de Saturne en 2017 est-elle restée si émouvante pour des scientifiques qui avaient passé 20 ans sur cette mission ? 4 phrases.' },
       { heading:'Hubble et James Webb — les yeux de l\'humanité',
         text:'Hubble (1990–aujourd\'hui) révolutionne l\'astronomie : âge de l\'univers (13,8 milliards d\'années), expansion accélérée par l\'énergie noire, images emblématiques des « Piliers de la Création », catalogage de milliards de galaxies. Malgré un miroir défectueux corrigé en 1993, il est en service depuis 35 ans. Le James Webb Space Telescope (2021) observe l\'infrarouge et a déjà photographié des galaxies formées 300 millions d\'ans après le Big Bang — repoussant les limites observationnelles de 600 millions d\'années au-delà de Hubble. Ces deux observatoires ont redéfini notre place dans l\'univers.',
-        wikiImg:'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/HST-SM4.jpeg/480px-HST-SM4.jpeg',
+        wikiImg:'https://upload.wikimedia.org/wikipedia/commons/3/3f/HST-SM4.jpeg',
         aiKey:'ch3_telescopes', aiPrompt:'Hubble et James Webb : comment ces deux télescopes ont-ils transformé notre vision de l\'univers ? Quelle est la différence fondamentale entre les deux (infrarouge vs visible) ? Et qu\'est-ce que JWST a déjà découvert qui remet en question les modèles de formation des premières galaxies ? 4 phrases.' },
     ] },
   { id:'ch4', num:'04', label:'Chapitre 4', badge:'Ch. 4',
     title:'Stations orbitales et vol durable', sub:'Saliout · Mir · Navette spatiale · ISS',
     color:'#9e7b4a',
-    heroImg:'https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/International_Space_Station_after_undocking_of_STS-132.jpg/480px-International_Space_Station_after_undocking_of_STS-132.jpg',
+    heroImg:'https://upload.wikimedia.org/wikipedia/commons/0/04/International_Space_Station_after_undocking_of_STS-132.jpg',
     sections:[
       { heading:'De Saliout à Mir — l\'école soviétique de longue durée',
         text:'L\'URSS invente la station spatiale habitable. Saliout 1 (1971) accueille les premiers résidents, mais la mission se termine tragiquement : les 3 cosmonautes de Soyouz 11 périssent lors de la rentrée par dépressurisation de la capsule. Skylab américain (1973–1974) accueille 3 équipages pour 9 mois cumulés. Puis vient Mir (1986–2001) : la station soviétique bat tous les records. Valeri Polyakov y séjourne 437 jours consécutifs (record jamais battu en mission continue), prouvant que l\'être humain peut survivre à la durée d\'un aller-retour vers Mars.',
-        nasaQuery:'Mir space station cosmonaut orbit long duration',
+        wikiImg:'https://upload.wikimedia.org/wikipedia/commons/0/09/Mir_Space_Station_viewed_from_Endeavour_during_STS-89.jpg',
         aiKey:'ch4_mir', aiPrompt:'Des stations Saliout à Mir : qu\'ont-elles appris sur les effets à long terme de l\'espace sur le corps humain ? Pourquoi le record de 437 jours de Polyakov est-il si crucial pour planifier un vol vers Mars ? Quelle a été la fin spectaculaire de Mir en 2001 ? 4 phrases.' },
       { heading:'La navette spatiale — triomphe et tragédies (1981–2011)',
         text:'La navette spatiale américaine est le premier vaisseau spatial réutilisable. En 135 missions, elle déploie Hubble (et le répare 5 fois), construit l\'ISS et fait voler 355 personnes. Deux catastrophes marquent son histoire : Challenger (28 jan. 1986) explose 73 secondes après le décollage — 7 morts dont l\'institutrice Christa McAuliffe — à cause d\'un joint gelé par le froid. Columbia (1er fév. 2003) se désintègre à la rentrée après une tuile endommagée au décollage — 7 morts. Ces deux accidents transforment en profondeur la culture de sécurité de la NASA.',
-        nasaQuery:'Space Shuttle launch Columbia STS orbiter',
+        wikiImg:'https://upload.wikimedia.org/wikipedia/commons/9/9f/Challenger_explosion.jpg',
         aiKey:'ch4_shuttle', aiPrompt:'La navette spatiale : pourquoi était-elle révolutionnaire, et quelles étaient ses limitations ? Les accidents Challenger et Columbia étaient-ils évitables ? Qu\'ont appris ces deux tragédies sur les risques systémiques dans les grandes organisations sous pression budgétaire ? 4 phrases.' },
       { heading:'L\'ISS — 25 ans de présence permanente dans l\'espace',
         text:'La Station spatiale internationale est la plus grande infrastructure jamais construite dans l\'espace : 109 m de long, 420 tonnes, 15 nations partenaires. Habitée en permanence depuis novembre 2000, elle a accueilli plus de 270 astronautes et 3 000 expériences scientifiques — en biologie cellulaire, physique des fluides, médecine, matériaux. En 2022, malgré l\'invasion de l\'Ukraine, astronautes et cosmonautes ont continué à travailler ensemble à bord, symbole que la coopération scientifique peut résister aux crises politiques. Elle sera déorbitée vers 2030, remplacée par des stations commerciales.',
-        wikiImg:'https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/International_Space_Station_after_undocking_of_STS-132.jpg/480px-International_Space_Station_after_undocking_of_STS-132.jpg',
+        wikiImg:'https://upload.wikimedia.org/wikipedia/commons/0/04/International_Space_Station_after_undocking_of_STS-132.jpg',
         aiKey:'ch4_iss', aiPrompt:'L\'ISS après 25 ans : quelles ont été les découvertes scientifiques les plus importantes réalisées à bord ? Comment la coopération entre 15 nations a-t-elle fonctionné en pratique ? Et quelle sera la suite après la déorbitation prévue vers 2030 ? 4 phrases.' },
     ] },
   { id:'ch5', num:'05', label:'Chapitre 5', badge:'Ch. 5',
     title:'Nouveaux acteurs, nouvelle ère', sub:'Chine · SpaceX · Artemis · Tourisme · Mars',
     color:'#4a6b9e',
-    heroImg:'https://upload.wikimedia.org/wikipedia/commons/thumb/9/97/The_Earth_seen_from_Apollo_17.jpg/480px-The_Earth_seen_from_Apollo_17.jpg',
+    heroImg:'https://upload.wikimedia.org/wikipedia/commons/9/97/The_Earth_seen_from_Apollo_17.jpg',
     sections:[
       { heading:'La Chine — la troisième puissance spatiale',
         text:'Sans accès aux technologies américaines ou russes, la Chine a développé son programme de A à Z. Yang Liwei devient le premier taikonaute en 2003 (Shenzhou 5). La station Tiangong est habitée en permanence depuis 2021. Le rover Yutu-2 explore la face cachée de la Lune depuis 2019 — une première mondiale. Chang\'e 5 rapporte 1,7 kg d\'échantillons lunaires en 2020. La sonde Tianwen-1 dépose le rover Zhurong sur Mars en 2021. La Chine vise un alunissage habité avant 2030 et une base lunaire permanente — une vraie compétition avec le programme Artemis américain.',
-        nasaQuery:'China space program Tiangong taikonauts lunar mission',
+        wikiImg:'https://upload.wikimedia.org/wikipedia/commons/0/03/Tiangong_Space_Station_Rendering_2021.08.png',
         aiKey:'ch5_china', aiPrompt:'Comment la Chine est-elle devenue la troisième grande puissance spatiale en si peu de temps ? Quelles sont ses ambitions pour la Lune et Mars, et pourquoi cette nouvelle course entre USA et Chine est-elle différente — et peut-être plus dangereuse — que la Guerre froide USA/URSS ? 4 phrases.' },
       { heading:'SpaceX et la révolution de la réutilisabilité',
         text:'Fondé en 2002 par Elon Musk avec l\'objectif explicite de coloniser Mars, SpaceX bouleverse l\'économie des lancements. En 2015, Falcon 9 réalise le premier atterrissage vertical contrôlé d\'un premier étage — réduisant les coûts d\'un facteur 10. Crew Dragon transporte des astronautes vers l\'ISS depuis 2020, mettant fin à la dépendance vis-à-vis des Soyouz russes. Starship (120 m, le plus grand lanceur jamais construit), en développement actif depuis 2023, vise la Lune (contrat NASA Artemis) puis Mars. Blue Origin, Rocket Lab et Arianespace réinventent aussi le secteur.',
-        nasaQuery:'SpaceX Falcon 9 rocket landing reusable Starship',
+        wikiImg:'https://upload.wikimedia.org/wikipedia/commons/5/54/CRS-8_%2826239020092%29.jpg',
         aiKey:'ch5_spacex', aiPrompt:'SpaceX a changé les règles du jeu spatial. Comment la réutilisabilité des fusées a-t-elle transformé l\'économie des lancements ? Qu\'est-ce que Starship représente vraiment — est-ce réaliste d\'aller sur Mars avec ce lanceur ? Quels risques pose la domination d\'un acteur privé sur l\'accès à l\'espace ? 4 phrases.' },
       { heading:'Artemis — retour habité sur la Lune',
         text:'Le programme Artemis (NASA, depuis 2017) vise à ramener des astronautes sur la Lune pour la première fois depuis Apollo 17 (1972). Artemis I (novembre 2022) a testé sans équipage le lanceur SLS et la capsule Orion. Artemis II (2025) enverra 4 astronautes en orbite lunaire. Artemis III (2026) doit déposer les premiers humains au pôle sud lunaire — dont la première femme et le premier non-Blanc sur la Lune. Le pôle sud est visé car ses cratères ombragés renferment de la glace d\'eau, ressource clé pour produire carburant et oxygène sur place.',
-        nasaQuery:'Artemis moon program SLS Orion lunar south pole',
+        wikiImg:'https://upload.wikimedia.org/wikipedia/commons/7/75/Artemis_I_Launch_%28NHQ202211160028%29.jpg',
         aiKey:'ch5_artemis', aiPrompt:'Le programme Artemis : pourquoi retourner sur la Lune 50 ans après Apollo ? Qu\'est-ce qui est fondamentalement différent cette fois (objectifs durables, pôle sud, glace d\'eau, Gateway orbital) ? Quel rôle joue la compétition avec la Chine dans l\'urgence du programme ? 4 phrases.' },
       { heading:'Mars — le prochain grand saut humain',
         text:'Mars est à 54 à 401 millions de km selon l\'alignement des orbites. Un voyage aller prend 6 à 9 mois avec la propulsion chimique actuelle. Les défis sont immenses : radiation cosmique (risque de cancer multiplié), microgravité prolongée (os, muscles, vision), communication avec un délai de 24 minutes, auto-suffisance totale. MOXIE, expérience embarquée sur Perseverance, a produit 122 g d\'oxygène depuis le CO₂ martien — première production de ressource in-situ sur Mars. SpaceX vise des vols cargo dans les années 2020 et des humains vers 2030–2035.',
-        wikiImg:'https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/OSIRIS_Mars_true_color.jpg/480px-OSIRIS_Mars_true_color.jpg',
+        wikiImg:'https://upload.wikimedia.org/wikipedia/commons/0/02/OSIRIS_Mars_true_color.jpg',
         aiKey:'ch5_mars', aiPrompt:'Un voyage humain vers Mars : quels sont les défis les plus difficiles à résoudre (radiation, durée, ressources, santé mentale de l\'équipage) ? Comment l\'expérience MOXIE prépare-t-elle concrètement une mission habitée ? Et comment imagine-tu le quotidien des premiers Marsiens ? 4 phrases.' },
     ] },
   { id:'ch6', num:'06', label:'Chapitre 6', badge:'Ch. 6',
     title:'Défis et limites actuelles', sub:'Corps humain · Débris · Droit · Éthique',
     color:'#9e4a4a',
-    heroImg:'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b4/Space_debris.jpg/480px-Space_debris.jpg',
+    heroImg:'https://upload.wikimedia.org/wikipedia/commons/a/a1/Debris-GEO1280.jpg',
     sections:[
       { heading:'Le corps humain face à l\'espace',
         text:'L\'espace est hostile au corps humain. En microgravité, les muscles s\'atrophient (1–2 % de masse par mois), les os se décalcifient, la pression intraoculaire augmente et altère durablement la vision (syndrome SANS). Les rayonnements cosmiques, non filtrés hors de la magnétosphère, augmentent le risque de cancer : un voyage aller-retour vers Mars exposerait l\'équipage à environ 1 Sievert, soit 33 fois la limite annuelle pour un travailleur du nucléaire. Des solutions sont à l\'étude : gravité artificielle par rotation, boucliers d\'hydrogène liquide, traitements médicaux préventifs.',
-        nasaQuery:'astronaut health effects microgravity radiation ISS exercise',
+        wikiImg:'https://upload.wikimedia.org/wikipedia/commons/a/a1/ISS-38_Mike_Hopkins_works_on_the_COLBERT_treadmill_in_the_Unity_node.jpg',
         aiKey:'ch6_health', aiPrompt:'Les effets de l\'espace sur le corps humain : quels sont les plus dangereux à long terme (radiation, os, vision, cœur) ? Quelles solutions techniques ou médicales sont développées pour des vols longue durée ? Parle aussi des effets psychologiques de l\'isolement prolongé en équipage restreint. 4 phrases.' },
       { heading:'Débris spatiaux — le syndrome de Kessler',
         text:'Plus de 27 000 débris de plus de 10 cm orbitent autour de la Terre, plus des millions de particules plus petites. À 7 km/s, un boulon de 10 g a l\'énergie cinétique d\'une voiture à 100 km/h. L\'astrophysicien Donald Kessler prédit en 1978 un scénario catastrophique : au-delà d\'un seuil critique, les collisions génèrent des débris qui causent d\'autres collisions — une réaction en chaîne rendant certaines orbites inutilisables pendant des siècles. Avec les méga-constellations (Starlink : 6 000 satellites), le problème s\'accélère. Des projets de ramassage actif (filets, harpons magnétiques, lasers) sont en développement.',
-        nasaQuery:'space debris orbital low Earth orbit satellite collision Kessler',
+        wikiImg:'https://upload.wikimedia.org/wikipedia/commons/a/a1/Debris-GEO1280.jpg',
         aiKey:'ch6_debris', aiPrompt:'Le syndrome de Kessler et les débris spatiaux : à quel point la situation est-elle critique aujourd\'hui ? Qui est responsable des débris (États, entreprises) et quelles obligations légales existent ? Quelles technologies de nettoyage orbital sont les plus prometteuses ? 4 phrases.' },
       { heading:'Droit spatial, éthique et militarisation',
         text:'Le Traité de l\'espace (1967, 111 signataires) stipule que l\'espace est « patrimoine commun de l\'humanité », interdit d\'y placer des armes nucléaires et empêche toute appropriation nationale d\'un corps céleste. Mais ce traité a 60 ans et ne couvre pas les ressources des astéroïdes ou de la Lune (lois américaine de 2015 et luxembourgeoise de 2017 : une entreprise peut posséder ce qu\'elle extrait). La militarisation progresse avec la Space Force américaine et les armes anti-satellites. La question des droits des futurs habitants de Mars ou d\'une colonie lunaire reste entièrement ouverte.',
@@ -1002,15 +1002,15 @@ const CONQUEST = [
   { id:'conclusion', num:'', label:'Conclusion', badge:'Fin',
     title:'Quel avenir pour la conquête spatiale ?', sub:'Bilan · Base lunaire · Mars · Europa · Humanité multiplanétaire',
     color:'#4a7b9e',
-    heroImg:'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a4/NASA-Apollo8-Dec24-Earthrise.jpg/480px-NASA-Apollo8-Dec24-Earthrise.jpg',
+    heroImg:'https://upload.wikimedia.org/wikipedia/commons/a/a8/NASA-Apollo8-Dec24-Earthrise.jpg',
     sections:[
       { heading:'Bilan — 67 ans d\'ère spatiale',
         text:'En 67 ans, l\'humanité a posé le pied sur la Lune, photographié chaque planète du système solaire, maintenu une présence permanente en orbite, et créé des technologies qui structurent le quotidien (GPS, satellites météo, internet par satellite, IRM, capteurs CMOS, matériaux composites). Les échecs sont réels : 18 astronautes morts en mission, des centaines de sondes perdues, des milliards engloutis. Mais chaque échec a enrichi le savoir-faire des ingénieurs. La conquête spatiale a aussi changé notre regard sur la Terre — une bille bleue fragile visible dans toute son unicité depuis 400 km d\'altitude.',
-        wikiImg:'https://upload.wikimedia.org/wikipedia/commons/thumb/9/97/The_Earth_seen_from_Apollo_17.jpg/480px-The_Earth_seen_from_Apollo_17.jpg',
+        wikiImg:'https://upload.wikimedia.org/wikipedia/commons/9/97/The_Earth_seen_from_Apollo_17.jpg',
         aiKey:'concl_balance', aiPrompt:'Bilan de 67 ans de conquête spatiale : les coûts humains et financiers ont-ils été justifiés par les bénéfices ? Quelles technologies du quotidien n\'existeraient pas sans la course à l\'espace ? Et quelle est la prochaine étape que tu considères comme la plus transformative pour l\'humanité ? 4 phrases.' },
       { heading:'L\'humanité deviendra-t-elle multiplanétaire ?',
         text:'Les prochaines décennies verront probablement une base orbitale autour de la Lune (Gateway), une base au pôle sud lunaire, les premiers humains sur Mars (2030–2040), et des sondes plongeant dans les océans d\'Europe ou de Titan. La question philosophique reste ouverte : devons-nous coloniser d\'autres mondes pour assurer la survie de l\'espèce, ou cette énergie devrait-elle d\'abord résoudre les crises terrestres ? Pour les partisans de la multiplanétarisation, une civilisation confinée à une seule planète est vulnérable à un événement catastrophique (astéroïde géant, guerre nucléaire, pandémie) qui pourrait l\'anéantir.',
-        nasaQuery:'future space exploration lunar base Mars colony',
+        wikiImg:'https://upload.wikimedia.org/wikipedia/commons/0/07/Moon_colony_with_rover.jpeg',
         aiKey:'concl_future', aiPrompt:'L\'humanité est-elle destinée à devenir multiplanétaire ? Quels sont les arguments en faveur (survie de l\'espèce) et contre (priorités terrestres, éthique de la colonisation) ? Si tu devais vivre sur Mars en 2050, dans une colonie des premiers temps, à quoi ressemblerait ton quotidien ? 4 phrases imaginatives.' },
     ] },
 ]
@@ -1110,13 +1110,32 @@ const CONQUEST_BIOS = [
 
 // ─── Composants Conquête spatiale ─────────────────────────────────────────────
 
-function ConquestWikiImg({ src, alt, height }) {
-  const [ok, setOk] = useState(true)
-  if (!src || !ok) return null
+function ConquestWikiImg({ src, alt, fallbackQuery, height }) {
+  const [wikiOk, setWikiOk] = useState(true)
+  const [nasaUrl, setNasaUrl] = useState(null)
+  const fetched = useRef(false)
+
+  const tryNasa = () => {
+    if (!fallbackQuery || fetched.current) return
+    fetched.current = true
+    fetchNASAImages(fallbackQuery, 1)
+      .then(photos => { if (photos.length) setNasaUrl(photos[0].thumbUrl) })
+      .catch(() => {})
+  }
+
+  if (!src) return null
+  const h = height || 200
+  const imgStyle = { width:'100%', height:h, objectFit:'cover', borderRadius:12, marginBottom:14, display:'block' }
+
+  if (!wikiOk) {
+    if (nasaUrl) return <img src={nasaUrl} alt={alt} style={imgStyle} />
+    tryNasa()
+    return null
+  }
   return (
-    <img src={src} alt={alt} onError={() => setOk(false)}
-      style={{ width:'100%', height: height || 200, objectFit:'cover',
-        borderRadius:12, marginBottom:14, display:'block' }} />
+    <img src={src} alt={alt} loading="lazy"
+      onError={() => { setWikiOk(false); tryNasa() }}
+      style={imgStyle} />
   )
 }
 
@@ -1131,7 +1150,7 @@ function ConquestNasaImg({ query, alt }) {
       .catch(() => {})
   }, [query])
   if (!url) return (
-    <div style={{ height:80, borderRadius:12, background:'var(--surface-2)', marginBottom:14,
+    <div style={{ height:64, borderRadius:12, background:'var(--surface-2)', marginBottom:14,
       display:'flex', alignItems:'center', justifyContent:'center' }}>
       <div style={{ display:'flex', gap:5 }}>
         {[0,1,2].map(i => (
@@ -1157,7 +1176,7 @@ function ConquestSection({ section }) {
         {section.heading}
       </div>
       {section.wikiImg
-        ? <ConquestWikiImg src={section.wikiImg} alt={section.heading} />
+        ? <ConquestWikiImg src={section.wikiImg} alt={section.heading} fallbackQuery={section.nasaQuery} />
         : section.nasaQuery
           ? <ConquestNasaImg query={section.nasaQuery} alt={section.heading} />
           : null}
