@@ -850,11 +850,524 @@ function TheoryView({ onPick }) {
   )
 }
 
+// ─── Conquête spatiale — données ─────────────────────────────────────────────
+
+const CONQUEST = [
+  { id:'intro', num:'', label:'Introduction', badge:'Intro',
+    title:'Pourquoi explorer l\'espace ?', sub:'Définition · Guerre froide · Enjeux',
+    color:'#3d6b9e',
+    heroImg:'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a4/NASA-Apollo8-Dec24-Earthrise.jpg/480px-NASA-Apollo8-Dec24-Earthrise.jpg',
+    sections:[
+      { heading:'La conquête spatiale, qu\'est-ce que c\'est ?',
+        text:'La conquête spatiale désigne l\'ensemble des activités humaines visant à explorer et comprendre l\'espace au-delà de l\'atmosphère. Elle se divise en deux branches : le vol habité (astronautes en orbite, sur la Lune, demain sur Mars) et l\'exploration robotique (sondes, rovers, télescopes spatiaux). Depuis Spoutnik en 1957, plus de 600 humains ont voyagé dans l\'espace et des centaines de sondes ont exploré chaque recoin du système solaire. La conquête spatiale est à la fois une aventure scientifique, technologique et profondément humaine.',
+        wikiImg:'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a4/NASA-Apollo8-Dec24-Earthrise.jpg/480px-NASA-Apollo8-Dec24-Earthrise.jpg',
+        aiKey:'intro_def', aiPrompt:'Qu\'est-ce que la conquête spatiale dans toute sa dimension (vols habités, sondes robotiques, télescopes) ? Pourquoi est-elle considérée comme l\'une des plus grandes aventures de l\'humanité, et quelle différence existe-t-il entre exploration spatiale et colonisation ? 4 phrases captivantes.' },
+      { heading:'Guerre froide — moteur de la course à l\'espace',
+        text:'La conquête spatiale naît de la rivalité entre les États-Unis et l\'URSS pendant la Guerre froide (1947–1991). Chaque exploit spatial est une victoire idéologique : le premier satellite, le premier homme en orbite, la première marche sur la Lune. Cette compétition nourrie par la peur et l\'orgueil national a produit en moins de 15 ans les avancées technologiques les plus spectaculaires du XXe siècle. À partir des années 1970, la rivalité a cédé la place à une coopération progressive, incarnée aujourd\'hui par la Station spatiale internationale.',
+        wikiImg:'https://upload.wikimedia.org/wikipedia/commons/thumb/9/97/The_Earth_seen_from_Apollo_17.jpg/480px-The_Earth_seen_from_Apollo_17.jpg',
+        aiKey:'intro_cold', aiPrompt:'Comment la Guerre froide a-t-elle été le moteur de la conquête spatiale ? Pourquoi cette rivalité USA/URSS a-t-elle paradoxalement produit les plus grandes avancées spatiales de l\'histoire, et comment la coopération internationale (ISS) a-t-elle changé le modèle ? 4 phrases.' },
+      { heading:'Des enjeux multiples',
+        text:'Les enjeux sont scientifiques (comprendre l\'univers, l\'origine de la vie), politiques (prestige national, soft power), économiques (GPS, satellites météo, internet, matériaux composites) et philosophiques. La vision de la Terre depuis l\'espace engendre ce que les astronautes appellent l\'« Overview Effect » — une prise de conscience soudaine de la fragilité et de l\'unicité de notre planète. Plus de 45 % des astronautes ayant vécu cette expérience déclarent avoir profondément changé de regard sur le monde. La conquête spatiale est aussi, fondamentalement, un acte d\'espoir.',
+        wikiImg:'https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/International_Space_Station_after_undocking_of_STS-132.jpg/480px-International_Space_Station_after_undocking_of_STS-132.jpg',
+        aiKey:'intro_stakes', aiPrompt:'Quels sont les enjeux réels de la conquête spatiale (scientifiques, économiques, politiques, philosophiques) ? Parle de l\'Overview Effect (la perception de la Terre qui transforme les astronautes) et des technologies du quotidien nées de la course à l\'espace. 4 phrases.' },
+    ] },
+  { id:'ch1', num:'01', label:'Chapitre 1', badge:'Ch. 1',
+    title:'Les prémisses (avant 1957)', sub:'Tsiolkovski · Goddard · V2 · Course aux missiles',
+    color:'#7b4a9e',
+    heroImg:'https://upload.wikimedia.org/wikipedia/commons/thumb/7/74/Goddard_and_Rocket.jpg/480px-Goddard_and_Rocket.jpg',
+    sections:[
+      { heading:'Les pionniers théoriques',
+        text:'Trois visionnaires ont posé les bases du voyage spatial. Konstantin Tsiolkovski (1857–1935), instituteur russe sourd, formule dès 1903 l\'équation-fusée fondamentale et le principe de propulsion par réaction. Robert Goddard (1882–1945) lance la première fusée à carburant liquide le 16 mars 1926 dans un champ du Massachusetts — elle monte à 12 mètres, mais prouve le concept. Hermann Oberth (1894–1989) publie en 1923 « Die Rakete zu den Planetenräumen », inspirant une génération d\'ingénieurs dont le jeune Wernher von Braun. Ces trois pionniers théorisèrent et expérimentèrent dans l\'indifférence quasi générale.',
+        wikiImg:'https://upload.wikimedia.org/wikipedia/commons/thumb/7/74/Goddard_and_Rocket.jpg/480px-Goddard_and_Rocket.jpg',
+        aiKey:'ch1_pioneers', aiPrompt:'Tsiolkovski, Goddard et Oberth — les trois pionniers de l\'astronautique. Pourquoi leurs travaux, souvent moqués de leur vivant, sont-ils devenus la fondation de toute exploration spatiale ? Qu\'est-ce que l\'équation de Tsiolkovski et pourquoi est-elle encore utilisée sur chaque lancement aujourd\'hui ? 4 phrases.' },
+      { heading:'La V2 — première fusée à atteindre l\'espace',
+        text:'En Allemagne nazie, sous la direction de Wernher von Braun depuis Peenemünde, la V2 (Vergeltungswaffe 2) franchit pour la première fois la limite de l\'espace le 3 octobre 1942. Arme de terreur, plus de 3 000 V2 s\'abattent sur Londres, Anvers et d\'autres villes en 1944–1945, tuant 9 000 civils. La sinistre réalité : ces fusées étaient fabriquées par des détenus du camp de Dora, dont 12 000 périront à la tâche. À la capitulation, les deux superpuissances s\'emparent des plans et recrutent les ingénieurs allemands (Opération Paperclip côté américain).',
+        nasaQuery:'V2 rocket launch history World War',
+        aiKey:'ch1_v2', aiPrompt:'La fusée V2 allemande : comment une arme de destruction est-elle devenue la mère de toutes les fusées spatiales ? Quelle est la part d\'ombre (travail forcé, crimes de guerre) et la part d\'héritage technologique ? Qu\'est devenu Wernher von Braun après la guerre ? 4 phrases nuancées.' },
+      { heading:'La course aux missiles balistiques',
+        text:'Après 1945, les deux superpuissances comprennent vite que la V2, améliorée, peut placer un engin en orbite. En URSS, Sergueï Korolev — brillant ingénieur survivant du Goulag — développe le R-7, premier ICBM réussi (août 1957). Son identité reste classifiée jusqu\'à sa mort en 1966 pour le protéger des espions. C\'est ce même R-7 qui lancera Spoutnik deux mois plus tard. Aux États-Unis, von Braun travaille pour l\'armée sur les missiles Redstone, mais reste sous-financé jusqu\'au « choc Spoutnik ».',
+        nasaQuery:'Soviet R7 rocket Korolev missile program history',
+        aiKey:'ch1_missiles', aiPrompt:'Sergueï Korolev, l\'homme de l\'ombre de la conquête spatiale soviétique : pourquoi son identité est-elle restée secrète pendant sa vie, et quel rôle crucial a-t-il joué dans l\'histoire de l\'espace ? Comment le passage du missile militaire au lanceur spatial civil s\'est-il opéré ? 4 phrases.' },
+    ] },
+  { id:'ch2', num:'02', label:'Chapitre 2', badge:'Ch. 2',
+    title:'La course à l\'espace (1957–1975)', sub:'Spoutnik · Gagarine · Apollo · Animaux · Apollo-Soyouz',
+    color:'#4a9e6b',
+    heroImg:'https://upload.wikimedia.org/wikipedia/commons/thumb/b/be/Sputnik_asm.jpg/480px-Sputnik_asm.jpg',
+    sections:[
+      { heading:'Spoutnik 1 — le choc mondial (1957)',
+        text:'Le 4 octobre 1957, l\'URSS lance Spoutnik 1, premier satellite artificiel de la Terre. Cette sphère de 84 kg émet un simple bip-bip capté par des amateurs du monde entier — et provoque un traumatisme politique aux États-Unis. La NASA est créée en réponse directe en juillet 1958. Un mois après Spoutnik 1, Spoutnik 2 emporte Laïka, premier être vivant en orbite — un aller simple, sans retour prévu. Le mot « spoutnik » (compagnon de voyage) entre dans toutes les langues du monde.',
+        wikiImg:'https://upload.wikimedia.org/wikipedia/commons/thumb/b/be/Sputnik_asm.jpg/480px-Sputnik_asm.jpg',
+        aiKey:'ch2_sputnik', aiPrompt:'Spoutnik 1 (1957) : pourquoi ce satellite de 84 kg a-t-il provoqué un traumatisme géopolitique aux États-Unis ? Qu\'est-ce que le « Spoutnik choc » a changé à l\'éducation américaine, à la politique de défense et à la création de la NASA ? Quel a été le sort de Laïka ? 4 phrases.' },
+      { heading:'Gagarine et les premiers humains dans l\'espace (1961)',
+        text:'Le 12 avril 1961, Youri Gagarine (27 ans) effectue le premier vol humain : 108 minutes, une orbite. En descendant dans l\'atmosphère, il radiodiffuse : « Le ciel est d\'un noir profond. La Terre est bleue. Quelle beauté ! » Trois semaines plus tard, Alan Shepard réalise le premier vol suborbital américain (15 minutes). En 1963, Valentina Terechkova devient la première femme dans l\'espace à bord de Vostok 6. Stimulé par ces défaites en série, Kennedy lance en 1961 le défi Apollo : un Américain sur la Lune avant 1970.',
+        nasaQuery:'Yuri Gagarin Vostok first human spaceflight',
+        aiKey:'ch2_gagarin', aiPrompt:'Youri Gagarine : qu\'a-t-il vécu lors de ses 108 minutes historiques ? Quelle était l\'atmosphère en URSS ce jour-là, et comment le monde a-t-il réagi ? Pourquoi la mort de Gagarine en 1968 dans un accident d\'avion reste-t-elle entourée de mystère ? 4 phrases.' },
+      { heading:'Les animaux précurseurs',
+        text:'Avant d\'envoyer des humains, les deux superpuissances testent l\'espace avec des animaux. L\'URSS envoie des chiens : Laïka (1957, mourut de surchauffe quelques heures après le lancement), puis Belka et Strelka (1960), premières à revenir vivantes. Les États-Unis envoient des singes et chimpanzés, dont Ham (janvier 1961), premier chimpanzé en espace suborbital. Ces vols valident les systèmes de survie et démontrent que la vie peut supporter l\'apesanteur et les forces de lancement — ouvrant concrètement la voie aux vols humains.',
+        wikiImg:'https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/Laika_-_1957.jpg/480px-Laika_-_1957.jpg',
+        aiKey:'ch2_animals', aiPrompt:'Les animaux dans l\'espace : comment ont-ils contribué à rendre le vol humain possible ? Était-ce éthique d\'envoyer Laïka sans retour possible ? Quelles espèces ont voyagé dans l\'espace depuis (araignées, poissons, méduses, tardigrades) et pourquoi ? 4 phrases.' },
+      { heading:'Apollo 11 — premiers pas sur la Lune (1969)',
+        text:'Le 20 juillet 1969, le module Eagle se pose sur la Mer de la Tranquillité. Neil Armstrong pose le pied sur la Lune à 02:56 UTC : « C\'est un petit pas pour un homme, un bond de géant pour l\'humanité. » Buzz Aldrin le rejoint 19 minutes plus tard ; Michael Collins orbit. 600 millions de personnes regardent en direct — l\'audience la plus large de l\'histoire à ce moment. Les 6 missions Apollo qui alunissent (1969–1972) rapportent 382 kg de roches lunaires. Apollo 13 (1970), après une explosion du service module, revient sain et sauf grâce à une improvisation d\'ingénierie remarquable.',
+        wikiImg:'https://upload.wikimedia.org/wikipedia/commons/thumb/9/98/Aldrin_Apollo_11_original.jpg/480px-Aldrin_Apollo_11_original.jpg',
+        aiKey:'ch2_apollo', aiPrompt:'Apollo 11 : comment l\'humanité a-t-elle accompli en seulement 8 ans ce qui semblait impossible ? Qu\'a-t-on appris sur la Lune grâce aux 382 kg de roches rapportées ? Et pourquoi n\'y est-on pas retourné depuis Apollo 17 (1972) jusqu\'à Artemis ? 4 phrases.' },
+      { heading:'Mission Apollo-Soyouz — première poignée de main (1975)',
+        text:'En juillet 1975, un vaisseau Apollo américain et un Soyouz soviétique s\'ariment en orbite. Thomas Stafford et Alexeï Leonov se serrent la main dans l\'espace pour la première fois — symbole fort de la détente internationale. La mission révèle les défis de la coopération technique entre deux systèmes incompatibles, préfigurant les compromis qui permettront l\'ISS. L\'anglais et le russe deviennent officiellement les deux langues de la coopération spatiale. C\'est le dernier vol habité américain avant la navette spatiale en 1981.',
+        nasaQuery:'Apollo Soyuz Test Project 1975 docking handshake',
+        aiKey:'ch2_apollo_soyuz', aiPrompt:'La mission Apollo-Soyouz (1975) : pourquoi cette poignée de main dans l\'espace était-elle si symbolique dans le contexte de la Guerre froide ? Quels obstacles techniques ont dû être résolus pour l\'arrimage ? Comment a-t-elle préfiguré l\'ISS 25 ans plus tard ? 4 phrases.' },
+    ] },
+  { id:'ch3', num:'03', label:'Chapitre 3', badge:'Ch. 3',
+    title:'L\'exploration robotique du système solaire', sub:'Voyager · Rovers martiens · Cassini · Télescopes',
+    color:'#6b9e4a',
+    heroImg:'https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/OSIRIS_Mars_true_color.jpg/480px-OSIRIS_Mars_true_color.jpg',
+    sections:[
+      { heading:'Sondes lunaires et vénusiennes — les premières',
+        text:'Avant Apollo, les sondes robotiques préparent le terrain. Le programme Luna soviétique (1959–1976) accumule les premières : premier impact lunaire (Luna 2), premières photos du côté caché (Luna 3), premier alunissage en douceur (Luna 9, 1966), premier retour d\'échantillons automatique (Luna 16, 1970). Les sondes Surveyor américaines valident les sites d\'atterrissage d\'Apollo. Sur Vénus, les sondes Venera soviétiques (1970–1983) révèlent un enfer de 465 °C et 92 atm — et transmettent les premières photos couleur d\'une autre surface planétaire.',
+        nasaQuery:'Luna program Soviet moon probe Venera Venus',
+        aiKey:'ch3_lunar', aiPrompt:'Les premières sondes robotiques lunaires et vénusiennes (Luna, Surveyor, Venera) : comment ont-elles transformé des corps célestes inconnus en destinations explorées ? Qu\'ont révélé les Venera sur Vénus, et pourquoi la surface vénusienne est-elle si difficile à explorer encore aujourd\'hui ? 4 phrases.' },
+      { heading:'Voyager — les ambassadeurs interstellaires (1977)',
+        text:'Lancées en 1977 pour profiter d\'un alignement planétaire exceptionnel (une fois tous les 176 ans), Voyager 1 et 2 survolent les 4 planètes géantes et révèlent les volcans de Io, l\'anneau de Jupiter, les lunes actives de Saturne, les anneaux d\'Uranus et les tempêtes de Neptune. Depuis 2012, Voyager 1 évolue dans l\'espace interstellaire — à plus de 23 milliards de km, le plus loin qu\'un objet humain ait jamais atteint. Chaque sonde porte un « Disque d\'or » encodant sons, images et langues de la Terre, message pour d\'éventuelles civilisations extraterrestres.',
+        nasaQuery:'Voyager spacecraft solar system outer planets interstellar',
+        aiKey:'ch3_voyager', aiPrompt:'Les sondes Voyager : comment ont-elles révolutionné notre connaissance du système solaire externe en un seul voyage ? Qu\'est-ce que le Disque d\'or contient, et pourquoi certains scientifiques pensent-ils que l\'envoyer représente un risque (en révélant notre existence) ? 4 phrases.' },
+      { heading:'Les rovers martiens — géologues sur Mars',
+        text:'Depuis 1997, des rovers de plus en plus sophistiqués explorent Mars. Sojourner (1997, 10 kg, 83 jours) prouve la viabilité du concept. Spirit et Opportunity (2004), prévus pour 90 jours, ont respectivement résisté 6 et 14 ans. Curiosity (2012, 1 tonne, toujours actif) confirme que Mars a abrité des lacs liquides il y a 3,5 milliards d\'années. Perseverance (2021) constitue des dépôts d\'échantillons en attente de retour terrestre, tandis qu\'Ingenuity réalise les premiers vols motorisés sur une autre planète (72 vols). L\'expérience MOXIE produit de l\'oxygène depuis le CO₂ martien.',
+        wikiImg:'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/Curiosity_Self-Portrait_at_%27Big_Sky%27_Drilling_Site.jpg/480px-Curiosity_Self-Portrait_at_%27Big_Sky%27_Drilling_Site.jpg',
+        aiKey:'ch3_rovers', aiPrompt:'Les rovers martiens : qu\'a apporté chaque génération (Sojourner → Curiosity → Perseverance) à notre compréhension de Mars ? Ingenuity a réalisé les premiers vols motorisés sur une autre planète — pourquoi est-ce une avancée révolutionnaire pour les missions futures ? 4 phrases.' },
+      { heading:'Galileo, Cassini-Huygens, New Horizons',
+        text:'Galileo (1995–2003) révèle l\'océan sous-glaciaire d\'Europe et les volcans de Io. Cassini-Huygens (2004–2017) tourne autour de Saturne pendant 13 ans : elle découvre les geysers d\'Encelade (eau liquide + organiques = candidat à la vie), et la sonde Huygens se pose sur Titan en 2005 (lacs de méthane, rivières d\'éthane). New Horizons survole Pluton en 2015 et révèle montagnes de 3 000 m et cœur de glace géant. OSIRIS-REx rapporte en 2023 250 g de l\'astéroïde Bennu — plus grande collecte d\'échantillons extraterrestres depuis Apollo.',
+        nasaQuery:'Cassini Saturn Enceladus Titan plumes rings',
+        aiKey:'ch3_outer', aiPrompt:'Cassini, Galileo, New Horizons : quelles découvertes vous ont le plus surpris ? Pourquoi l\'entrée finale de Cassini dans l\'atmosphère de Saturne en 2017 est-elle restée si émouvante pour des scientifiques qui avaient passé 20 ans sur cette mission ? 4 phrases.' },
+      { heading:'Hubble et James Webb — les yeux de l\'humanité',
+        text:'Hubble (1990–aujourd\'hui) révolutionne l\'astronomie : âge de l\'univers (13,8 milliards d\'années), expansion accélérée par l\'énergie noire, images emblématiques des « Piliers de la Création », catalogage de milliards de galaxies. Malgré un miroir défectueux corrigé en 1993, il est en service depuis 35 ans. Le James Webb Space Telescope (2021) observe l\'infrarouge et a déjà photographié des galaxies formées 300 millions d\'ans après le Big Bang — repoussant les limites observationnelles de 600 millions d\'années au-delà de Hubble. Ces deux observatoires ont redéfini notre place dans l\'univers.',
+        wikiImg:'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/HST-SM4.jpeg/480px-HST-SM4.jpeg',
+        aiKey:'ch3_telescopes', aiPrompt:'Hubble et James Webb : comment ces deux télescopes ont-ils transformé notre vision de l\'univers ? Quelle est la différence fondamentale entre les deux (infrarouge vs visible) ? Et qu\'est-ce que JWST a déjà découvert qui remet en question les modèles de formation des premières galaxies ? 4 phrases.' },
+    ] },
+  { id:'ch4', num:'04', label:'Chapitre 4', badge:'Ch. 4',
+    title:'Stations orbitales et vol durable', sub:'Saliout · Mir · Navette spatiale · ISS',
+    color:'#9e7b4a',
+    heroImg:'https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/International_Space_Station_after_undocking_of_STS-132.jpg/480px-International_Space_Station_after_undocking_of_STS-132.jpg',
+    sections:[
+      { heading:'De Saliout à Mir — l\'école soviétique de longue durée',
+        text:'L\'URSS invente la station spatiale habitable. Saliout 1 (1971) accueille les premiers résidents, mais la mission se termine tragiquement : les 3 cosmonautes de Soyouz 11 périssent lors de la rentrée par dépressurisation de la capsule. Skylab américain (1973–1974) accueille 3 équipages pour 9 mois cumulés. Puis vient Mir (1986–2001) : la station soviétique bat tous les records. Valeri Polyakov y séjourne 437 jours consécutifs (record jamais battu en mission continue), prouvant que l\'être humain peut survivre à la durée d\'un aller-retour vers Mars.',
+        nasaQuery:'Mir space station cosmonaut orbit long duration',
+        aiKey:'ch4_mir', aiPrompt:'Des stations Saliout à Mir : qu\'ont-elles appris sur les effets à long terme de l\'espace sur le corps humain ? Pourquoi le record de 437 jours de Polyakov est-il si crucial pour planifier un vol vers Mars ? Quelle a été la fin spectaculaire de Mir en 2001 ? 4 phrases.' },
+      { heading:'La navette spatiale — triomphe et tragédies (1981–2011)',
+        text:'La navette spatiale américaine est le premier vaisseau spatial réutilisable. En 135 missions, elle déploie Hubble (et le répare 5 fois), construit l\'ISS et fait voler 355 personnes. Deux catastrophes marquent son histoire : Challenger (28 jan. 1986) explose 73 secondes après le décollage — 7 morts dont l\'institutrice Christa McAuliffe — à cause d\'un joint gelé par le froid. Columbia (1er fév. 2003) se désintègre à la rentrée après une tuile endommagée au décollage — 7 morts. Ces deux accidents transforment en profondeur la culture de sécurité de la NASA.',
+        nasaQuery:'Space Shuttle launch Columbia STS orbiter',
+        aiKey:'ch4_shuttle', aiPrompt:'La navette spatiale : pourquoi était-elle révolutionnaire, et quelles étaient ses limitations ? Les accidents Challenger et Columbia étaient-ils évitables ? Qu\'ont appris ces deux tragédies sur les risques systémiques dans les grandes organisations sous pression budgétaire ? 4 phrases.' },
+      { heading:'L\'ISS — 25 ans de présence permanente dans l\'espace',
+        text:'La Station spatiale internationale est la plus grande infrastructure jamais construite dans l\'espace : 109 m de long, 420 tonnes, 15 nations partenaires. Habitée en permanence depuis novembre 2000, elle a accueilli plus de 270 astronautes et 3 000 expériences scientifiques — en biologie cellulaire, physique des fluides, médecine, matériaux. En 2022, malgré l\'invasion de l\'Ukraine, astronautes et cosmonautes ont continué à travailler ensemble à bord, symbole que la coopération scientifique peut résister aux crises politiques. Elle sera déorbitée vers 2030, remplacée par des stations commerciales.',
+        wikiImg:'https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/International_Space_Station_after_undocking_of_STS-132.jpg/480px-International_Space_Station_after_undocking_of_STS-132.jpg',
+        aiKey:'ch4_iss', aiPrompt:'L\'ISS après 25 ans : quelles ont été les découvertes scientifiques les plus importantes réalisées à bord ? Comment la coopération entre 15 nations a-t-elle fonctionné en pratique ? Et quelle sera la suite après la déorbitation prévue vers 2030 ? 4 phrases.' },
+    ] },
+  { id:'ch5', num:'05', label:'Chapitre 5', badge:'Ch. 5',
+    title:'Nouveaux acteurs, nouvelle ère', sub:'Chine · SpaceX · Artemis · Tourisme · Mars',
+    color:'#4a6b9e',
+    heroImg:'https://upload.wikimedia.org/wikipedia/commons/thumb/9/97/The_Earth_seen_from_Apollo_17.jpg/480px-The_Earth_seen_from_Apollo_17.jpg',
+    sections:[
+      { heading:'La Chine — la troisième puissance spatiale',
+        text:'Sans accès aux technologies américaines ou russes, la Chine a développé son programme de A à Z. Yang Liwei devient le premier taikonaute en 2003 (Shenzhou 5). La station Tiangong est habitée en permanence depuis 2021. Le rover Yutu-2 explore la face cachée de la Lune depuis 2019 — une première mondiale. Chang\'e 5 rapporte 1,7 kg d\'échantillons lunaires en 2020. La sonde Tianwen-1 dépose le rover Zhurong sur Mars en 2021. La Chine vise un alunissage habité avant 2030 et une base lunaire permanente — une vraie compétition avec le programme Artemis américain.',
+        nasaQuery:'China space program Tiangong taikonauts lunar mission',
+        aiKey:'ch5_china', aiPrompt:'Comment la Chine est-elle devenue la troisième grande puissance spatiale en si peu de temps ? Quelles sont ses ambitions pour la Lune et Mars, et pourquoi cette nouvelle course entre USA et Chine est-elle différente — et peut-être plus dangereuse — que la Guerre froide USA/URSS ? 4 phrases.' },
+      { heading:'SpaceX et la révolution de la réutilisabilité',
+        text:'Fondé en 2002 par Elon Musk avec l\'objectif explicite de coloniser Mars, SpaceX bouleverse l\'économie des lancements. En 2015, Falcon 9 réalise le premier atterrissage vertical contrôlé d\'un premier étage — réduisant les coûts d\'un facteur 10. Crew Dragon transporte des astronautes vers l\'ISS depuis 2020, mettant fin à la dépendance vis-à-vis des Soyouz russes. Starship (120 m, le plus grand lanceur jamais construit), en développement actif depuis 2023, vise la Lune (contrat NASA Artemis) puis Mars. Blue Origin, Rocket Lab et Arianespace réinventent aussi le secteur.',
+        nasaQuery:'SpaceX Falcon 9 rocket landing reusable Starship',
+        aiKey:'ch5_spacex', aiPrompt:'SpaceX a changé les règles du jeu spatial. Comment la réutilisabilité des fusées a-t-elle transformé l\'économie des lancements ? Qu\'est-ce que Starship représente vraiment — est-ce réaliste d\'aller sur Mars avec ce lanceur ? Quels risques pose la domination d\'un acteur privé sur l\'accès à l\'espace ? 4 phrases.' },
+      { heading:'Artemis — retour habité sur la Lune',
+        text:'Le programme Artemis (NASA, depuis 2017) vise à ramener des astronautes sur la Lune pour la première fois depuis Apollo 17 (1972). Artemis I (novembre 2022) a testé sans équipage le lanceur SLS et la capsule Orion. Artemis II (2025) enverra 4 astronautes en orbite lunaire. Artemis III (2026) doit déposer les premiers humains au pôle sud lunaire — dont la première femme et le premier non-Blanc sur la Lune. Le pôle sud est visé car ses cratères ombragés renferment de la glace d\'eau, ressource clé pour produire carburant et oxygène sur place.',
+        nasaQuery:'Artemis moon program SLS Orion lunar south pole',
+        aiKey:'ch5_artemis', aiPrompt:'Le programme Artemis : pourquoi retourner sur la Lune 50 ans après Apollo ? Qu\'est-ce qui est fondamentalement différent cette fois (objectifs durables, pôle sud, glace d\'eau, Gateway orbital) ? Quel rôle joue la compétition avec la Chine dans l\'urgence du programme ? 4 phrases.' },
+      { heading:'Mars — le prochain grand saut humain',
+        text:'Mars est à 54 à 401 millions de km selon l\'alignement des orbites. Un voyage aller prend 6 à 9 mois avec la propulsion chimique actuelle. Les défis sont immenses : radiation cosmique (risque de cancer multiplié), microgravité prolongée (os, muscles, vision), communication avec un délai de 24 minutes, auto-suffisance totale. MOXIE, expérience embarquée sur Perseverance, a produit 122 g d\'oxygène depuis le CO₂ martien — première production de ressource in-situ sur Mars. SpaceX vise des vols cargo dans les années 2020 et des humains vers 2030–2035.',
+        wikiImg:'https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/OSIRIS_Mars_true_color.jpg/480px-OSIRIS_Mars_true_color.jpg',
+        aiKey:'ch5_mars', aiPrompt:'Un voyage humain vers Mars : quels sont les défis les plus difficiles à résoudre (radiation, durée, ressources, santé mentale de l\'équipage) ? Comment l\'expérience MOXIE prépare-t-elle concrètement une mission habitée ? Et comment imagine-tu le quotidien des premiers Marsiens ? 4 phrases.' },
+    ] },
+  { id:'ch6', num:'06', label:'Chapitre 6', badge:'Ch. 6',
+    title:'Défis et limites actuelles', sub:'Corps humain · Débris · Droit · Éthique',
+    color:'#9e4a4a',
+    heroImg:'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b4/Space_debris.jpg/480px-Space_debris.jpg',
+    sections:[
+      { heading:'Le corps humain face à l\'espace',
+        text:'L\'espace est hostile au corps humain. En microgravité, les muscles s\'atrophient (1–2 % de masse par mois), les os se décalcifient, la pression intraoculaire augmente et altère durablement la vision (syndrome SANS). Les rayonnements cosmiques, non filtrés hors de la magnétosphère, augmentent le risque de cancer : un voyage aller-retour vers Mars exposerait l\'équipage à environ 1 Sievert, soit 33 fois la limite annuelle pour un travailleur du nucléaire. Des solutions sont à l\'étude : gravité artificielle par rotation, boucliers d\'hydrogène liquide, traitements médicaux préventifs.',
+        nasaQuery:'astronaut health effects microgravity radiation ISS exercise',
+        aiKey:'ch6_health', aiPrompt:'Les effets de l\'espace sur le corps humain : quels sont les plus dangereux à long terme (radiation, os, vision, cœur) ? Quelles solutions techniques ou médicales sont développées pour des vols longue durée ? Parle aussi des effets psychologiques de l\'isolement prolongé en équipage restreint. 4 phrases.' },
+      { heading:'Débris spatiaux — le syndrome de Kessler',
+        text:'Plus de 27 000 débris de plus de 10 cm orbitent autour de la Terre, plus des millions de particules plus petites. À 7 km/s, un boulon de 10 g a l\'énergie cinétique d\'une voiture à 100 km/h. L\'astrophysicien Donald Kessler prédit en 1978 un scénario catastrophique : au-delà d\'un seuil critique, les collisions génèrent des débris qui causent d\'autres collisions — une réaction en chaîne rendant certaines orbites inutilisables pendant des siècles. Avec les méga-constellations (Starlink : 6 000 satellites), le problème s\'accélère. Des projets de ramassage actif (filets, harpons magnétiques, lasers) sont en développement.',
+        nasaQuery:'space debris orbital low Earth orbit satellite collision Kessler',
+        aiKey:'ch6_debris', aiPrompt:'Le syndrome de Kessler et les débris spatiaux : à quel point la situation est-elle critique aujourd\'hui ? Qui est responsable des débris (États, entreprises) et quelles obligations légales existent ? Quelles technologies de nettoyage orbital sont les plus prometteuses ? 4 phrases.' },
+      { heading:'Droit spatial, éthique et militarisation',
+        text:'Le Traité de l\'espace (1967, 111 signataires) stipule que l\'espace est « patrimoine commun de l\'humanité », interdit d\'y placer des armes nucléaires et empêche toute appropriation nationale d\'un corps céleste. Mais ce traité a 60 ans et ne couvre pas les ressources des astéroïdes ou de la Lune (lois américaine de 2015 et luxembourgeoise de 2017 : une entreprise peut posséder ce qu\'elle extrait). La militarisation progresse avec la Space Force américaine et les armes anti-satellites. La question des droits des futurs habitants de Mars ou d\'une colonie lunaire reste entièrement ouverte.',
+        nasaQuery:'space law treaty international cooperation satellite military',
+        aiKey:'ch6_law', aiPrompt:'Le droit spatial est-il encore adapté à l\'ère SpaceX et des ambitions de colonisation ? Qui peut légalement exploiter les ressources de la Lune ou d\'un astéroïde ? Si on découvrait de la vie sur Europa — quelle serait notre obligation éthique et légale avant d\'y envoyer une sonde ? 4 phrases.' },
+    ] },
+  { id:'conclusion', num:'', label:'Conclusion', badge:'Fin',
+    title:'Quel avenir pour la conquête spatiale ?', sub:'Bilan · Base lunaire · Mars · Europa · Humanité multiplanétaire',
+    color:'#4a7b9e',
+    heroImg:'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a4/NASA-Apollo8-Dec24-Earthrise.jpg/480px-NASA-Apollo8-Dec24-Earthrise.jpg',
+    sections:[
+      { heading:'Bilan — 67 ans d\'ère spatiale',
+        text:'En 67 ans, l\'humanité a posé le pied sur la Lune, photographié chaque planète du système solaire, maintenu une présence permanente en orbite, et créé des technologies qui structurent le quotidien (GPS, satellites météo, internet par satellite, IRM, capteurs CMOS, matériaux composites). Les échecs sont réels : 18 astronautes morts en mission, des centaines de sondes perdues, des milliards engloutis. Mais chaque échec a enrichi le savoir-faire des ingénieurs. La conquête spatiale a aussi changé notre regard sur la Terre — une bille bleue fragile visible dans toute son unicité depuis 400 km d\'altitude.',
+        wikiImg:'https://upload.wikimedia.org/wikipedia/commons/thumb/9/97/The_Earth_seen_from_Apollo_17.jpg/480px-The_Earth_seen_from_Apollo_17.jpg',
+        aiKey:'concl_balance', aiPrompt:'Bilan de 67 ans de conquête spatiale : les coûts humains et financiers ont-ils été justifiés par les bénéfices ? Quelles technologies du quotidien n\'existeraient pas sans la course à l\'espace ? Et quelle est la prochaine étape que tu considères comme la plus transformative pour l\'humanité ? 4 phrases.' },
+      { heading:'L\'humanité deviendra-t-elle multiplanétaire ?',
+        text:'Les prochaines décennies verront probablement une base orbitale autour de la Lune (Gateway), une base au pôle sud lunaire, les premiers humains sur Mars (2030–2040), et des sondes plongeant dans les océans d\'Europe ou de Titan. La question philosophique reste ouverte : devons-nous coloniser d\'autres mondes pour assurer la survie de l\'espèce, ou cette énergie devrait-elle d\'abord résoudre les crises terrestres ? Pour les partisans de la multiplanétarisation, une civilisation confinée à une seule planète est vulnérable à un événement catastrophique (astéroïde géant, guerre nucléaire, pandémie) qui pourrait l\'anéantir.',
+        nasaQuery:'future space exploration lunar base Mars colony',
+        aiKey:'concl_future', aiPrompt:'L\'humanité est-elle destinée à devenir multiplanétaire ? Quels sont les arguments en faveur (survie de l\'espèce) et contre (priorités terrestres, éthique de la colonisation) ? Si tu devais vivre sur Mars en 2050, dans une colonie des premiers temps, à quoi ressemblerait ton quotidien ? 4 phrases imaginatives.' },
+    ] },
+]
+
+const CONQUEST_TIMELINE = [
+  { year:'1903', flag:'🇷🇺', event:'Tsiolkovski publie l\'équation-fusée fondamentale' },
+  { year:'1926', flag:'🇺🇸', event:'Goddard lance la première fusée à carburant liquide' },
+  { year:'1942', flag:'🇩🇪', event:'La V2 franchit la ligne de Kármán (100 km) — premier objet humain dans l\'espace' },
+  { year:'1957', flag:'🇷🇺', event:'Spoutnik 1 (4 oct.) · Laïka, premier être vivant en orbite (3 nov.)' },
+  { year:'1958', flag:'🇺🇸', event:'Création de la NASA (29 juillet)' },
+  { year:'1961', flag:'🇷🇺', event:'Youri Gagarine — premier homme dans l\'espace (12 avr.) · Kennedy lance le défi Apollo' },
+  { year:'1963', flag:'🇷🇺', event:'Valentina Terechkova — première femme dans l\'espace (Vostok 6)' },
+  { year:'1965', flag:'🇷🇺', event:'Alexeï Leonov — première sortie extravéhiculaire (EVA)' },
+  { year:'1969', flag:'🇺🇸', event:'Apollo 11 — premiers pas sur la Lune (20 juil.) · Armstrong + Aldrin' },
+  { year:'1971', flag:'🇷🇺', event:'Saliout 1 — première station spatiale habitée' },
+  { year:'1972', flag:'🇺🇸', event:'Apollo 17 — dernière mission habitée lunaire (jusqu\'à Artemis)' },
+  { year:'1975', flag:'🌍', event:'Mission Apollo-Soyouz — première coopération USA/URSS en orbite' },
+  { year:'1977', flag:'🇺🇸', event:'Lancement Voyager 1 et 2 — grand tour du système solaire' },
+  { year:'1981', flag:'🇺🇸', event:'Premier vol de la navette spatiale Columbia (STS-1)' },
+  { year:'1986', flag:'🇷🇺', event:'Station Mir en orbite (active jusqu\'en 2001)' },
+  { year:'1986', flag:'🇺🇸', event:'Catastrophe Challenger (28 jan.) — 7 morts' },
+  { year:'1990', flag:'🌍', event:'Déploiement du télescope spatial Hubble' },
+  { year:'1995', flag:'🇺🇸', event:'Sonde Galileo entre en orbite de Jupiter — découvre l\'océan d\'Europe' },
+  { year:'1997', flag:'🇺🇸', event:'Rover Sojourner sur Mars (mission Pathfinder)' },
+  { year:'1998', flag:'🌍', event:'Début de construction de l\'ISS (module Zarya)' },
+  { year:'2000', flag:'🌍', event:'ISS : début de l\'occupation humaine permanente (nov.)' },
+  { year:'2003', flag:'🇨🇳', event:'Yang Liwei — premier taikonaute chinois (Shenzhou 5)' },
+  { year:'2003', flag:'🇺🇸', event:'Catastrophe Columbia (1er fév.) — 7 morts · Rovers Spirit et Opportunity sur Mars' },
+  { year:'2004', flag:'🌍', event:'Cassini-Huygens entre en orbite de Saturne · Sonde Huygens sur Titan (2005)' },
+  { year:'2011', flag:'🇺🇸', event:'Dernier vol de la navette spatiale (STS-135, Atlantis)' },
+  { year:'2012', flag:'🇺🇸', event:'Curiosity se pose sur Mars · Voyager 1 entre dans l\'espace interstellaire' },
+  { year:'2015', flag:'🇺🇸', event:'New Horizons survole Pluton · Falcon 9 réalise le premier atterrissage vertical' },
+  { year:'2019', flag:'🇨🇳', event:'Yutu-2 sur la face cachée de la Lune (Chang\'e 4) — première mondiale' },
+  { year:'2020', flag:'🇺🇸', event:'Crew Dragon transporte des astronautes vers l\'ISS (fin de la dépendance au Soyouz)' },
+  { year:'2021', flag:'🌍', event:'JWST lancé (25 déc.) · Perseverance + Ingenuity sur Mars · Tiangong chinoise habitée' },
+  { year:'2022', flag:'🇺🇸', event:'Artemis I — tour de la Lune sans équipage (SLS + Orion)' },
+  { year:'2025', flag:'🇺🇸', event:'Artemis II — 4 astronautes en orbite lunaire (prévu)' },
+  { year:'2026', flag:'🇺🇸', event:'Artemis III — premiers humains au pôle sud lunaire (prévu)' },
+  { year:'2030s', flag:'🌍', event:'Mission habitée vers Mars — objectif SpaceX / NASA (visée)' },
+]
+
+const CONQUEST_GLOSSARY = [
+  { term:'Ligne de Kármán', def:'Altitude de 100 km généralement reconnue comme la frontière entre atmosphère et espace. Aux USA, la limite est fixée à 80 km.' },
+  { term:'Delta-v (Δv)', def:'Variation de vitesse nécessaire pour passer d\'une orbite à une autre. Mesure universelle du « coût » d\'une manœuvre spatiale.' },
+  { term:'EVA', def:'Extra-Vehicular Activity — sortie extravéhiculaire dans l\'espace. Les astronautes portent une combinaison pressurisée (EMU).' },
+  { term:'ICBM', def:'Missile balistique intercontinental — capable d\'atteindre n\'importe quel point du globe. La technologie ICBM a directement produit les premiers lanceurs spatiaux.' },
+  { term:'ISS', def:'Station spatiale internationale — orbite à 400 km, vitesse 7,66 km/s, 15 nations partenaires, habitée en permanence depuis 2000.' },
+  { term:'LEO', def:'Low Earth Orbit — orbite basse entre 160 et 2 000 km. ISS, navette, Starlink y évoluent.' },
+  { term:'Microgravité', def:'État d\'apesanteur apparent vécu en orbite. Non pas l\'absence de gravité, mais la chute libre permanente autour de la Terre.' },
+  { term:'Module lunaire', def:'Partie d\'un vaisseau Apollo conçue pour se poser sur la Lune et en décoller. Composée d\'un étage de descente et d\'un étage de remontée (Eagle pour Apollo 11).' },
+  { term:'Orbite géostationnaire', def:'Orbite à 35 786 km où un satellite est synchrone avec la rotation terrestre — il semble immobile. Utilisée pour la communication et la météo.' },
+  { term:'Overview Effect', def:'Expérience subjective décrite par de nombreux astronautes : la vue de la Terre depuis l\'espace provoque une prise de conscience soudaine de sa fragilité et de l\'unité de l\'humanité.' },
+  { term:'Propulsion ionique', def:'Moteur accélérant des ions par champ électrique. Très efficace sur le long terme (faible poussée, longue durée) — utilisée par Dawn, Hayabusa, SMART-1.' },
+  { term:'Rover', def:'Véhicule robotique explorant la surface d\'un autre corps céleste (Lune, Mars, et bientôt Titan avec Dragonfly en 2034).' },
+  { term:'Sievert (Sv)', def:'Unité de dose de radiation absorbée. Limite annuelle terrestre : 1 mSv. Limite nucléaire : 20 mSv/an. Voyage vers Mars aller-retour : ~1 Sv (1 000 mSv).' },
+  { term:'Taikonaute', def:'Terme officiel chinois pour astronaute — de « Taikong » (espace en mandarin) et « naute » (navigateur en grec).' },
+  { term:'Vitesse de libération', def:'Vitesse minimale pour quitter un champ gravitationnel. Terre : 11,2 km/s. Lune : 2,4 km/s. Mars : 5 km/s.' },
+  { term:'JWST', def:'James Webb Space Telescope — lancé en 2021, observe dans l\'infrarouge depuis le point de Lagrange L2 à 1,5 million de km de la Terre.' },
+]
+
+const CONQUEST_MISSIONS = [
+  { name:'Spoutnik 1', year:'1957', agency:'URSS', dest:'Orbite terrestre', note:'Premier satellite artificiel de la Terre — 84 kg, bip-bip, 3 mois en orbite' },
+  { name:'Vostok 1', year:'1961', agency:'URSS', dest:'Orbite terrestre', note:'Premier vol humain — Youri Gagarine (108 min, 1 orbite)' },
+  { name:'Apollo 11', year:'1969', agency:'NASA', dest:'Lune', note:'Premiers humains sur la Lune — Armstrong, Aldrin, Collins' },
+  { name:'Mariner 9', year:'1971', agency:'NASA', dest:'Mars', note:'Première sonde en orbite martienne — cartographie complète de la surface' },
+  { name:'Pioneer 10 & 11', year:'1972–73', agency:'NASA', dest:'Jupiter/Saturne', note:'Premières missions vers les planètes géantes, première plaque dorée' },
+  { name:'Viking 1 & 2', year:'1976', agency:'NASA', dest:'Mars', note:'Premiers atterrisseurs sur Mars — recherche de vie dans le sol' },
+  { name:'Voyager 1 & 2', year:'1977', agency:'NASA', dest:'Système solaire', note:'Grand tour des planètes géantes — Voyager 1 en espace interstellaire depuis 2012' },
+  { name:'Hubble (HST)', year:'1990', agency:'NASA/ESA', dest:'Orbite terrestre', note:'Télescope spatial visible/UV — 35 ans de service, révolutionne l\'astronomie' },
+  { name:'Galileo', year:'1995', agency:'NASA', dest:'Jupiter', note:'Orbite jovienne — révèle l\'océan sous-glaciaire d\'Europe' },
+  { name:'Cassini-Huygens', year:'2004', agency:'NASA/ESA', dest:'Saturne', note:'13 ans d\'orbite saturnienne, sonde Huygens sur Titan, geysers d\'Encelade' },
+  { name:'Spirit & Opportunity', year:'2004', agency:'NASA', dest:'Mars', note:'Rovers géologiques — Opportunity actif 14 ans (prévu 3 mois)' },
+  { name:'New Horizons', year:'2015', agency:'NASA', dest:'Pluton/Kuiper', note:'Premier survol de Pluton — révèle montagnes de 3 000 m et cœur de glace' },
+  { name:'JWST', year:'2021', agency:'NASA/ESA/CSA', dest:'L2 (1,5 M km)', note:'Télescope infrarouge — photographie des galaxies formées 300 Ma après le Big Bang' },
+  { name:'Perseverance + Ingenuity', year:'2021', agency:'NASA', dest:'Mars', note:'Collecte d\'échantillons, 72 vols d\'Ingenuity, production d\'O₂ (MOXIE)' },
+  { name:'Artemis I', year:'2022', agency:'NASA', dest:'Lune', note:'Test sans équipage SLS + Orion en orbite lunaire' },
+]
+
+const CONQUEST_BIOS = [
+  { name:'Konstantin Tsiolkovski', dates:'1857–1935', role:'Père théorique de l\'astronautique',
+    bio:'Instituteur russe sourd de naissance, il formule dès 1903 l\'équation-fusée fondamentale encore utilisée aujourd\'hui. Il imagine les stations orbitales, les vaisseaux multi-étages et la colonisation du système solaire, dans l\'indifférence quasi totale de ses contemporains. Sa phrase culte : « La Terre est le berceau de l\'humanité, mais on ne peut pas vivre éternellement dans un berceau. »' },
+  { name:'Robert Goddard', dates:'1882–1945', role:'Premier rocketeur pratique',
+    bio:'Physicien américain moqué par la presse (dont le New York Times) pour ses idées sur les fusées dans le vide spatial, il lance néanmoins la première fusée à carburant liquide en 1926. Il dépose 214 brevets en propulsion spatiale. Le centre Goddard de la NASA, l\'un des plus importants du monde, honore sa mémoire.' },
+  { name:'Sergueï Korolev', dates:'1907–1966', role:'Concepteur en chef soviétique',
+    bio:'Ingénieur ukraino-soviétique, il survit au Goulag stalinien et dirige en secret le programme spatial soviétique. Son identité est classifiée jusqu\'à sa mort — il est désigné comme le « Concepteur en chef » dans les communications officielles. Il réalise Spoutnik, Vostok (Gagarine) et planifie le voyage lunaire. Sa mort prématurée en 1966 est un facteur décisif dans l\'échec soviétique à envoyer des hommes sur la Lune.' },
+  { name:'Youri Gagarine', dates:'1934–1968', role:'Premier homme dans l\'espace',
+    bio:'Pilote soviétique sélectionné parmi 3 000 candidats pour son courage, sa petite stature (le cockpit était exigu) et sa personnalité charismatique. Son vol du 12 avril 1961 dure 108 minutes. Devenu icône mondiale, il meurt dans un accident d\'avion d\'entraînement en mars 1968. La cause exacte n\'a jamais été officiellement établie, alimentant les théories.' },
+  { name:'Wernher von Braun', dates:'1912–1977', role:'Architecte des V2 et Saturn V',
+    bio:'Ingénieur allemand passionné d\'espace dès l\'enfance, il développe la V2 pour les nazis (avec travail forcé à Dora), puis est transféré aux États-Unis via l\'Opération Paperclip. Il dirige le programme Saturn V, lanceur d\'Apollo 11. Figure ambiguë de l\'histoire : génie technique indiscutable, compromis éthiques indéniables.' },
+  { name:'Katherine Johnson', dates:'1918–2020', role:'Mathématicienne essentielle de la NASA',
+    bio:'Mathématicienne afro-américaine dont les calculs orbitaux ont été essentiels pour Mercury, Apollo et la navette spatiale. En 1962, John Glenn refuse de décoller pour son orbite avant que Johnson ait personnellement vérifié les calculs de l\'ordinateur. Son histoire est racontée dans « Les Figures de l\'ombre » (film 2016). Médaille présidentielle de la Liberté en 2015.' },
+  { name:'Neil Armstrong', dates:'1930–2012', role:'Premier homme sur la Lune',
+    bio:'Pilote d\'essai et astronaute américain, il commande Apollo 11 et pose le pied sur la Lune le 20 juillet 1969. Discret et réservé, il refuse le statut d\'icône qui lui est imposé. Sa phrase — « Un petit pas pour un homme, un bond de géant pour l\'humanité » — reste l\'une des plus citées du XXe siècle.' },
+  { name:'Valentina Terechkova', dates:'1937–', role:'Première femme dans l\'espace',
+    bio:'Ouvrière en usine textile et parachutiste amateur, elle est sélectionnée pour Vostok 6 en 1963. En 3 jours, elle effectue 48 orbites — plus que tous les astronautes américains réunis à ce stade. Elle reste la seule femme à avoir effectué un vol spatial solo. Engagée en politique en Russie, elle a proposé un voyage sans retour vers Mars si elle en avait l\'occasion.' },
+]
+
+// ─── Composants Conquête spatiale ─────────────────────────────────────────────
+
+function ConquestWikiImg({ src, alt, height }) {
+  const [ok, setOk] = useState(true)
+  if (!src || !ok) return null
+  return (
+    <img src={src} alt={alt} onError={() => setOk(false)}
+      style={{ width:'100%', height: height || 200, objectFit:'cover',
+        borderRadius:12, marginBottom:14, display:'block' }} />
+  )
+}
+
+function ConquestNasaImg({ query, alt }) {
+  const [url, setUrl] = useState(null)
+  const fetched = useRef(false)
+  useEffect(() => {
+    if (fetched.current || !query) return
+    fetched.current = true
+    fetchNASAImages(query, 1)
+      .then(photos => { if (photos.length) setUrl(photos[0].thumbUrl) })
+      .catch(() => {})
+  }, [query])
+  if (!url) return (
+    <div style={{ height:80, borderRadius:12, background:'var(--surface-2)', marginBottom:14,
+      display:'flex', alignItems:'center', justifyContent:'center' }}>
+      <div style={{ display:'flex', gap:5 }}>
+        {[0,1,2].map(i => (
+          <span key={i} style={{ width:5, height:5, borderRadius:'50%', background:'var(--faint)',
+            animation:'pulse 1.2s ease-in-out infinite', animationDelay:`${i*0.18}s` }} />
+        ))}
+      </div>
+    </div>
+  )
+  return (
+    <img src={url} alt={alt || query}
+      style={{ width:'100%', height:200, objectFit:'cover',
+        borderRadius:12, marginBottom:14, display:'block' }} />
+  )
+}
+
+function ConquestSection({ section }) {
+  return (
+    <div style={{ marginBottom:28 }}>
+      <div style={{ fontSize:15.5, fontWeight:600, fontFamily:'var(--sans)',
+        color:'var(--text)', marginBottom:12, paddingBottom:9,
+        borderBottom:'1px solid var(--line)' }}>
+        {section.heading}
+      </div>
+      {section.wikiImg
+        ? <ConquestWikiImg src={section.wikiImg} alt={section.heading} />
+        : section.nasaQuery
+          ? <ConquestNasaImg query={section.nasaQuery} alt={section.heading} />
+          : null}
+      <p className="body serif-body" style={{ fontSize:14, lineHeight:1.68, margin:'0 0 12px' }}>
+        {section.text}
+      </p>
+      <AiInfoPanel cacheKey={`cq_${section.aiKey}`} buildPrompt={section.aiPrompt} />
+    </div>
+  )
+}
+
+function ConquestAnnexes() {
+  const [sub, setSub] = useState('timeline')
+  const SUBS = [
+    { key:'timeline', label:'Chronologie' },
+    { key:'glossary', label:'Glossaire' },
+    { key:'missions', label:'Missions' },
+    { key:'bios', label:'Biographies' },
+  ]
+  return (
+    <div>
+      <div style={{ display:'flex', gap:7, flexWrap:'wrap', marginBottom:18 }}>
+        {SUBS.map(s => (
+          <button key={s.key} className={'chip' + (sub === s.key ? ' on' : '')}
+            onClick={() => setSub(s.key)}>{s.label}</button>
+        ))}
+      </div>
+
+      {sub === 'timeline' && (
+        <div>
+          {CONQUEST_TIMELINE.map((t, i) => (
+            <div key={i} style={{ display:'flex', gap:12, padding:'10px 0',
+              borderBottom:'1px solid var(--line)', alignItems:'flex-start' }}>
+              <div style={{ flexShrink:0, width:52 }}>
+                <div style={{ fontSize:11, fontFamily:'var(--mono)', color:'var(--gold)',
+                  letterSpacing:'.06em', marginBottom:2 }}>{t.year}</div>
+                <div style={{ fontSize:16 }}>{t.flag}</div>
+              </div>
+              <div className="body" style={{ fontSize:13, lineHeight:1.5, color:'var(--dim)' }}>{t.event}</div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {sub === 'glossary' && (
+        <div>
+          {CONQUEST_GLOSSARY.map((g, i) => (
+            <div key={i} style={{ padding:'10px 0', borderBottom:'1px solid var(--line)' }}>
+              <div style={{ fontSize:13.5, fontWeight:600, fontFamily:'var(--sans)',
+                color:'var(--gold)', marginBottom:3 }}>{g.term}</div>
+              <div className="body" style={{ fontSize:13, lineHeight:1.5, color:'var(--dim)' }}>{g.def}</div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {sub === 'missions' && (
+        <div>
+          {CONQUEST_MISSIONS.map((m, i) => (
+            <div key={i} style={{ padding:'11px 0', borderBottom:'1px solid var(--line)' }}>
+              <div style={{ display:'flex', alignItems:'baseline', gap:8, flexWrap:'wrap', marginBottom:2 }}>
+                <span style={{ fontSize:14, fontWeight:600, fontFamily:'var(--sans)', color:'var(--text)' }}>{m.name}</span>
+                <span className="meta" style={{ fontSize:11 }}>{m.year}</span>
+                <span style={{ fontSize:10, fontFamily:'var(--mono)', padding:'1px 7px', borderRadius:99,
+                  background:'var(--surface-2)', border:'1px solid var(--line)', color:'var(--faint)' }}>{m.agency}</span>
+              </div>
+              <div className="meta" style={{ color:'var(--gold)', fontSize:11, marginBottom:2 }}>{m.dest}</div>
+              <div className="body" style={{ fontSize:12.5, lineHeight:1.5, color:'var(--dim)' }}>{m.note}</div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {sub === 'bios' && (
+        <div style={{ display:'flex', flexDirection:'column', gap:12 }}>
+          {CONQUEST_BIOS.map((b, i) => (
+            <div key={i} style={{ borderRadius:14, padding:'14px 15px',
+              background:'var(--surface-1)', border:'1px solid var(--line)' }}>
+              <div style={{ fontSize:15, fontWeight:600, fontFamily:'var(--sans)',
+                color:'var(--text)', marginBottom:2 }}>{b.name}</div>
+              <div className="meta" style={{ color:'var(--gold)', marginBottom:7 }}>
+                {b.dates} · {b.role}
+              </div>
+              <div className="body serif-body" style={{ fontSize:13, lineHeight:1.6, color:'var(--dim)' }}>{b.bio}</div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+const CONQUEST_CHAPTER_COLORS = {
+  intro:'#3d6b9e', ch1:'#7b4a9e', ch2:'#4a9e6b', ch3:'#6b9e4a',
+  ch4:'#9e7b4a', ch5:'#4a6b9e', ch6:'#9e4a4a', conclusion:'#4a7b9e', annexes:'#5a5a7e',
+}
+
+const CONQUEST_ALL = [
+  ...CONQUEST,
+  { id:'annexes', num:'', label:'Annexes', badge:'Annexes',
+    title:'Chronologie · Glossaire · Missions · Biographies',
+    sub:'Dates clés · Termes · Missions marquantes · Pionniers',
+    color:'#2a2a3a', heroImg:null, sections:[] },
+]
+
+function ConquestCard({ chapter, onOpen }) {
+  const accent = CONQUEST_CHAPTER_COLORS[chapter.id] || '#4a7b9e'
+  return (
+    <button onClick={() => onOpen(chapter)} className="press"
+      style={{ width:'100%', textAlign:'left', cursor:'pointer',
+        background:'linear-gradient(180deg,var(--surface-2),var(--surface-1))',
+        border:'1px solid var(--line)', borderRadius:'var(--r-l)', overflow:'hidden', padding:0 }}>
+      <div style={{ height:4, background:`linear-gradient(90deg,${accent},${accent}88)` }} />
+      <div style={{ padding:'14px 16px 15px' }}>
+        <div style={{ marginBottom:6 }}>
+          <span style={{ fontSize:10.5, fontFamily:'var(--mono)', letterSpacing:'.08em',
+            color:accent, background:`${accent}16`,
+            border:`1px solid ${accent}40`, padding:'2px 9px', borderRadius:99 }}>
+            {chapter.num ? `CH ${chapter.num}` : chapter.badge}
+          </span>
+        </div>
+        <div className="h-card" style={{ fontSize:16, marginBottom: chapter.sub ? 4 : 0 }}>
+          {chapter.title}
+        </div>
+        {chapter.sub && (
+          <div className="body tight" style={{ fontSize:12, color:'var(--faint)', lineHeight:1.4 }}>
+            {chapter.sub}
+          </div>
+        )}
+        {chapter.sections.length > 0 && (
+          <div style={{ marginTop:8, fontSize:11, fontFamily:'var(--mono)',
+            color:accent, letterSpacing:'.04em' }}>
+            {chapter.sections.length} section{chapter.sections.length > 1 ? 's' : ''} · Lire →
+          </div>
+        )}
+        {chapter.id === 'annexes' && (
+          <div style={{ marginTop:8, fontSize:11, fontFamily:'var(--mono)',
+            color:accent, letterSpacing:'.04em' }}>
+            Chronologie · Glossaire · Missions · Biographies →
+          </div>
+        )}
+      </div>
+    </button>
+  )
+}
+
+function ConquestDetail({ chapter }) {
+  if (!chapter) return null
+  const accent = CONQUEST_CHAPTER_COLORS[chapter.id] || '#4a7b9e'
+  return (
+    <div>
+      {chapter.heroImg && (
+        <div style={{ borderRadius:14, overflow:'hidden', marginBottom:16, height:190,
+          background:'var(--surface-2)' }}>
+          <img src={chapter.heroImg} alt={chapter.title}
+            onError={e => { e.target.style.display = 'none' }}
+            style={{ width:'100%', height:'100%', objectFit:'cover', display:'block' }} />
+        </div>
+      )}
+      {chapter.num && (
+        <div style={{ fontSize:11, fontFamily:'var(--mono)', color:accent,
+          letterSpacing:'.1em', textTransform:'uppercase', marginBottom:5 }}>
+          Chapitre {chapter.num}
+        </div>
+      )}
+      {!chapter.num && chapter.badge && chapter.id !== 'annexes' && (
+        <div style={{ fontSize:11, fontFamily:'var(--mono)', color:accent,
+          letterSpacing:'.1em', textTransform:'uppercase', marginBottom:5 }}>
+          {chapter.label}
+        </div>
+      )}
+      <div className="h-sec" style={{ fontSize:22, marginBottom: chapter.sub ? 5 : 18 }}>
+        {chapter.title}
+      </div>
+      {chapter.sub && (
+        <div className="meta" style={{ marginBottom:20, color:'var(--faint)' }}>{chapter.sub}</div>
+      )}
+      {chapter.id === 'annexes'
+        ? <ConquestAnnexes />
+        : chapter.sections.map((s, i) => <ConquestSection key={i} section={s} />)
+      }
+    </div>
+  )
+}
+
+function ConquestView() {
+  const [selected, setSelected] = useState(null)
+  return (
+    <div className="enter">
+      <p className="body" style={{ padding:'6px 18px 10px', fontSize:12.5, color:'var(--faint)' }}>
+        De Spoutnik à Mars — histoire, enjeux et futur de la conquête spatiale
+      </p>
+      <div className="pad" style={{ display:'flex', flexDirection:'column', gap:10 }}>
+        {CONQUEST_ALL.map(ch => (
+          <ConquestCard key={ch.id} chapter={ch} onOpen={setSelected} />
+        ))}
+      </div>
+      <Sheet open={!!selected} onClose={() => setSelected(null)}>
+        {selected && <ConquestDetail chapter={selected} />}
+      </Sheet>
+    </div>
+  )
+}
+
 // ─── Segments ─────────────────────────────────────────────────────────────────
 
 const SEGMENTS = [
   { key: 'solar', label: 'Système solaire' },
   { key: 'jwst', label: 'James Webb' },
+  { key: 'conquest', label: 'Conquête spatiale' },
   { key: 'anomaly', label: 'Anomalies' },
   { key: 'theory', label: 'Théories' },
 ]
@@ -897,10 +1410,11 @@ export default function ExploreScreen() {
       <ScreenHeader eyebrow="Explorer le cosmos" title="Explorer" right={<SettingsBtn />} />
       <Segmented value={seg} onChange={setSeg} />
       <div style={{ marginTop: 6 }}>
-        {seg === 'solar'   && <SolarView onPick={setPlanet} onSun={() => setSunOpen(true)} onMoons={setMoonsFor} planetPositions={planetPositions} />}
-        {seg === 'jwst'    && <JwstView />}
-        {seg === 'anomaly' && <AnomalyView onPick={setAnom} />}
-        {seg === 'theory'  && <TheoryView onPick={setTheo} />}
+        {seg === 'solar'    && <SolarView onPick={setPlanet} onSun={() => setSunOpen(true)} onMoons={setMoonsFor} planetPositions={planetPositions} />}
+        {seg === 'jwst'     && <JwstView />}
+        {seg === 'conquest' && <ConquestView />}
+        {seg === 'anomaly'  && <AnomalyView onPick={setAnom} />}
+        {seg === 'theory'   && <TheoryView onPick={setTheo} />}
       </div>
 
       {/* Fiche planète */}
