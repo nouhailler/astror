@@ -239,38 +239,134 @@ function recordQuiz(score) {
   return saved
 }
 
-// ─── Persistance parcours ────────────────────────────────────────────────────
+// ─── Parcours pédagogiques avec leçons réelles ───────────────────────────────
 
-const PARCOURS_STORE = 'astror_parcours_v1'
 const PARCOURS_DEF = [
-  { id: 'stars', name: 'Premiers pas sous les étoiles', steps: '8 leçons',  initPct: 100 },
-  { id: 'map',   name: 'Lire une carte du ciel',         steps: '6 leçons',  initPct: 66  },
-  { id: 'scope', name: 'Choisir et régler son télescope', steps: '10 leçons', initPct: 30  },
-  { id: 'photo', name: 'Initiation à l\'astrophoto',      steps: '12 leçons', initPct: 0   },
+  {
+    id: 'stars', name: 'Premiers pas sous les étoiles',
+    lessons: [
+      { id: 's1', title: "S'orienter dans le ciel nocturne",
+        body: "La première chose à faire sous un ciel étoilé est de trouver le Nord. Par nuit claire, repérez la Grande Ourse (les sept étoiles en forme de casserole). Prolongez mentalement l'axe des deux étoiles du « bord » du carré sur environ cinq fois cette distance : vous tombez sur l'Étoile polaire (Polaris), qui marque le Nord géographique à moins d'un degré.\n\nPolaris se trouve à la pointe de la Petite Ourse, constellation moins lumineuse. Une fois le Nord identifié, le Sud est derrière vous, l'Est à votre gauche, l'Ouest à votre droite.\n\nLaissez vos yeux s'adapter à l'obscurité pendant 20 à 30 minutes : la pupille se dilate et la rétine active ses bâtonnets, bien plus sensibles que les cônes. N'allumez jamais de lampe blanche — utilisez une lampe rouge pour préserver votre vision nocturne." },
+      { id: 's2', title: "Les constellations : repères permanents",
+        body: "Une constellation est une zone délimitée du ciel, non un groupe physique d'étoiles. L'Union Astronomique Internationale en reconnaît 88. Certaines sont visibles toute l'année depuis nos latitudes (circumpolaires), d'autres n'apparaissent qu'en certaines saisons.\n\nLes circumpolaires incontournables (depuis l'Europe) : Grande Ourse, Petite Ourse, Cassiopée (grand W), Céphée, Dragon. En hiver : Orion, Taureau, Gémeaux, Persée. Au printemps : Lion, Vierge, Bouvier. En été : Cygne, Lyra, Aigle (le Triangle d'été). En automne : Pégase, Andromède, Persée.\n\nCommencez par Orion en hiver : ses trois étoiles alignées (la ceinture) sont unmistakables. De là, suivez la ceinture vers le bas-gauche pour trouver Sirius, l'étoile la plus brillante du ciel." },
+      { id: 's3', title: "La magnitude : mesurer la brillance",
+        body: "La magnitude apparente mesure la brillance d'un astre telle que nous la percevons depuis la Terre. L'échelle est logarithmique et inversée : plus la valeur est basse (ou négative), plus l'astre est brillant.\n\nRepères pratiques : Soleil −26,7 · Lune pleine −12,7 · Vénus jusqu'à −4,8 · Sirius −1,46 · étoiles visibles à l'œil nu jusqu'à +6 · limite des jumelles 10×50 : +10 · limite d'un télescope 200 mm : +14.\n\nLa différence entre deux magnitudes se calcule avec un rapport de 2,512 : une étoile de mag 1 est 100 fois plus brillante qu'une étoile de mag 6. La magnitude absolue, elle, mesure la luminosité intrinsèque de l'astre, ramenée à une distance standard de 10 parsecs." },
+      { id: 's4', title: "La Lune : premier objet à observer",
+        body: "La Lune est l'objet idéal pour débuter : elle est brillante, grande et ne demande aucun matériel. À l'œil nu, repérez les mers (zones sombres, basaltiques) et les hautes terres (zones claires, cratérisées).\n\nAux jumelles ou à la lunette, observez le terminateur — la ligne entre la zone éclairée et la zone dans l'ombre. C'est là que le relief est le plus spectaculaire car les ombres sont rasantes. Le cratère Tycho (sud) avec son système de rayons, Copernicus et Clavius sont parmi les plus beaux.\n\nLa Lune passe par plusieurs phases en 29,5 jours (mois synodique) : nouvelle Lune, croissant, premier quartier, gibbeuse croissante, pleine Lune, puis décroissante. Pour l'astronomie du ciel profond, favorisez les nuits sans Lune : sa lumière réduit les contrastes sur les nébuleuses et galaxies." },
+      { id: 's5', title: "Les planètes visibles à l'œil nu",
+        body: "Cinq planètes sont visibles à l'œil nu et connues depuis l'Antiquité : Mercure, Vénus, Mars, Jupiter, Saturne. On les reconnaît à leur lumière stable (elles ne scintillent presque pas, contrairement aux étoiles) et à leur déplacement lent sur fond de constellations.\n\nVénus est la plus brillante (jusqu'à −4,8 mag) et toujours proche du Soleil — visible en soirée à l'ouest ou le matin à l'est. Jupiter (jusqu'à −2,9 mag) est souvent le deuxième objet le plus brillant après Vénus. Mars se reconnaît à sa teinte rouge-orangée. Saturne a une lumière légèrement dorée.\n\nMercure est difficile à observer car toujours proche de l'horizon au coucher ou lever du soleil. Les meilleures périodes sont ses élongations maximales (≈ 18–28° du Soleil)." },
+      { id: 's6', title: "Météores, étoiles filantes et comètes",
+        body: "Une étoile filante (météore) est un grain de poussière de quelques milligrammes qui se vaporise dans l'atmosphère à 80–120 km d'altitude. Pendant les pluies de météores (essaims), la Terre traverse le sillage de poussières laissé par une comète.\n\nLes essaims annuels incontournables : Perséides (12 août, jusqu'à 100/h, radiant dans Persée) · Géminides (14 décembre, jusqu'à 120/h, les plus actives) · Léonides (17 novembre, variables mais parfois spectaculaires) · Quadrantides (3 janvier, pic court mais intense).\n\nUne comète est un corps de glace et de poussières de quelques kilomètres. En s'approchant du Soleil, la glace se sublime et forme une chevelure (coma) et une queue. Les comètes brillantes (C/2022 E3, Tsuchinshan-ATLAS…) sont imprévisibles et font la une des actualités astronomiques quand elles apparaissent." },
+      { id: 's7', title: "Le ciel qui change avec les saisons",
+        body: "La Terre orbite autour du Soleil en un an : notre planète regarde vers des régions différentes de l'univers selon la saison. C'est pourquoi Orion est une constellation d'hiver (en été, elle est du côté du Soleil, donc invisible la nuit).\n\nEn pratique, le ciel avance d'environ 2 heures par mois à la même heure : ce qui était au méridien à 22 h en janvier sera au méridien à 20 h en février. On dit que la sphère céleste « avance » de 1° par jour.\n\nLes objets circumpolaires (proches du pôle nord céleste) ne se couchent jamais sous nos latitudes (>48°N) : Grande Ourse, Cassiopée, Céphée, Dragon sont visibles toute l'année. En été, la Voie Lactée est particulièrement belle au zénith entre 22 h et 2 h du matin, en direction du Sagittaire où se trouve le centre galactique." },
+      { id: 's8', title: "Préparer sa première nuit d'observation",
+        body: "Une bonne session d'observation se prépare en amont. Vérifiez la météo (transparence et seeing), la phase de la Lune, et les objets visibles depuis votre position. Les applications comme SkySafari, Stellarium ou l'onglet Éphémérides d'Astror vous donneront les horaires de lever/coucher et les positions.\n\nMatériel essentiel : lampe rouge (préserve la vision nocturne), carte du ciel imprimée ou tablette, couverture ou vêtements chauds (la température chute rapidement), thermos. Si vous utilisez un télescope, sortez-le 30 à 60 minutes avant pour l'acclimatation thermique.\n\nChoisissez un site à l'écart des lumières, avec un horizon dégagé vers le sud. Les meilleures nuits combinent : ciel dégagé sans vent, humidité faible, Lune absente, et un site Bortle ≤ 4. Notez vos observations dans un journal (outil Observer dans Astror) pour suivre vos progrès." },
+    ],
+  },
+  {
+    id: 'map', name: 'Lire une carte du ciel',
+    lessons: [
+      { id: 'm1', title: "Les coordonnées célestes : AR et déclinaison",
+        body: "Pour repérer un objet dans le ciel, les astronomes utilisent un système de coordonnées équivalent à la longitude et la latitude terrestre.\n\nL'ascension droite (AR) joue le rôle de la longitude : elle est mesurée en heures (de 0 h à 24 h) vers l'est, à partir du point vernal (intersection de l'équateur céleste et de l'écliptique au printemps). La déclinaison (Déc) joue le rôle de la latitude : mesurée en degrés de −90° (pôle sud céleste) à +90° (pôle nord céleste), 0° étant l'équateur céleste.\n\nExemple : M42, la nébuleuse d'Orion, est à AR 5 h 35 min, Déc −5°23'. Ces coordonnées sont fixes dans le repère céleste et permettent de pointer n'importe quel objet avec une monture équatoriale motorisée." },
+      { id: 'm2', title: "Le méridien et la culmination",
+        body: "Le méridien est un grand cercle imaginaire qui passe par le pôle nord céleste, le zénith (point au-dessus de votre tête) et le point sud de l'horizon. Chaque astre passe au méridien une fois par jour — c'est la culmination.\n\nLa culmination est le moment idéal pour observer : l'astre est à son maximum de hauteur, ce qui minimise la traversée de l'atmosphère (et donc les distorsions). Plus un objet culmine haut, mieux c'est.\n\nPour une étoile de déclinaison Déc depuis une latitude L, la hauteur à la culmination est : H = 90° − |L − Déc|. Depuis Paris (L = 48,8°N), Sirius (Déc = −16,7°) culmine à seulement 24,5° — observable mais bas. Deneb (Déc = +45,3°) culmine à 86,5° — presque au zénith." },
+      { id: 'm3', title: "Lire un planisphère",
+        body: "Un planisphère est une carte du ciel double disque : le disque du fond montre toutes les constellations, le disque rotatif du dessus comporte une fenêtre ovale représentant l'horizon. En alignant la date (sur le bord extérieur) avec l'heure (sur le bord du disque), la fenêtre révèle exactement le ciel visible à ce moment.\n\nPour l'utiliser : tenez-le au-dessus de votre tête, orienté face au nord. Le centre du planisphère correspond au zénith, et le bord de la fenêtre correspond à votre horizon. Les constellations sont alors orientées dans le même sens que ce que vous voyez dans le ciel.\n\nChoisissez un planisphère adapté à votre latitude (Paris ≈ 48°N, Lyon ≈ 45°N). Les planisphères pour 50°N ne sont pas adaptés pour les régions méditerranéennes. Le planisphère ne montre pas les planètes, qui se déplacent sur l'écliptique." },
+      { id: 'm4', title: "Les coordonnées horizontales : hauteur et azimut",
+        body: "En parallèle des coordonnées équatoriales (AR/Déc), les coordonnées horizontales décrivent la position d'un astre par rapport à votre horizon local.\n\nL'azimut est l'angle horizontal mesuré depuis le Nord (0°) vers l'Est, le Sud (180°) puis l'Ouest (360°). La hauteur (ou altitude) est l'angle vertical depuis l'horizon (0°) jusqu'au zénith (90°). Un objet à azimut 180° et hauteur 45° se trouve au sud, à mi-chemin entre l'horizon et le zénith.\n\nCes coordonnées changent en permanence au fil du temps et dépendent de l'observateur. Elles sont utiles pour planifier une session ('Jupiter se lève à l'est à 22 h, à hauteur 20°') mais pas pour pointer un télescope à monture équatoriale. Les applications comme Stellarium affichent les deux systèmes simultanément." },
+      { id: 'm5', title: "Le catalogue Messier et le ciel profond",
+        body: "En 1781, l'astronome Charles Messier publie un catalogue de 110 objets nébuleux afin de ne pas les confondre avec les comètes qu'il chassait. Ce catalogue est devenu la liste de référence des objets du ciel profond pour les amateurs.\n\nLe catalogue comprend : 40 galaxies (M31 Andromède, M51 Tourbillon, M81/M82…), 28 amas globulaires (M13 Hercule, M3, M5…), 27 nébuleuses et restes de supernovae (M42 Orion, M1 Crabe, M57 Anneau…), amas ouverts, et quelques objets inclassables.\n\nLe défi Messier (observer les 110 objets en une nuit au printemps, quand ils sont tous visibles) est un rite de passage pour les astronomes amateurs. Avec des jumelles 10×50, une trentaine sont accessibles depuis un ciel Bortle 4." },
+      { id: 'm6', title: "Utiliser une application de carte du ciel",
+        body: "Les applications de planétarium sur smartphone ont révolutionné l'observation. Stellarium (gratuit, open-source), SkySafari, ou l'onglet Ciel d'Astror permettent d'identifier instantanément n'importe quel astre en pointant l'écran vers le ciel.\n\nFonctionnalités à maîtriser : le mode temps réel (utilise le GPS et le gyroscope), la simulation temporelle (accélérer/reculer le temps), la recherche d'objet par nom ou coordonnées, l'affichage de la Voie Lactée et de l'écliptique, les éphémérides de lever/coucher.\n\nConseils pratiques : passez l'interface en mode nuit (écran rouge) pour préserver votre vision nocturne. Calibrez la boussole à l'écart des objets métalliques. Sur Astror, l'onglet Ciel affiche la carte avec boussole AR et un filtre par type d'objet (planètes, amas, nébuleuses, galaxies)." },
+    ],
+  },
+  {
+    id: 'scope', name: 'Choisir et régler son télescope',
+    lessons: [
+      { id: 'sc1', title: "Lunette ou télescope : les différences fondamentales",
+        body: "Une lunette astronomique (réfracteur) forme l'image par réfraction à travers un objectif en verre. Un télescope (réflecteur) utilise un miroir primaire concave pour collecter la lumière. Chacun a ses avantages.\n\nLunette : image contrastée et nette (idéale pour la Lune et les planètes), étanche, peu d'entretien. Inconvénient : aberration chromatique (halos colorés) sur les modèles simples, et le diamètre est limité par le poids et le coût du verre. Les achromats doubles (ED ou APO) corrigent cela mais coûtent plus cher.\n\nTélescope Newton (miroir parabolique) : le plus grand diamètre pour le budget, idéal pour le ciel profond. Inconvénient : nécessite une collimation régulière. Le Schmidt-Cassegrain (SCT) est compact malgré une longue focale — polyvalent, idéal pour les appartements. Pour débuter avec un budget limité, un Newton 150/750 ou 200/1000 sur monture équatoriale est un excellent choix." },
+      { id: 'sc2', title: "L'ouverture et la focale : paramètres clés",
+        body: "L'ouverture (diamètre du miroir ou de l'objectif) est le paramètre le plus important. Elle détermine la quantité de lumière collectée et le pouvoir de résolution. Un 200 mm collecte ~1 630 fois plus de lumière que l'œil nu (pupille 7 mm).\n\nLa focale (distance entre le miroir et le point focal) détermine le grossissement obtenu avec un oculaire donné : grossissement = focale du télescope ÷ focale de l'oculaire. Un Newton 200/1000 avec un oculaire de 10 mm donne 100×.\n\nLe rapport focal f/D = focale ÷ diamètre. Un f/5 est « lumineux » (champ large, bonnes poses courtes en photo), un f/10 est « lent » (fort grossissement naturel, bon pour les planètes). La magnitude limite théorique dépend uniquement de l'ouverture : m ≈ 2 + 5 × log(D en mm). Pour D = 200 mm : m ≈ 13,5." },
+      { id: 'sc3', title: "Les montures : alt-azimutale vs équatoriale",
+        body: "La monture est souvent plus importante que l'optique. Elle doit être stable et permettre un suivi facile des astres.\n\nMonture alt-azimutale (AltAz) : deux axes, vertical (azimut) et horizontal (hauteur). Simple et intuitive. Suffisante pour l'observation visuelle, mais nécessite un dérotateur de champ pour l'astrophoto longue pose. La monture Dobson (alt-az de grande taille) est la reine du rapport diamètre/prix.\n\nMonture équatoriale (EQ) : un axe (polaire) est aligné parallèlement à l'axe de rotation terrestre. Un seul moteur sur l'axe polaire compense la rotation terrestre — idéal pour le suivi et l'astrophoto. Plus lourde et complexe à mettre en œuvre, mais indispensable pour la photographie du ciel profond. La monture EQ3 ou EQ5 motorisée est un excellent point de départ." },
+      { id: 'sc4', title: "Les oculaires : grossissement et champ",
+        body: "L'oculaire est l'interface entre le télescope et votre œil. Sa qualité impacte directement la netteté et le confort d'observation. Le grossissement est : G = F_télescope ÷ F_oculaire.\n\nChamp apparent et réel : un oculaire à grand champ apparent (68° à 100°) donne une sensation d'immersion. Le champ réel = champ apparent ÷ grossissement. Pour un Newton 200/1000 avec un Nagler 13 mm (82°) : G = 77×, champ réel = 1,06°.\n\nGrossissement maximum utile : 2× le diamètre en mm (400× pour un 200 mm). Au-delà, l'image est grande mais floue et sombre. Grossissement minimum utile : G_min = D/7 (environ 29× pour 200 mm). Commencez avec un oculaire basse puissance (25–32 mm) pour centrer l'objet, puis montez en grossissement. Trois oculaires couvrent tous les besoins : 25 mm (faible), 10 mm (moyen), 5 mm ou barlow 2× (fort)." },
+      { id: 'sc5', title: "La collimation d'un télescope Newton",
+        body: "La collimation est l'alignement optique du miroir secondaire (petit miroir plat) et du miroir primaire (grand miroir concave). Sur un Newton, elle doit être vérifiée régulièrement (après chaque transport).\n\nOutils nécessaires : un oculaire de collimation (Cheshire ou laser). Procédure en trois étapes : 1) Centrer le reflet du miroir primaire dans le secondaire (vis du porte-secondaire). 2) Centrer le secondaire dans le focaliseur (vis de réglage du secondaire). 3) Centrer le point focal dans le primaire en agissant sur les vis de réglage du miroir principal.\n\nSigne d'une mauvaise collimation : les étoiles défocalisées ne sont pas des anneaux concentriques mais un disque asymétrique. Une collimation parfaite donne des anneaux de diffraction parfaitement centrés. Prenez le temps de bien la faire : même un excellent miroir donne de mauvais résultats si mal collimaté." },
+      { id: 'sc6', title: "L'acclimatation thermique",
+        body: "Quand vous sortez votre télescope d'une pièce chauffée vers l'extérieur froid, le miroir ou l'objectif est plus chaud que l'air ambiant. Cette différence de température crée des courants d'air locaux qui dégradent les images — on parle de « tube seeing ».\n\nLe temps d'acclimatation dépend de la masse de verre et de la différence de température : compter 30 min pour une petite lunette, 60 à 90 min pour un télescope à miroir de 200 mm, et jusqu'à 2 h pour un grand Dobson.\n\nAstuces pour accélérer : sortez le télescope ouvert pour favoriser la circulation d'air, évitez d'observer à travers du verre de fenêtre (double effet thermique), et installez un petit ventilateur derrière le miroir primaire des Newton pour forcer le renouvellement de l'air." },
+      { id: 'sc7', title: "L'alignement polaire",
+        body: "Pour une monture équatoriale, l'alignement polaire (pointer l'axe polaire vers le pôle nord céleste = Polaris) est indispensable pour que le suivi soit précis.\n\nAlignement rapide (observation visuelle) : réglez l'azimut et la latitude de la monture pour que le cherche-pole ou le viseur polaire pointe vers Polaris. C'est suffisant pour observer visuellement et faire des poses photographiques courtes (<30 s).\n\nAlignement précis (astrophoto longue pose) : utilisez la méthode de Bigourdan (déplacer une étoile au méridien avec les axes de la monture jusqu'à ce qu'elle reste centrée) ou un logiciel d'alignement polaire assisté (SharpCap, PoleMaster, NINA). Un bon alignement permet des poses de 5 à 10 minutes sans dérive notable." },
+      { id: 'sc8', title: "L'entretien du matériel optique",
+        body: "Un télescope bien entretenu dure des décennies. Quelques règles simples suffisent.\n\nProtection : rangez toujours avec les bouchons sur les optiques. Évitez les chocs et les vibrations. Stockez dans un endroit sec et sans poussière. Pour les Newton, laissez le tube fermé avec un couvercle percé pour éviter la condensation.\n\nNettoyage des optiques : à éviter autant que possible. La poussière sur un miroir ou un objectif a très peu d'impact sur les images — un miroir poussiéreux reste excellent. Si nettoyage nécessaire, utilisez une poire soufflante puis un chiffon microfibre humidifié d'alcool isopropylique en douceur. Ne jamais frotter sec. Pour les miroirs aluminisés, un nettoyage maladroit peut rayer le revêtement définitivement." },
+      { id: 'sc9', title: "Chercheur et pointage : trouver les objets",
+        body: "Le pointage (trouver un objet dans le champ de l'oculaire) est souvent la première difficulté des débutants. Le chercheur est une petite lunette ou un point rouge (Red Dot Finder) fixé sur le tube et aligné avec l'axe optique principal.\n\nAlignez d'abord le chercheur de jour sur un objet lointain. La nuit, commencez toujours avec le plus faible grossissement (oculaire 25–32 mm) pour avoir le plus grand champ.\n\nDeux techniques de pointage : le Star-Hopping (sauter d'étoile brillante en étoile brillante en suivant des patterns géométriques jusqu'à la cible) est la méthode manuelle classique. Le Go-To (monture motorisée avec base de données d'objets) pointe automatiquement après un alignement sur 2–3 étoiles de référence. Les débutants progressent plus vite avec le star-hopping car ils apprennent le ciel en même temps." },
+      { id: 'sc10', title: "Acheter son premier instrument : guide pratique",
+        body: "Le meilleur télescope est celui qu'on utilise. Évitez les instruments de grande surface qui vantent des grossissements fantaisistes (600×, 800×) avec un petit objectif de 60 mm — ils donnent des images floues et décevantes.\n\nPour un budget de 150–300 € : lunette 70/900 ou Newton 114/900 sur monture EQ2 motorisée — correct pour la Lune et les planètes. Budget 300–600 € : Newton 150/750 ou 200/1000 sur EQ3/EQ5 motorisée — excellents pour tout. Budget 600–1 000 € : Dobson 250/1200 ou Newton sur HEQ5 — ciel profond exceptionnel.\n\nPrivilégiez les revendeurs spécialisés (Astroshop, Pierro-Astro, Téléscope Service) qui offrent un SAV sérieux. Le marché de l'occasion (Webastro forum) est une excellente option pour accéder à du matériel de qualité à moindre coût. Rejoignez un club astronomique local : vous pourrez tester différents instruments avant d'acheter." },
+    ],
+  },
+  {
+    id: 'photo', name: "Initiation à l'astrophoto",
+    lessons: [
+      { id: 'p1', title: "Les bases de la photographie numérique",
+        body: "En astrophotographie, vous contrôlez trois paramètres fondamentaux : la sensibilité ISO, l'ouverture (f/D), et le temps de pose.\n\nISO : augmenter l'ISO amplifie le signal mais aussi le bruit électronique. En astrophoto, on utilise des ISO élevés (800–6400) pour capturer les objets faibles, mais au prix d'un bruit plus marqué. Le capteur chaud en longue pose ajoute un bruit thermique supplémentaire.\n\nTemps de pose : en astrophoto, on ne parle pas de 1/500 s mais de 30 s, 2 min, 5 min ou plus. Plus la pose est longue, plus le signal accumulé est important — mais aussi plus le bruit thermique s'accumule. La solution : additionner (empiler) de nombreuses poses courtes plutôt qu'une seule très longue. 30 poses de 2 min = bien mieux qu'une seule pose de 60 min." },
+      { id: 'p2', title: "Choisir son appareil photo",
+        body: "Trois grandes familles d'appareils pour l'astrophoto :\n\nDSLR / Mirrorless du commerce : le point d'entrée le plus accessible. Utilisez le mode Bulb pour des poses de durée arbitraire. Le mode RAW est indispensable. Un DSLR défiltré (modification interne) améliore la sensibilité à l'hydrogène-alpha (Hα) pour les nébuleuses rouges — mais rend l'appareil moins pratique pour la photo classique.\n\nCaméra couleur dédiée (ASI294MC, QHY268C…) : refroidissement thermoélectrique (−35°C en dessous de l'ambiant) qui réduit drastiquement le bruit thermique. Pas d'obturateur mécanique — pilotage par logiciel. Le format est souvent plus petit (capteur APS-C ou 4/3).\n\nCaméra mono dédiée : capteur noir et blanc ultra sensible, utilisé avec des filtres (L, R, G, B ou Ha, OIII, SII). Technique avancée mais qualité d'image maximale, notamment pour la narrowband." },
+      { id: 'p3', title: "La mise au point sur les étoiles",
+        body: "La mise au point (MAP) est critique en astrophoto : une légère imprécision rend les étoiles floues et asymétriques. Elle doit être refaite à chaque session et peut dériver avec les changements de température.\n\nMéthode manuelle sur étoile brillante : zoomez à 10× sur l'écran Live View, ajustez le focaliseur jusqu'à obtenir l'étoile la plus petite et la plus brillante possible. Difficile à l'œil mais suffisant pour débuter.\n\nMask de Bahtinov : masque à trois fentes placé devant l'objectif qui crée un motif de diffraction en étoile. La MAP est correcte quand le pic central est parfaitement centré entre les deux pics latéraux. Simple, fiable, très populaire. Méthode logicielle (Half-Flux Diameter, HFD) : logiciels comme Sharpcap, NINA ou Ekos affichent un indice numérique de mise au point et peuvent automatiser le processus avec un focaliseur motorisé." },
+      { id: 'p4', title: "Photographier la Lune",
+        body: "La Lune est la cible idéale pour débuter : pas besoin de suivi, lumière abondante, résultats spectaculaires rapidement.\n\nModes recommandés : en afocal (smartphone contre l'oculaire), vous pouvez obtenir de bonnes images de la Lune entière. En prime focus (appareil photo directement au foyer du télescope), l'échelle est parfaite pour les détails.\n\nParamètres typiques au foyer d'un 200/1000 : ISO 100–400, poses de 1/500 à 1/2 000 s selon la phase. Le terminateur (limite ombre/lumière) révèle le relief avec des ombres rasantes spectaculaires. Les détails maximaux s'obtiennent en pleine Lune pour les rayons de Tycho, et au quartier pour le relief cratérisé. Empilez une vidéo de quelques secondes (plusieurs centaines de frames) avec AutoStakkert ou PIPP pour obtenir des images d'une netteté exceptionnelle." },
+      { id: 'p5', title: "Photographier les planètes",
+        body: "Les planètes demandent un fort grossissement et un seeing excellent. On travaille en vidéo haute cadence (50–200 images/s) puis on sélectionne et empile les meilleures frames.\n\nMatériel optimal : caméra planétaire rapide (ASI224MC, ASI462MC), barlow 2× ou 3×, télescope à longue focale. Les conditions de seeing sont prépondérantes — mieux vaut 50 mm d'ouverture par nuit de seeing parfait que 400 mm par nuit turbulente.\n\nLogiciels : AutoStakkert!3 ou PIPP pour le prétraitement et l'empilement des meilleures frames (tri par qualité), RegiStax 6 ou Siril pour les wavelets (rehaussement des détails fins). Jupiter révèle ses bandes nuageuses et la Grande Tache Rouge, Saturne ses anneaux avec divisions, Mars ses calottes polaires et albédos de surface." },
+      { id: 'p6', title: "Les nébuleuses et galaxies : longues poses",
+        body: "Le ciel profond (nébuleuses, galaxies, amas globulaires) demande un suivi précis et l'accumulation de nombreuses poses. Ces objets ont une luminosité de surface très faible — plusieurs heures de temps de pose cumulé sont souvent nécessaires.\n\nChaîne de travail typique : 1) Visez et centrez l'objet. 2) Mettez au point. 3) Alignement polaire précis. 4) Lancez une série de poses de 2 à 5 min (selon les conditions et l'objet). 5) Entre les séries, faites des frames de calibration.\n\nPour M42 (nébuleuse d'Orion), des poses de 30 s à 1 min suffisent — elle est très brillante. Pour M81 (galaxie de la Grande Ourse), il faut 2 à 4 h de poses totales. Pour les nébu­leuses en émission (Rosette, Cœur, Âme), les filtres H-alpha permettent de travailler même par pleine Lune ou en ciel urbain." },
+      { id: 'p7', title: "Le guidage automatique",
+        body: "Même un alignement polaire parfait laisse une dérive résiduelle : après quelques minutes, les étoiles se déplacent légèrement, traçant des traits sur l'image. Le guidage automatique corrige en temps réel cette dérive.\n\nPrincipe : une caméra de guidage observe une étoile guide (sur un chercheur ou un prisme off-axis). Un logiciel (PHD2, le plus populaire) mesure le déplacement de l'étoile guide et envoie des corrections à la monture plusieurs fois par seconde.\n\nMatériel nécessaire : une lunette guide (60–80 mm de focale suffit) ou un prisme off-axis (OAG), une caméra de guidage (ASI120MM, QHY5L-II…), et un câble ST-4 ou connexion USB. PHD2 est gratuit et dispose d'un assistant de configuration très bien guidé. Avec un bon guidage, des poses de 5 à 10 min sans étoiles filées sont courantes." },
+      { id: 'p8', title: "Les frames de calibration",
+        body: "Pour obtenir une image propre, il faut soustraire les défauts du capteur et du système optique. On prend à part des images de calibration :\n\nDarks : expositions de même durée et même ISO que les lights, avec le bouchon sur l'objectif. Capturent le courant d'obscurité (bruit thermique). Doivent être pris à la même température que les lights.\n\nBias (offset) : poses très courtes (1/4 000 s) qui capturent le signal de lecture du capteur. Utilisés pour calibrer les darks si les températures diffèrent (méthode scaled darks).\n\nFlats : expositions sur une surface uniformément éclairée (panneau LED, ciel crépusculaire) qui révèlent les poussières sur le capteur et le vignettage. Doivent être pris avec la même configuration optique (même mise au point, même oculaire). En pratique, 20 darks, 20 bias et 20 flats suffisent pour une calibration correcte." },
+      { id: 'p9', title: "L'empilement d'images",
+        body: "L'empilement (stacking) consiste à combiner de nombreuses poses pour réduire le bruit aléatoire. Mathématiquement, empiler N images divise le bruit par √N : 16 poses → bruit divisé par 4.\n\nLogiciels : Siril (gratuit, multiplateforme), DeepSkyStacker (DSS, Windows, gratuit), PixInsight (payant, professionnel).\n\nProcédure dans Siril : 1) Calibration automatique avec les darks/bias/flats. 2) Enregistrement (alignement) des poses sur les étoiles. 3) Empilement avec rejet de sigma (élimine les rayons cosmiques et les passages de satellites). 4) Post-traitement. Le résultat est une image 32 bits par canal, à fort rapport signal/bruit, prête pour le traitement." },
+      { id: 'p10', title: "Traitement basique avec Siril",
+        body: "Siril est le logiciel libre de référence pour le traitement astrophoto. Après l'empilement, l'image résultante est linéaire (très sombre) — il faut l'étirer pour révéler les détails.\n\nÉtapes de base : 1) Retrait du gradient de fond de ciel (Background Extraction). 2) Calibration des couleurs (Color Calibration ou Photometric Color Calibration). 3) Étirement de l'histogramme : utilisez AutoStretch comme point de départ puis ajustez manuellement avec le transfert d'histogramme. 4) Rehaussement du signal : StarNet++ (sépare les étoiles du fond) + Unsharp Mask sur la nébuleuse, puis recombinez.\n\nÉvitez le sur-traitement : une bonne image astrophoto doit paraître naturelle, avec des étoiles rondes et un fond de ciel propre. L'erreur la plus courante est d'écraser le bruit au point de perdre les détails fins dans les zones faibles." },
+      { id: 'p11', title: "Balance des couleurs et esthétique",
+        body: "La balance des couleurs est la touche finale qui donne son caractère à une image. En broadband (LRGB), l'objectif est une couleur naturelle proche de ce que l'œil humain verrait si la nébuleuse était beaucoup plus brillante. En narrowband (Ha/OIII/SII), on choisit une palette :\n\nPalette Hubble (SHO : SII→rouge, Ha→vert, OIII→bleu) : les couleurs de référence des images HST — rouges chauds et bleu-vert profond. Palette naturelle (HOO : Ha→rouge, OIII→vert, OIII→bleu) : donne des tons roses-rouges et bleu-vert plus doux.\n\nTravaillez dans un espace de couleur linéaire avant l'étirement, puis passez en log ou gamma pour le rendu final. Réduisez les étoiles trop dominantes (StarReducer) si elles écrêtent sur la nébuleuse. L'objectif : équilibrer la nébuleuse et les étoiles pour une lecture facile de la structure." },
+      { id: 'p12', title: "Partager et progresser",
+        body: "Publier ses images est une étape importante : les retours de la communauté sont précieux pour progresser. Plusieurs plateformes accueillent les astrophotos amateurs.\n\nAstrobin (astrobin.com) est la référence internationale : chaque image est accompagnée du matériel utilisé, des temps de pose et du traitement. L'algorithme de mise en avant récompense la qualité technique. Les groupes nationaux (Webastro.net en France) sont d'excellents espaces d'échange et de critique constructive.\n\nPour progresser, analysez les images des meilleurs : décomposez leur traitement (beaucoup publient leurs scripts Siril ou PixInsight). Rejoignez les star parties et rencontres d'astro-imageurs. Tenez un carnet de vos sessions (outil Observer dans Astror) avec les paramètres, les problèmes rencontrés et les solutions trouvées — c'est la meilleure façon de ne pas répéter les mêmes erreurs." },
+    ],
+  },
 ]
+
+// ─── Persistance parcours (par leçons lues) ──────────────────────────────────
+
+const PARCOURS_STORE = 'astror_parcours_v2'
 
 function parcoursLoad() {
   try {
     const saved = JSON.parse(localStorage.getItem(PARCOURS_STORE)) || {}
-    return PARCOURS_DEF.map(p => ({ ...p, pct: saved[p.id] ?? p.initPct }))
-  } catch { return PARCOURS_DEF.map(p => ({ ...p, pct: p.initPct })) }
+    return PARCOURS_DEF.map(p => ({
+      ...p,
+      read: new Set(saved[p.id] || []),
+      pct: Math.round(((saved[p.id] || []).length / p.lessons.length) * 100),
+    }))
+  } catch {
+    return PARCOURS_DEF.map(p => ({ ...p, read: new Set(), pct: 0 }))
+  }
 }
 
-function parcoursSave(list) {
+function markLessonRead(parcours, parcoursId, lessonId) {
+  const updated = parcours.map(p => {
+    if (p.id !== parcoursId) return p
+    const read = new Set([...p.read, lessonId])
+    const pct = Math.round((read.size / p.lessons.length) * 100)
+    return { ...p, read, pct }
+  })
   try {
     const obj = {}
-    list.forEach(p => { obj[p.id] = p.pct })
+    updated.forEach(p => { obj[p.id] = [...p.read] })
     localStorage.setItem(PARCOURS_STORE, JSON.stringify(obj))
   } catch {}
-}
-
-function advanceParcours(parcours, score, total) {
-  const gain = Math.round((score / total) * 15)
-  if (gain <= 0) return parcours
-  const updated = [...parcours]
-  const idx = updated.findIndex(p => p.pct < 100)
-  if (idx >= 0) updated[idx] = { ...updated[idx], pct: Math.min(100, updated[idx].pct + gain) }
-  parcoursSave(updated)
+  // bonus XP pour la première lecture
+  addXp(15)
   return updated
 }
 
@@ -624,8 +720,10 @@ export default function EducationPage({ onBack }) {
   const [quizStats, setQuizStats] = useState(quizLoad)
   const [xp, setXp]             = useState(xpLoad)
   const [defiDone, setDefiDone] = useState(defiDoneToday)
-  const [quizCat, setQuizCat]   = useState('Tout')
+  const [quizCat, setQuizCat]       = useState('Tout')
   const [chronoMode, setChronoMode] = useState(false)
+  const [openParcours, setOpenParcours] = useState(null)
+  const [openLesson, setOpenLesson]     = useState(null)
 
   const defi = getTodayDefi()
   const { data: apodArticle } = useLiveData(fetchAPODArticle)
@@ -633,7 +731,6 @@ export default function EducationPage({ onBack }) {
   const onQuizComplete = (score, total, bonusXp) => {
     setQuizStats(quizLoad())
     setXp(xpLoad())
-    setParcours(prev => advanceParcours(prev, score, total))
     setTimeout(() => setQuizKey(k => k + 1), 4500)
   }
 
@@ -755,8 +852,9 @@ export default function EducationPage({ onBack }) {
           <ToolSection title="Parcours pédagogiques">
             <div style={{ display: 'flex', flexDirection: 'column', gap: 11 }}>
               {parcours.map(p => (
-                <div key={p.id} style={{ padding: 14, borderRadius: 14,
-                  background: 'var(--surface-1)', border: '1px solid var(--line)' }}>
+                <button key={p.id} onClick={() => setOpenParcours(p)} className="press"
+                  style={{ textAlign: 'left', padding: 14, borderRadius: 14, cursor: 'pointer',
+                    background: 'var(--surface-1)', border: '1px solid var(--line)' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 9 }}>
                     <span className="h-card" style={{ fontSize: 14, flex: 1 }}>{p.name}</span>
                     {p.pct >= 100
@@ -764,8 +862,10 @@ export default function EducationPage({ onBack }) {
                       : <span className="meta" style={{ color: 'var(--gold)' }}>{p.pct}%</span>}
                   </div>
                   <div className="bar"><i style={{ width: p.pct + '%' }} /></div>
-                  <div className="meta" style={{ marginTop: 7 }}>{p.steps}</div>
-                </div>
+                  <div className="meta" style={{ marginTop: 7 }}>
+                    {p.read.size} / {p.lessons.length} leçon{p.lessons.length > 1 ? 's' : ''} lue{p.read.size > 1 ? 's' : ''}
+                  </div>
+                </button>
               ))}
             </div>
           </ToolSection>
@@ -802,6 +902,95 @@ export default function EducationPage({ onBack }) {
       )}
 
       {seg === 'glossaire' && <GlossaireView />}
+
+      {/* ── Sheet : liste des leçons d'un parcours ── */}
+      <Sheet open={!!openParcours && !openLesson} onClose={() => setOpenParcours(null)}>
+        {openParcours && (
+          <div>
+            <div className="tag" style={{ marginBottom: 10 }}>Parcours</div>
+            <div className="h-sec" style={{ fontSize: 22, marginBottom: 4, lineHeight: 1.2 }}>{openParcours.name}</div>
+            <div className="meta" style={{ color: 'var(--gold)', marginBottom: 18 }}>
+              {openParcours.read.size} / {openParcours.lessons.length} leçons lues · {openParcours.pct}%
+            </div>
+            <div className="bar" style={{ marginBottom: 20 }}>
+              <i style={{ width: openParcours.pct + '%' }} />
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 9 }}>
+              {openParcours.lessons.map((l, idx) => {
+                const done = openParcours.read.has(l.id)
+                return (
+                  <button key={l.id} onClick={() => setOpenLesson(l)} className="press"
+                    style={{ textAlign: 'left', display: 'flex', alignItems: 'center', gap: 12,
+                      padding: '13px 15px', borderRadius: 13, cursor: 'pointer',
+                      background: done ? 'rgba(132,211,169,.06)' : 'var(--surface-1)',
+                      border: '1px solid ' + (done ? 'rgba(132,211,169,.3)' : 'var(--line)') }}>
+                    <span style={{ width: 26, height: 26, borderRadius: '50%', flexShrink: 0,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11,
+                      fontFamily: 'var(--mono)', fontWeight: 700,
+                      background: done ? 'rgba(132,211,169,.2)' : 'var(--surface-2)',
+                      color: done ? 'var(--good)' : 'var(--faint)' }}>
+                      {done ? '✓' : idx + 1}
+                    </span>
+                    <span className="h-card" style={{ fontSize: 13.5, flex: 1,
+                      color: done ? 'var(--text-2)' : 'var(--text)' }}>
+                      {l.title}
+                    </span>
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+        )}
+      </Sheet>
+
+      {/* ── Sheet : contenu d'une leçon ── */}
+      <Sheet open={!!openLesson} onClose={() => setOpenLesson(null)}>
+        {openLesson && openParcours && (() => {
+          const done = openParcours.read.has(openLesson.id)
+          const lessonIdx = openParcours.lessons.findIndex(l => l.id === openLesson.id)
+          const nextLesson = openParcours.lessons[lessonIdx + 1] || null
+          return (
+            <div>
+              <div className="tag" style={{ marginBottom: 10 }}>{openParcours.name}</div>
+              <div className="h-sec" style={{ fontSize: 22, marginBottom: 18, lineHeight: 1.2 }}>
+                {openLesson.title}
+              </div>
+              {openLesson.body.split('\n\n').map((para, i) => (
+                <p key={i} className="body serif-body" style={{ fontSize: 14.5, lineHeight: 1.68, marginBottom: 16 }}>
+                  {para}
+                </p>
+              ))}
+              <div style={{ marginTop: 24, display: 'flex', flexDirection: 'column', gap: 10 }}>
+                {!done ? (
+                  <button className="btn-primary" onClick={() => {
+                    const updated = markLessonRead(parcours, openParcours.id, openLesson.id)
+                    setParcours(updated)
+                    setXp(xpLoad())
+                    const updatedP = updated.find(p => p.id === openParcours.id)
+                    setOpenParcours(updatedP)
+                    if (nextLesson) setOpenLesson(nextLesson)
+                    else setOpenLesson(null)
+                  }}>
+                    <IcCheckCircle size={16} /> Marquer comme lu · +15 XP
+                    {nextLesson ? ' — Leçon suivante' : ' — Terminer le parcours'}
+                  </button>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                    <div className="meta" style={{ textAlign: 'center', color: 'var(--good)' }}>
+                      ✓ Leçon déjà lue
+                    </div>
+                    {nextLesson && (
+                      <button className="btn-primary" onClick={() => setOpenLesson(nextLesson)}>
+                        Leçon suivante →
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+          )
+        })()}
+      </Sheet>
 
       <Sheet open={!!read} onClose={() => setRead(null)}>
         {read && (
