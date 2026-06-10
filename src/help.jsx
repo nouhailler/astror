@@ -1,6 +1,9 @@
+import { useState, useEffect } from 'react'
 import {
   IcSky, IcMoon, IcOrbit, IcBook, IcGrid, IcSpark, IcTele, IcComet,
-  IcCamera, IcSat, IcCap, IcUsers, IcGem, IcHelp, IcCheck
+  IcCamera, IcSat, IcCap, IcUsers, IcGem, IcHelp, IcCheck,
+  IcPlay, IcEye, IcCompass, IcLayers, IcBell, IcPlanet, IcPlus,
+  IcSliders, IcClock, IcCloud, IcCal, IcPin, IcStar, IcRocket, IcTrophy,
 } from './icons'
 import { Sheet } from './ui'
 
@@ -134,7 +137,161 @@ export const HELP_CONTENT = {
     ] },
 }
 
-export function TopBar({ onHome, onHelp }) {
+// ─── Contenu démo ────────────────────────────────────────────────────────────
+
+export const DEMO_CONTENT = {
+  sky: { title: 'Carte du Ciel', icon: IcSky, steps: [
+    { icon: IcEye,     action: 'Touchez une étoile ou planète',   desc: "Un panneau s'ouvre avec magnitude, altitude, azimut, distance et une fiche enrichie par l'IA." },
+    { icon: IcCompass, action: 'Activez le mode boussole',        desc: "Pointez votre téléphone vers le ciel. Une flèche et un radar vous guident précisément vers l'objet sélectionné." },
+    { icon: IcLayers,  action: 'Filtrez par catégorie',           desc: "Affichez uniquement planètes, étoiles ou ciel profond. La liste « Visibles ce soir » se trie par éclat." },
+  ]},
+  eph: { title: 'Éphémérides', icon: IcMoon, steps: [
+    { icon: IcMoon,    action: 'Consultez la phase lunaire',      desc: "Phase exacte, illumination, âge en jours, distance Terre-Lune et conseil IA pour observer ce soir." },
+    { icon: IcSky,     action: 'Vérifiez la fenêtre solaire',     desc: "Lever/coucher du Soleil, crépuscule nautique et astronomique — la limite du ciel vraiment noir." },
+    { icon: IcBell,    action: 'Activez les alertes',             desc: "Passages ISS, conjonctions Lune-planète : activez les notifications pour ne rien manquer." },
+  ]},
+  explore: { title: 'Explorer', icon: IcOrbit, steps: [
+    { icon: IcPlanet,  action: 'Ouvrez une fiche planète',        desc: "Diamètre, distance, composition, lunes, badge « Visible ce soir » et panel IA contextuel." },
+    { icon: IcCamera,  action: 'Parcourez les images James Webb', desc: "Dernières images NASA avec description et lien vers l'article d'origine." },
+    { icon: IcSpark,   action: 'Explorez les grandes théories',   desc: "Matière noire, trous noirs, inflation… chaque entrée enrichie par l'IA et liée à Wikipédia." },
+  ]},
+  feed: { title: 'Veille', icon: IcBook, steps: [
+    { icon: IcSky,     action: 'Photo du jour NASA',              desc: "La photo astronomique du jour (APOD) renouvelée chaque nuit — chargée en direct avec titre et description." },
+    { icon: IcBook,    action: 'Lisez les actualités',            desc: "Articles éducatifs récents chargés en temps réel : missions, découvertes, astrophysique." },
+    { icon: IcPlus,    action: 'Gérez votre bibliothèque',        desc: "Ajoutez vos propres ressources (conférences, YouTube, livres) — elles apparaissent dans la bibliothèque." },
+  ]},
+  tools: { title: 'Outils', icon: IcGrid, steps: [
+    { icon: IcGrid,    action: 'Touchez une tuile',               desc: "Chaque tuile ouvre un module complet : Observer, Lune, Planètes, Événements, Astrophoto, Satellites…" },
+    { icon: IcSpark,   action: "Consultez l'IA dans chaque outil", desc: "Chaque module dispose d'un panel IA contextuel adapté à votre position, niveau et matériel." },
+    { icon: IcSliders, action: 'Personnalisez via les Paramètres', desc: "Modifiez votre ville, matériel et niveau — chaque outil s'adapte en conséquence." },
+  ]},
+  ai: { title: 'Assistant', icon: IcSpark, steps: [
+    { icon: IcSpark,   action: 'Posez votre question',            desc: "Tapez librement : observations du soir, choix d'instrument, astrophysique, cosmologie…" },
+    { icon: IcGrid,    action: 'Utilisez les suggestions',        desc: "11 catégories prêtes à l'emploi — touchez une suggestion pour démarrer une conversation guidée." },
+    { icon: IcSliders, action: 'Configurez votre clé API',        desc: "Saisissez votre clé Anthropic ou OpenRouter dans les Paramètres pour activer les réponses en direct." },
+  ]},
+  tool_observe: { title: 'Observer', icon: IcTele, steps: [
+    { icon: IcCloud,   action: 'Vérifiez les conditions',         desc: "Nuages, seeing, transparence et indice Bortle en temps réel avant de sortir votre télescope." },
+    { icon: IcClock,   action: 'Choisissez votre créneau',        desc: "Les créneaux optimaux de la nuit sont calculés pour votre position : Excellent / Bon / Médiocre." },
+    { icon: IcBook,    action: 'Parcourez les catalogues',        desc: "Messier, NGC, Caldwell ou « Visibles ce soir » — triés par difficulté selon votre matériel." },
+  ]},
+  tool_moon: { title: 'Lune', icon: IcMoon, steps: [
+    { icon: IcMoon,    action: 'Lisez le disque lunaire',         desc: "Phase, illumination, âge et distance en un coup d'œil. L'IA vous dit quelles zones observer ce soir." },
+    { icon: IcCal,     action: 'Planifiez les prochaines phases', desc: "Nouvelle, Premier quartier, Pleine, Dernier quartier — avec dates précises calculées pour votre lieu." },
+    { icon: IcPin,     action: 'Explorez la cartographie',        desc: "Touchez une mer ou un cratère pour ouvrir sa fiche d'observation générée par l'IA." },
+  ]},
+  tool_planets: { title: 'Planètes', icon: IcOrbit, steps: [
+    { icon: IcEye,     action: 'Lisez le tableau du soir',        desc: "Magnitude, taille apparente et visibilité de chaque planète pour cette nuit — mis à jour en direct." },
+    { icon: IcTele,    action: "Simulez l'oculaire",              desc: "Choisissez une planète pour voir ce que vous observerez : bandes de Jupiter, anneaux de Saturne à l'échelle." },
+    { icon: IcCal,     action: 'Anticipez les événements',        desc: "Conjonctions, oppositions et élongations à venir avec dates et séparations angulaires." },
+  ]},
+  tool_events: { title: 'Événements', icon: IcComet, steps: [
+    { icon: IcCal,     action: 'Filtrez par catégorie',           desc: "Éclipses, pluies de météores ou événements spéciaux — calendrier sur 18 mois en un coup d'œil." },
+    { icon: IcComet,   action: "Préparez avec l'IA",              desc: "Touchez un événement pour le panel IA : meilleur moment, matériel conseillé, position précise." },
+    { icon: IcBell,    action: 'Activez les notifications',       desc: "Ne manquez plus aucun passage ISS, éclipse ou pluie d'étoiles filantes — alerte personnalisée par type." },
+  ]},
+  tool_astrophoto: { title: 'Astrophoto', icon: IcCamera, steps: [
+    { icon: IcClock,   action: 'Vérifiez la fenêtre de nuit',     desc: "Heure bleue, crépuscule astronomique, seeing et météo en direct — pour choisir le bon moment." },
+    { icon: IcSky,     action: 'Localisez la Voie Lactée',        desc: "Position du cœur galactique et interférence lunaire pour planifier vos poses grand champ." },
+    { icon: IcCamera,  action: 'Calculez votre temps de pose',    desc: "Entrez focale et capteur (plein format, APS-C, MFT) — règles 500 et NPF calculées instantanément." },
+  ]},
+  tool_satellites: { title: 'Satellites', icon: IcSat, steps: [
+    { icon: IcSat,     action: "Suivez l'ISS en direct",          desc: "Altitude, vitesse, position géographique et statut — mis à jour toutes les 10 secondes." },
+    { icon: IcClock,   action: 'Planifiez le prochain passage',   desc: "Heure, durée, direction et altitude maximale pour les passages ISS visibles depuis votre ville." },
+    { icon: IcRocket,  action: 'Explorez les missions',           desc: "Missions en cours, lancements à venir, distances de Voyager 1/2 et New Horizons depuis le Soleil." },
+  ]},
+  tool_education: { title: 'Apprendre', icon: IcCap, steps: [
+    { icon: IcCap,     action: 'Lancez un quiz',                  desc: "40 questions en 6 catégories — une explication détaillée s'affiche après chaque réponse." },
+    { icon: IcBook,    action: 'Consultez le glossaire',          desc: "50 termes astronomiques — touchez un mot pour sa définition approfondie générée par l'IA." },
+    { icon: IcSky,     action: 'Restez informé',                  desc: "Photo du jour NASA et articles éducatifs chargés en direct : une nouveauté chaque jour." },
+  ]},
+  tool_community: { title: 'Communauté', icon: IcUsers, steps: [
+    { icon: IcUsers,   action: 'Parcourez le fil Mastodon',       desc: "Photos d'astrophotographie en direct depuis #astrophotography — nouvelles photos à chaque visite." },
+    { icon: IcTrophy,  action: 'Consultez le classement',         desc: "Connectez votre Google Sheets dans les Paramètres pour afficher un classement de photos en direct." },
+    { icon: IcPin,     action: 'Découvrez les sorties',           desc: "Actualités d'événements astronomiques en direct (SAF, Le Monde Espace)." },
+  ]},
+  tool_extras: { title: 'Explorations', icon: IcGem, steps: [
+    { icon: IcGem,     action: 'Explorez les échelles cosmiques', desc: "9 visuels de l'Everest à l'Univers observable — glissez pour prendre du recul sur l'immensité." },
+    { icon: IcComet,   action: 'Simulez un impact',               desc: "Choisissez la masse de l'impacteur — cratère, énergie et équivalent TNT se calculent en direct." },
+    { icon: IcStar,    action: 'Découvrez votre Top 10',          desc: "Liste personnalisée selon votre GPS et la saison, avec fiches détaillées et conseil IA par objet." },
+  ]},
+}
+
+// ─── Sheet de démonstration ───────────────────────────────────────────────────
+
+export function DemoSheet({ open, onClose, demoKey }) {
+  const [step, setStep] = useState(0)
+  const d = DEMO_CONTENT[demoKey]
+  const DIcon = d?.icon || IcPlay
+
+  useEffect(() => { if (open) setStep(0) }, [open, demoKey])
+
+  if (!d) return null
+  const s = d.steps[step]
+  const SIcon = s.icon || IcSpark
+  const total = d.steps.length
+
+  return (
+    <Sheet open={open} onClose={onClose}>
+      {/* En-tête */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 13, marginBottom: 22 }}>
+        <span style={{ width: 48, height: 48, borderRadius: 13, flexShrink: 0, display: 'flex',
+          alignItems: 'center', justifyContent: 'center', color: 'var(--gold)',
+          background: 'var(--gold-soft)', border: '1px solid var(--gold-line)' }}>
+          <DIcon size={24} />
+        </span>
+        <div>
+          <div className="eyebrow" style={{ marginBottom: 4, display: 'flex', alignItems: 'center', gap: 7 }}>
+            <IcPlay size={11} style={{ color: 'var(--gold)' }} />
+            Démonstration
+          </div>
+          <div className="h-sec" style={{ fontSize: 22 }}>{d.title}</div>
+        </div>
+      </div>
+
+      {/* Indicateur d'étapes */}
+      <div style={{ display: 'flex', gap: 6, justifyContent: 'center', marginBottom: 22 }}>
+        {d.steps.map((_, i) => (
+          <button key={i} onClick={() => setStep(i)} aria-label={`Étape ${i + 1}`}
+            style={{ width: i === step ? 26 : 8, height: 8, borderRadius: 999, padding: 0,
+              background: i === step ? 'var(--gold)' : 'var(--line-2)',
+              border: 0, cursor: 'pointer', transition: 'all .22s ease' }} />
+        ))}
+      </div>
+
+      {/* Contenu de l'étape */}
+      <div style={{ borderRadius: 18, background: 'var(--surface-1)', border: '1px solid var(--line)',
+        padding: '30px 20px 26px', textAlign: 'center', marginBottom: 16 }}>
+        <div style={{ width: 68, height: 68, borderRadius: 20, display: 'inline-flex',
+          alignItems: 'center', justifyContent: 'center', color: 'var(--gold)',
+          background: 'var(--gold-soft)', border: '1px solid var(--gold-line)', marginBottom: 18 }}>
+          <SIcon size={32} />
+        </div>
+        <div style={{ fontFamily: 'var(--mono)', fontSize: 10.5, letterSpacing: '.1em',
+          color: 'var(--faint)', marginBottom: 10, textTransform: 'uppercase' }}>
+          Étape {step + 1} / {total}
+        </div>
+        <div className="h-sec" style={{ fontSize: 17, marginBottom: 12 }}>{s.action}</div>
+        <p className="body" style={{ fontSize: 13.5, lineHeight: 1.65, color: 'var(--dim)', margin: 0 }}>{s.desc}</p>
+      </div>
+
+      {/* Navigation */}
+      <div style={{ display: 'flex', gap: 10 }}>
+        <button className="chip" onClick={() => setStep(i => i - 1)} disabled={step === 0}
+          style={{ flex: 1, height: 44, opacity: step === 0 ? .35 : 1 }}>
+          ← Précédent
+        </button>
+        {step < total - 1
+          ? <button className="chip on" onClick={() => setStep(i => i + 1)} style={{ flex: 1, height: 44 }}>Suivant →</button>
+          : <button className="chip on" onClick={onClose} style={{ flex: 1, height: 44 }}>Terminé ✓</button>
+        }
+      </div>
+    </Sheet>
+  )
+}
+
+
+export function TopBar({ onHome, onHelp, onDemo }) {
   return (
     <div className="appbar">
       <button className="brand" onClick={onHome} aria-label="Retour à l'accueil">
@@ -142,9 +299,15 @@ export function TopBar({ onHome, onHelp }) {
           color: '#1a130a', background: 'linear-gradient(160deg,var(--gold-2),var(--gold-3))' }}><IcSpark size={15} /></span>
         <span className="bw">Astror</span>
       </button>
-      <button className="help-btn press" onClick={onHelp} aria-label="Aide sur cet écran">
-        <IcHelp size={19} />
-      </button>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+        <button className="help-btn press" onClick={onDemo} aria-label="Démonstration de cet écran"
+          style={{ color: 'var(--gold)' }}>
+          <IcPlay size={17} />
+        </button>
+        <button className="help-btn press" onClick={onHelp} aria-label="Aide sur cet écran">
+          <IcHelp size={19} />
+        </button>
+      </div>
     </div>
   )
 }

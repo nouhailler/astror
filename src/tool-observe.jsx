@@ -202,7 +202,7 @@ export default function ObservePage({ onBack }) {
   const delSession  = (id) => saveJournal(journal.filter(x => x.id !== id))
 
   return (
-    <ToolPage title="Observer" onBack={onBack}>
+    <ToolPage title="Observer" onBack={onBack} demoKey="tool_observe">
       <ToolSeg items={[{ key: 'prep', label: 'Préparer' }, { key: 'journal', label: 'Journal' }, { key: 'objets', label: 'Objets' }]}
         value={seg} onChange={setSeg} />
 

@@ -54,7 +54,7 @@ export default function SatellitesPage({ onBack }) {
   }, [])
 
   return (
-    <ToolPage title="Satellites" onBack={onBack}>
+    <ToolPage title="Satellites" onBack={onBack} demoKey="tool_satellites">
       <ToolSeg items={[{ key: 'track', label: 'Suivi' }, { key: 'explore', label: 'Exploration' }]} value={seg} onChange={setSeg} />
 
       {seg === 'track' && (

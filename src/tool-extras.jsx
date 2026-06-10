@@ -497,7 +497,7 @@ export default function ExtrasPage({ onBack }) {
   const [top10pick, setTop10pick] = useState(null)
 
   return (
-    <ToolPage title="Explorations" onBack={onBack}>
+    <ToolPage title="Explorations" onBack={onBack} demoKey="tool_extras">
       <ToolHero
         title="Explorations cosmiques"
         sub="Simulateurs, top 10 et voyages interactifs"

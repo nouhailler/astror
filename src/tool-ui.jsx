@@ -1,16 +1,25 @@
-import { IcArrowLeft, IcSliders } from './icons'
+import { IcArrowLeft, IcSliders, IcPlay } from './icons'
 
-export function ToolPage({ title, onBack, children }) {
+const iconBtnStyle = {
+  width: 38, height: 38, borderRadius: 999, border: '1px solid var(--line-2)',
+  background: 'rgba(255,255,255,0.03)', display: 'flex', alignItems: 'center',
+  justifyContent: 'center', cursor: 'pointer', flexShrink: 0,
+}
+
+export function ToolPage({ title, onBack, demoKey, children }) {
   return (
     <div className="screen pad-b">
       <div className="tool-head">
         <button className="tool-back press" onClick={onBack} aria-label="Retour"><IcArrowLeft size={19} /></button>
         <div className="h-sec" style={{ fontSize: 19, flex: 1 }}>{title}</div>
+        {demoKey && (
+          <button className="press" onClick={() => window.openAstrorDemo && window.openAstrorDemo(demoKey)}
+            aria-label="Démonstration" style={{ ...iconBtnStyle, color: 'var(--gold)' }}>
+            <IcPlay size={16} />
+          </button>
+        )}
         <button className="press" onClick={() => window.openAstrorSettings && window.openAstrorSettings()}
-          aria-label="Paramètres"
-          style={{ width: 38, height: 38, borderRadius: 999, border: '1px solid var(--line-2)',
-            background: 'rgba(255,255,255,0.03)', color: 'var(--dim)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flexShrink: 0 }}>
+          aria-label="Paramètres" style={{ ...iconBtnStyle, color: 'var(--dim)' }}>
           <IcSliders size={17} />
         </button>
       </div>

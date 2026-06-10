@@ -64,7 +64,7 @@ export default function PlanetsPage({ onBack }) {
   const obs = PLANET_OBS[sel] || PLANET_OBS.jupiter
 
   return (
-    <ToolPage title="Planètes" onBack={onBack}>
+    <ToolPage title="Planètes" onBack={onBack} demoKey="tool_planets">
       <ToolSeg items={[{ key: 'eph', label: 'Éphémérides' }, { key: 'obs', label: 'Observation' }]} value={seg} onChange={setSeg} />
 
       {seg === 'eph' && (

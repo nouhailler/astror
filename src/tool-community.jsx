@@ -143,7 +143,7 @@ export default function CommunityPage({ onBack }) {
   const rankFailed        = rankError && !rankNotConfigured
 
   return (
-    <ToolPage title="Communauté" onBack={onBack}>
+    <ToolPage title="Communauté" onBack={onBack} demoKey="tool_community">
       <ToolSeg
         items={[{ key: 'feed', label: 'Fil' }, { key: 'rank', label: 'Classement' }, { key: 'events', label: 'Sorties' }]}
         value={seg} onChange={setSeg}

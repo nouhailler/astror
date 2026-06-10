@@ -977,7 +977,7 @@ export default function EducationPage({ onBack }) {
   ]
 
   return (
-    <ToolPage title="Apprendre" onBack={onBack}>
+    <ToolPage title="Apprendre" onBack={onBack} demoKey="tool_education">
       <ToolSeg
         items={[{ key: 'learn', label: 'Apprentissage' }, { key: 'content', label: 'Contenus' }, { key: 'glossaire', label: 'Glossaire' }]}
         value={seg} onChange={setSeg}

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { IcSky, IcMoon, IcGlobe, IcBell, IcWrench, IcSpark } from './icons'
-import { TopBar, HelpSheet } from './help'
+import { TopBar, HelpSheet, DemoSheet } from './help'
 import SettingsSheet from './settings'
 import Onboarding, { onbWasSeen, onbMarkSeen, onbLoad, onbSave } from './onboarding'
 import SkyScreen from './sky'
@@ -41,6 +41,7 @@ export default function App() {
   const [onboarded, setOnboarded] = useState(() => onbWasSeen())
   const [tab, setTab] = useState('sky')
   const [helpKey, setHelpKey] = useState(null)
+  const [demoKey, setDemoKey] = useState(null)
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [profile, setProfile] = useState(() => onbLoad())
   const [toolDeepLink, setToolDeepLink] = useState(null)
@@ -50,7 +51,8 @@ export default function App() {
   useEffect(() => {
     window.openAstrorSettings = () => setSettingsOpen(true)
     window.openAstrorTool = (key) => { setTab('tools'); setToolDeepLink(key) }
-    return () => { delete window.openAstrorSettings; delete window.openAstrorTool }
+    window.openAstrorDemo = (key) => setDemoKey(key)
+    return () => { delete window.openAstrorSettings; delete window.openAstrorTool; delete window.openAstrorDemo }
   }, [])
 
   if (!onboarded) {
@@ -65,7 +67,7 @@ export default function App() {
   return (
     <div className="app-root">
       <div className="safe-top" />
-      <TopBar onHelp={() => setHelpKey(HELP_KEYS[tab])} onHome={() => setTab('sky')} />
+      <TopBar onHelp={() => setHelpKey(HELP_KEYS[tab])} onDemo={() => setDemoKey(HELP_KEYS[tab])} onHome={() => setTab('sky')} />
       <div className="screen-area">
         {tab === 'sky' && <SkyScreen />}
         {tab === 'eph' && <EphScreen />}
@@ -77,6 +79,7 @@ export default function App() {
       <TabBar tab={tab} onChange={setTab} />
 
       <HelpSheet open={!!helpKey} helpKey={helpKey} onClose={() => setHelpKey(null)} />
+      <DemoSheet open={!!demoKey} demoKey={demoKey} onClose={() => setDemoKey(null)} />
 
       <SettingsSheet
         open={settingsOpen}

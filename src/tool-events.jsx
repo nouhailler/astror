@@ -70,7 +70,7 @@ export default function EventsPage({ onBack }) {
   }
 
   return (
-    <ToolPage title="Événements" onBack={onBack}>
+    <ToolPage title="Événements" onBack={onBack} demoKey="tool_events">
       <ToolSeg items={[{ key: 'upcoming', label: 'À venir' }, { key: 'notif', label: 'Notifications' }]} value={seg} onChange={setSeg} />
 
       {seg === 'upcoming' && (

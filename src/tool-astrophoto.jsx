@@ -84,7 +84,7 @@ export default function AstrophotoPage({ onBack }) {
   ]
 
   return (
-    <ToolPage title="Astrophoto" onBack={onBack}>
+    <ToolPage title="Astrophoto" onBack={onBack} demoKey="tool_astrophoto">
       <ToolSeg items={[{ key: 'plan', label: 'Planifier' }, { key: 'tools', label: 'Outils' }]} value={seg} onChange={setSeg} />
 
       {seg === 'plan' && (

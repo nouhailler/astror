@@ -51,7 +51,7 @@ export default function MoonPage({ onBack }) {
   const illum = 73, age = 9.4
 
   return (
-    <ToolPage title="Lune" onBack={onBack}>
+    <ToolPage title="Lune" onBack={onBack} demoKey="tool_moon">
       <ToolSeg items={[{ key: 'suivi', label: 'Suivi lunaire' }, { key: 'carte', label: 'Cartographie' }]} value={seg} onChange={setSeg} />
 
       {seg === 'suivi' && (
