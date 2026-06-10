@@ -95,6 +95,7 @@ export default function EphScreen() {
 
   const { data: weather, loading: wLoading } = useLiveData(() => fetchWeather(lat, lng))
   const [evt, setEvt] = useState(null)
+  const [alertSheet, setAlertSheet] = useState(null)
   const [manageOpen, setManageOpen] = useState(false)
   const [notifPrefs, setNotifPrefs] = useState(() => ({ iss: true, conj: true, iri: false, ...loadNotifPrefs() }))
   const [permission, setPermission] = useState(() => getPermission())
@@ -117,7 +118,7 @@ export default function EphScreen() {
   return (
     <div className="screen pad-b">
       <ScreenHeader eyebrow={dateLabel} title="Éphémérides"
-        right={<HeaderTools><IconBtn badge><IcBell size={19} /></IconBtn><SettingsBtn /></HeaderTools>} />
+        right={<HeaderTools><IconBtn badge onClick={() => setManageOpen(true)}><IcBell size={19} /></IconBtn><SettingsBtn /></HeaderTools>} />
 
       <div className="pad">
         <div className="card enter" style={{ padding: 18, display: 'flex', gap: 18, alignItems: 'center' }}>
@@ -159,7 +160,8 @@ export default function EphScreen() {
         <SectionTitle action="Gérer" onAction={() => setManageOpen(true)}>Alertes</SectionTitle>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           {ALERTS.map(a => (
-            <div key={a.id} className="card" style={{ padding: 14, display: 'flex', gap: 13 }}>
+            <button key={a.id} onClick={() => setAlertSheet(a)} className="card press"
+              style={{ width: '100%', textAlign: 'left', cursor: 'pointer', padding: 14, display: 'flex', gap: 13 }}>
               <span style={{ width: 38, height: 38, borderRadius: 11, flexShrink: 0, display: 'flex',
                 alignItems: 'center', justifyContent: 'center', color: 'var(--gold)',
                 background: 'var(--gold-soft)', border: '1px solid var(--gold-line)' }}>
@@ -173,7 +175,8 @@ export default function EphScreen() {
                 <div className="meta" style={{ color: 'var(--gold)', margin: '4px 0 6px' }}>{a.when}</div>
                 <div className="body tight" style={{ fontSize: 12.5 }}>{a.detail}</div>
               </div>
-            </div>
+              <span style={{ alignSelf: 'center', color: 'var(--faint)', flexShrink: 0 }}>›</span>
+            </button>
           ))}
         </div>
       </div>
@@ -231,6 +234,66 @@ En 4 à 5 phrases, analyse ces conditions pour la nuit : qu'est-il raisonnable d
           )}
         </div>
       </div>
+
+      {/* ── Détail alerte ── */}
+      <Sheet open={!!alertSheet} onClose={() => setAlertSheet(null)}>
+        {alertSheet && (() => {
+          const notifSetting = ALERT_NOTIF_SETTINGS.find(s => s.k === alertSheet.icon)
+          return (
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 20 }}>
+                <span style={{ width: 52, height: 52, borderRadius: 14, flexShrink: 0, display: 'flex',
+                  alignItems: 'center', justifyContent: 'center', color: 'var(--gold)',
+                  background: 'var(--gold-soft)', border: '1px solid var(--gold-line)' }}>
+                  {ALERT_ICON[alertSheet.icon]}
+                </span>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  {alertSheet.live && (
+                    <span className="tag live" style={{ display: 'inline-flex', marginBottom: 7 }}>
+                      <span className="dot pulse" style={{ background: 'var(--good)' }} /> EN DIRECT
+                    </span>
+                  )}
+                  <div className="h-sec" style={{ fontSize: 22 }}>{alertSheet.title}</div>
+                  <div className="meta" style={{ color: 'var(--gold)', marginTop: 4 }}>{alertSheet.when}</div>
+                </div>
+              </div>
+
+              <p className="body serif-body" style={{ fontSize: 15, lineHeight: 1.6, marginBottom: 18 }}>
+                {alertSheet.detail}
+              </p>
+
+              <AiInfoPanel
+                cacheKey={`alert_${alertSheet.id}`}
+                style={{ marginBottom: 18 }}
+                buildPrompt={`Événement astronomique : ${alertSheet.title}
+Quand : ${alertSheet.when}
+Détails : ${alertSheet.detail}
+
+En 4 phrases concrètes, explique comment observer au mieux cet événement : à quelle heure se préparer, où regarder dans le ciel, quel équipement conseilles-tu (œil nu, jumelles, télescope), et donne une astuce pratique pour ne pas le rater.`}
+              />
+
+              {notifSetting && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 15px',
+                  borderRadius: 14, background: 'var(--surface-1)', border: '1px solid var(--line)' }}>
+                  <IcBell size={18} style={{ color: 'var(--gold)', flexShrink: 0 }} />
+                  <span style={{ flex: 1, minWidth: 0 }}>
+                    <span className="h-card" style={{ display: 'block', fontSize: 14, marginBottom: 3 }}>
+                      Notifications
+                    </span>
+                    <span className="meta">{notifSetting.sub}</span>
+                  </span>
+                  <button
+                    className={'switch' + (notifPrefs[notifSetting.k] ? ' on' : '')}
+                    onClick={() => toggleAlert(notifSetting.k, !notifPrefs[notifSetting.k])}
+                    aria-pressed={!!notifPrefs[notifSetting.k]}
+                    aria-label={'Notifications · ' + notifSetting.label}
+                  ><i /></button>
+                </div>
+              )}
+            </div>
+          )
+        })()}
+      </Sheet>
 
       <Sheet open={manageOpen} onClose={() => setManageOpen(false)} aria-label="Gérer les alertes">
         <div className="h-sec" style={{ fontSize: 22, marginBottom: 6 }}>Alertes</div>
