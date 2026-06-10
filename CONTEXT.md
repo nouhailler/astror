@@ -46,11 +46,16 @@ src/
 │
 ├── onboarding.jsx      # Onboarding 7 étapes + onbLoad/onbSave/onbWasSeen/onbMarkSeen
 ├── settings.jsx        # SettingsSheet (default export) — wraps Sheet internally
-├── help.jsx            # TopBar + HelpSheet + HELP_CONTENT
+├── help.jsx            # TopBar + HelpSheet + DemoSheet + HELP_CONTENT + DEMO_CONTENT
 │
 ├── sky.jsx             # Onglet Ciel : carte SVG, boussole AR (deviceorientation), filtres, fiche objet
 ├── ephemerides.jsx     # Onglet Éphémérides : Lune, météo dynamique, alertes, événements calculés
-├── explore.jsx         # Onglet Explorer : visibilité planètes live, images JWST Wikimedia, liens Wikipedia
+├── explore.jsx         # Onglet Explorer :
+│                       #   - Système solaire : planètes live, fiches, lunes (photos NASA)
+│                       #   - James Webb : images Wikimedia
+│                       #   - Conquête spatiale : article 10 chapitres + annexes interactives
+│                       #     (Chronologie/Glossaire/Missions → WikiSummarySheet via createPortal)
+│                       #   - Anomalies cosmiques + Théories
 ├── feed.jsx            # Onglet Veille : actualités, conférences (images Wikipedia), livres (couvertures),
 │                       #                 personnalités (photos Wikipedia), ajout utilisateur (localStorage)
 ├── assistant.jsx       # Onglet Assistant : chat OpenRouter
@@ -83,8 +88,26 @@ src/
 | `astror_xp_v1` | XP total accumulé + date du dernier défi complété |
 | `astror_parcours_v1` | Progression (%) par parcours pédagogique |
 | `astror_api_key_v1` | Clé OpenRouter (séparée du profil) |
+| `astror_ai_cache_v1` | Cache des réponses IA — panels AiInfoPanel et WikiSummarySheet |
 | `astror_conf_imgs_v1` | Cache images Wikipedia des conférences |
 | `astror_book_covers_v1` | Cache couvertures livres (Open Library / Google Books) |
+
+---
+
+## APIs utilisées
+
+| Service | Usage |
+|---|---|
+| open-meteo.com | Météo locale (sans clé) |
+| wheretheiss.at | Position ISS live (10 s) |
+| lldev.thespacedevs.com | Prochains lancements |
+| spaceflightnewsapi.net | Actualités spatiales |
+| api.nasa.gov | APOD (DEMO_KEY) |
+| commons.wikimedia.org/w/api.php | Thumbnails images (480 px, imageinfo API) |
+| fr.wikipedia.org/api/rest_v1/page/summary | Fiches Wikipédia FR (WikiSummarySheet) |
+| en.wikipedia.org/api/rest_v1/page/summary | Fallback fiches Wikipédia EN |
+| OpenLibrary / Google Books | Couvertures de livres |
+| OpenRouter | IA (clé dans `astror_api_key_v1`) |
 
 ---
 
@@ -95,7 +118,9 @@ src/
 - **`Onboarding`** est un `export default`, les helpers (`onbLoad`, etc.) sont des exports nommés.
 - **`window.openAstrorSettings`** est enregistré dans `App.jsx` via `useEffect` — c'est le seul endroit.
 - **`profile.location`** est un objet `{ city, lat, lng }` (migration automatique dans `onbLoad()`).
-- Les apostrophes françaises dans les strings JS doivent être en **double quotes** `"..."` pour éviter les erreurs de build.
+- **Apostrophes françaises** dans les strings JS : utiliser le double-quote `"..."` ou échapper avec `\'`.
+- **Sheets dans composants animés** : l'animation CSS `.enter` applique `transform: translateY(0)` (fill-mode `forwards`), ce qui crée un CSS containing block. Tout Sheet imbriqué dans cette arborescence doit utiliser `createPortal(content, document.getElementById('root'))` pour se positionner correctement par rapport au viewport.
+- **Wikimedia images** : utiliser l'API thumbnail (`iiprop=thumburl&iiurlwidth=480`) plutôt que les URLs directes pleine taille. Ne jamais utiliser le format `/thumb/`.
 - Les `.ph` (placeholder divs) remplacent les `<image-slot>` custom elements du prototype.
 - **`useLiveData(fetchFn)`** dans `api.js` : hook universel pour les appels API avec cache et rafraîchissement.
 
@@ -106,7 +131,7 @@ src/
 - **Build** : ✅ propre (`npm run build` passe sans erreur)
 - **Dev server** : ✅ fonctionnel (`npm run dev`)
 - **Tests** : ✅ 21 tests Vitest (`npm test`)
-- **Git** : 36 commits — branche `main` à jour sur GitHub
+- **Git** : 40+ commits — branche `main` à jour sur GitHub
 - **Netlify** : prêt à connecter (le `netlify.toml` est en place)
 
 ---
@@ -119,6 +144,7 @@ src/
 4. **PWA offline** : certains appels API échouent silencieusement hors-ligne
 5. **i18n** : tout est en français hard-codé
 6. **Notifications push** : les notifications locales fonctionnent, les push web nécessiteraient un backend
+7. **Conquête spatiale — Biographies** : les 8 biographies sont statiques (pas de lien Wikipédia interactif)
 
 ---
 

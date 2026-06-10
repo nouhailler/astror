@@ -25,11 +25,11 @@ export const HELP_CONTENT = {
     ] },
 
   explore: { title: 'Explorer', icon: IcOrbit,
-    intro: "Un voyage guidé dans le cosmos : les 8 planètes du système solaire en direct, les dernières images du James Webb et les grandes questions ouvertes de l'astrophysique.",
+    intro: "Un voyage guidé dans le cosmos : les planètes en direct, les images du James Webb, un grand article sur la conquête spatiale avec annexes interactives, et les grandes questions ouvertes de l'astrophysique.",
     points: [
-      "Système solaire : fiche de chaque planète (diamètre, distance, composition, lunes…) avec badge « Visible ce soir » calculé en direct et panel IA",
-      "James Webb : dernières images chargées depuis la NASA avec description et lien vers l'article d'origine",
-      "Anomalies cosmiques et grandes théories (matière noire, trous noirs, inflation…) — chaque entrée enrichie par un panel IA et un lien Wikipédia",
+      "Système solaire : fiche de chaque planète (diamètre, distance, composition, lunes avec photos NASA) avec badge « Visible ce soir » calculé en direct et panel IA",
+      "Conquête spatiale : article complet « De Spoutnik à Mars » en 10 chapitres — touchez Chronologie, Glossaire ou Missions pour ouvrir une fiche Wikipédia avec photo, résumé et panel IA",
+      "James Webb, Anomalies cosmiques et grandes Théories (matière noire, trous noirs, inflation…) — chaque entrée enrichie par un panel IA et un lien Wikipédia",
     ] },
 
   feed: { title: 'Veille', icon: IcBook,
@@ -151,9 +151,9 @@ export const DEMO_CONTENT = {
     { icon: IcBell,    action: 'Activez les alertes',             desc: "Passages ISS, conjonctions Lune-planète : activez les notifications pour ne rien manquer." },
   ]},
   explore: { title: 'Explorer', icon: IcOrbit, steps: [
-    { icon: IcPlanet,  action: 'Ouvrez une fiche planète',        desc: "Diamètre, distance, composition, lunes, badge « Visible ce soir » et panel IA contextuel." },
-    { icon: IcCamera,  action: 'Parcourez les images James Webb', desc: "Dernières images NASA avec description et lien vers l'article d'origine." },
-    { icon: IcSpark,   action: 'Explorez les grandes théories',   desc: "Matière noire, trous noirs, inflation… chaque entrée enrichie par l'IA et liée à Wikipédia." },
+    { icon: IcPlanet,  action: 'Ouvrez une fiche planète',           desc: "Diamètre, distance, composition, lunes avec photos NASA, badge « Visible ce soir » et panel IA contextuel." },
+    { icon: IcRocket,  action: 'Lisez la Conquête spatiale',          desc: "Article complet en 10 chapitres. Dans les Annexes, touchez une date, un terme ou une mission pour ouvrir sa fiche Wikipédia avec photo et résumé." },
+    { icon: IcSpark,   action: 'Explorez anomalies et théories',      desc: "Matière noire, trous noirs, inflation… chaque entrée enrichie par l'IA et liée à Wikipédia." },
   ]},
   feed: { title: 'Veille', icon: IcBook, steps: [
     { icon: IcSky,     action: 'Photo du jour NASA',              desc: "La photo astronomique du jour (APOD) renouvelée chaque nuit — chargée en direct avec titre et description." },
