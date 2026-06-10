@@ -226,9 +226,12 @@ export default function AiPage({ onBack }) {
         </div>
       )}
 
-      <div ref={scrollRef} style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '16px 18px 8px' }}>
-        {msgs.map((m, i) => <AiBubble key={i} m={m} />)}
-      </div>
+      {msgs.length > 1 && (
+        <div ref={scrollRef} style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '16px 18px 8px' }}>
+          {msgs.map((m, i) => <AiBubble key={i} m={m} />)}
+        </div>
+      )}
+      {msgs.length <= 1 && <div ref={scrollRef} style={{ flex: 1 }} />}
 
       <div style={{ flexShrink: 0, padding: '10px 16px calc(22px + var(--sab))', borderTop: '1px solid var(--line)', background: 'rgba(6,9,18,.7)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 9, background: 'var(--surface-1)', border: '1px solid var(--line-2)', borderRadius: 999, padding: '5px 5px 5px 16px' }}>

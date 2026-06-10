@@ -226,9 +226,12 @@ export default function AssistantScreen() {
         </div>
       )}
 
-      <div ref={scrollRef} className="screen" style={{ flex: 1, padding: '16px 18px 8px' }}>
-        {msgs.map((m, i) => <Bubble key={i} m={m} />)}
-      </div>
+      {msgs.length > 1 && (
+        <div ref={scrollRef} className="screen" style={{ flex: 1, padding: '16px 18px 8px' }}>
+          {msgs.map((m, i) => <Bubble key={i} m={m} />)}
+        </div>
+      )}
+      {msgs.length <= 1 && <div ref={scrollRef} style={{ flex: 1 }} />}
 
       <div style={{ padding: '10px 16px calc(14px + var(--sab))', borderTop: '1px solid var(--line)',
         background: 'linear-gradient(180deg, rgba(8,12,24,0), rgba(8,12,24,.6))' }}>
