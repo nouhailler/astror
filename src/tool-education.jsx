@@ -411,61 +411,228 @@ const EDU_CONTENT = [
 // ─── Glossaire astronomique ──────────────────────────────────────────────────
 
 const GLOSSAIRE = [
-  { term: 'Albédo', def: 'Fraction de lumière réfléchie par une surface. La Lune a un albédo de ~12 %, Venus de ~65 %.' },
-  { term: 'Apogée', def: 'Point de l\'orbite lunaire (ou d\'un satellite) le plus éloigné de la Terre. Opposé : périgée.' },
-  { term: 'Ascension droite', def: 'Coordonnée céleste équivalente à la longitude, mesurée en heures (0 h à 24 h) vers l\'est.' },
-  { term: 'Astéroïde', def: 'Petit corps rocheux du système solaire, principalement dans la ceinture principale entre Mars et Jupiter.' },
-  { term: 'Bortle (échelle de)', def: 'Échelle de 1 à 9 mesurant la pollution lumineuse du ciel. Bortle 1 = ciel parfait, Bortle 9 = centre-ville.' },
-  { term: 'Céphéide', def: 'Étoile variable pulsante dont la période est liée à la luminosité. Sert d\'indicateur de distance cosmique.' },
-  { term: 'Chromosphère', def: 'Couche de l\'atmosphère solaire visible lors des éclipses totales, d\'une couleur rose-rouge caractéristique.' },
-  { term: 'Comète', def: 'Corps de glace et de poussière qui développe une chevelure (coma) et une queue en s\'approchant du Soleil.' },
-  { term: 'Conjonction', def: 'Alignement apparent de deux astres ou plus sur la même droite vue depuis la Terre.' },
-  { term: 'Coronagraphe', def: 'Instrument masquant le disque solaire pour observer la couronne ou les exoplanètes proches de leur étoile.' },
-  { term: 'Déclinaison', def: 'Coordonnée céleste équivalente à la latitude, mesurée en degrés (−90° à +90°) depuis l\'équateur céleste.' },
-  { term: 'Écliptique', def: 'Plan de l\'orbite terrestre autour du Soleil. Les planètes du système solaire sont toutes proches de ce plan.' },
-  { term: 'Elongation', def: 'Angle entre un astre et le Soleil vu depuis la Terre. Vénus atteint au maximum ~47° d\'élongation.' },
-  { term: 'Équinoxe', def: 'Moment de l\'année où le Soleil passe sur l\'équateur céleste. Durée nuit = durée jour. Deux par an.' },
-  { term: 'Exoplanète', def: 'Planète en orbite autour d\'une autre étoile que le Soleil. Plus de 5 500 confirmées en 2024.' },
-  { term: 'Fond diffus cosmologique', def: 'Rayonnement fossile à 2,7 K émis 380 000 ans après le Big Bang, preuve clé du modèle standard.' },
-  { term: 'Géocroiseur', def: 'Astéroïde dont l\'orbite croise celle de la Terre. Surveillés pour les risques d\'impact potentiel.' },
-  { term: 'Héliocentrisme', def: 'Modèle astronomique plaçant le Soleil au centre du système planétaire, défendu par Copernic dès 1543.' },
-  { term: 'Hubble (loi de)', def: 'Les galaxies s\'éloignent d\'autant plus vite qu\'elles sont lointaines : v = H₀ × d (H₀ ≈ 70 km/s/Mpc).' },
-  { term: 'Infrarouge', def: 'Rayonnement électromagnétique au-delà du rouge visible. JWST observe dans l\'infrarouge proche et moyen.' },
-  { term: 'Libration', def: 'Oscillation apparente de la Lune qui permet d\'observer légèrement plus de 50 % de sa surface au total.' },
-  { term: 'Luminosité absolue', def: 'Quantité d\'énergie réellement émise par un astre, indépendamment de sa distance. Mesurée en magnitude absolue.' },
-  { term: 'Magnitude', def: 'Échelle logarithmique de brillance. Plus la valeur est basse (ou négative), plus l\'astre est brillant.' },
-  { term: 'Méridien (passage au)', def: 'Moment où un astre atteint sa hauteur maximale dans le ciel, en traversant le méridien local. Idéal pour observer.' },
-  { term: 'Météorite', def: 'Fragment de météoroïde ayant survécu à la traversée atmosphérique et atteint le sol terrestre.' },
-  { term: 'Naine blanche', def: 'Résidu dense d\'une étoile de faible masse après sa mort. Taille de la Terre, masse solaire.' },
-  { term: 'Nébuleuse', def: 'Nuage de gaz et de poussière interstellaire. Peut être émission (HII), réflexion, absorption ou planétaire.' },
-  { term: 'Opposition', def: 'Configuration où une planète supérieure est à l\'opposé du Soleil vu de la Terre — idéale pour observer.' },
-  { term: 'Parallaxe', def: 'Décalage apparent d\'un objet proche selon le point d\'observation. Base de la mesure des distances stellaires.' },
-  { term: 'Parsec', def: 'Unité de distance : 3,26 années-lumière, soit 3,086 × 10¹³ km. La mesure de référence en astrophysique.' },
-  { term: 'Périgée', def: 'Point de l\'orbite lunaire (ou d\'un satellite) le plus proche de la Terre. Super Lune = pleine Lune au périgée.' },
-  { term: 'Planète naine', def: 'Corps suffisamment massif pour être sphérique, mais n\'ayant pas « nettoyé » son orbite. Ex : Pluton, Éris.' },
-  { term: 'Point de Lagrange', def: 'Position d\'équilibre gravitationnel dans un système à deux corps. JWST orbite autour du point L2 Soleil-Terre.' },
-  { term: 'Précession', def: 'Lent balancement de l\'axe de rotation terrestre, d\'une période de ~26 000 ans. Modifie l\'étoile polaire.' },
-  { term: 'Pulsar', def: 'Étoile à neutrons émettant des faisceaux radio périodiques. Horloge naturelle parmi les plus précises.' },
-  { term: 'Quasar', def: 'Noyau de galaxie actif extrêmement lumineux alimenté par un trou noir supermassif. Visible à des milliards d\'al.' },
-  { term: 'Rapport F (ouverture)', def: 'Rapport focal = focale / diamètre. Un f/5 est plus lumineux qu\'un f/10 : champ plus large, poses plus courtes.' },
-  { term: 'Seeing', def: 'Qualité de la stabilité atmosphérique. Un mauvais seeing brouille les images hautes résolutions.' },
-  { term: 'Solstice', def: 'Moment où le Soleil atteint sa déclinaison maximale (+23,5° en juin, −23,5° en décembre). Jours les plus longs/courts.' },
-  { term: 'Spectroscopie', def: 'Décomposition de la lumière en spectre. Révèle la composition chimique, la vitesse radiale et la température des astres.' },
-  { term: 'Supernova', def: 'Explosion cataclysmique de fin de vie d\'une étoile massive (type II) ou d\'une naine blanche en accrétion (type Ia).' },
-  { term: 'Transit', def: 'Passage d\'un astre devant un autre plus grand. Détection principale des exoplanètes par la méthode des transits.' },
-  { term: 'Trou noir', def: 'Région de l\'espace où la gravité est si intense que rien, pas même la lumière, ne peut s\'en échapper.' },
-  { term: 'Unité Astronomique (UA)', def: 'Distance moyenne Terre-Soleil : 149,6 millions de km. Référence pour les distances du système solaire.' },
-  { term: 'Vitesse de libération', def: 'Vitesse minimale pour échapper à l\'attraction d\'un corps. 11,2 km/s pour la Terre, 620 km/s pour le Soleil.' },
-  { term: 'Zenith', def: 'Point du ciel situé exactement à la verticale de l\'observateur. Distance zénithale = 90° − hauteur.' },
-  { term: 'Zodiaque', def: 'Bande du ciel le long de l\'écliptique divisée en 12 constellations. Les planètes y circulent toujours.' },
+  { term: 'Albédo', cat: 'Photométrie',
+    def: 'Fraction de lumière réfléchie par une surface. La Lune a un albédo de ~12 %, Vénus de ~65 %.',
+    detail: "L'albédo se mesure entre 0 (absorption totale) et 1 (réflexion parfaite). On distingue l'albédo de Bond A_B, qui intègre toutes les longueurs d'onde et toutes les directions, et l'albédo géométrique p, mesuré à opposition. La relation entre les deux fait intervenir la fonction de phase : A_B = p·q. La Lune a p ≈ 0,12 (très sombre), Vénus p ≈ 0,65 (nuages sulfuriques hautement réfléchissants), la Terre p ≈ 0,30. En planétologie, albédo + diamètre angulaire contraignent le diamètre réel d'un corps trop petit pour être résolu. Les comètes ont un albédo de seulement ~0,04 — parmi les objets les plus sombres du système solaire." },
+
+  { term: 'Apogée', cat: 'Mécanique céleste',
+    def: 'Point de l\'orbite lunaire (ou d\'un satellite) le plus éloigné de la Terre. Opposé : périgée.',
+    detail: "En mécanique orbitale, la distance à l'apogée vaut r_a = a(1+e), où a est le demi-grand axe et e l'excentricité. À l'apogée, la vitesse orbitale est minimale (conservation du moment cinétique : v_a × r_a = v_p × r_p). Pour la Lune, r_a ≈ 405 400 km contre r_p ≈ 362 600 km. La précession de la ligne des apsides (rotation lente de l'axe apogée-périgée) est un effet perturbatif dû à l'aplatissement terrestre et à l'attraction du Soleil — sa période est de ~8,85 ans pour la Lune. Pour les orbites solaires, les termes équivalents sont aphélie et périhélie." },
+
+  { term: 'Ascension droite', cat: 'Coordonnées célestes',
+    def: 'Coordonnée céleste équivalente à la longitude, mesurée en heures (0 h à 24 h) vers l\'est.',
+    detail: "L'ascension droite (α) se mesure depuis le point vernal γ (nœud ascendant de l'écliptique sur l'équateur céleste) vers l'est, en heures-minutes-secondes. 1h = 15° exactement. Ce point γ se déplace lentement à cause de la précession des équinoxes (~50,3 arcsec/an), ce qui oblige à préciser l'époque des coordonnées (J2000.0, J2050.0…). Une monture équatoriale suit le mouvement diurne en AR à vitesse sidérale de 15 arcsec/s. Combinée à la déclinaison, l'AR permet de pointer n'importe quel objet du ciel indépendamment de la latitude de l'observateur." },
+
+  { term: 'Astéroïde', cat: 'Corps du système solaire',
+    def: 'Petit corps rocheux du système solaire, principalement dans la ceinture principale entre Mars et Jupiter.',
+    detail: "La ceinture principale s'étend de 2,2 à 3,2 UA et contient plus d'un million d'objets de diamètre > 1 km. Sa masse totale est infime (~4 % de la Lune), ce qui exclut toute formation planétaire perturbée par Jupiter. Les astéroïdes sont classés par composition spectrale : type C (carbonés, sombres, ~75 %), type S (silicatés, brillants, ~17 %), type M (métalliques). La mission DART (2022) a démontré qu'un impact cinétique peut dévier l'orbite d'un petit corps (Dimorphos). Les familles d'astéroïdes (Hilda, Troyens…) sont piégées en résonances orbitales avec Jupiter." },
+
+  { term: 'Bortle (échelle de)', cat: 'Observation',
+    def: 'Échelle de 1 à 9 mesurant la pollution lumineuse du ciel. Bortle 1 = ciel parfait, Bortle 9 = centre-ville.',
+    detail: "Proposée par John Bortle en 2001, l'échelle quantifie la luminance du fond de ciel (en mag/arcsec²). Bortle 1 correspond à une luminance > 21,7 mag/arcsec² (Voie Lactée projetant des ombres), Bortle 9 à < 17,5 mag/arcsec² (seules quelques centaines d'étoiles visibles). La limite de magnitude à l'œil nu passe de ~7,6 à < 4. En France métropolitaine, moins de 1 % du territoire atteint Bortle ≤ 3. Pour l'astrophoto du ciel profond, les nébuleuses à émission (Hα) restent accessibles en Bortle 6-7 avec des filtres passe-bande étroits (3–7 nm)." },
+
+  { term: 'Céphéide', cat: 'Astrophysique stellaire',
+    def: 'Étoile variable pulsante dont la période est liée à la luminosité. Sert d\'indicateur de distance cosmique.',
+    detail: "Les Céphéides sont des supergéantes jaunes-blanches (F–K) qui pulsent en raison du mécanisme κ : l'hélium ionisé deux fois (He II) absorbe l'énergie, se dilate, puis se refroidit et se contracte périodiquement. La relation période-luminosité (découverte par Henrietta Leavitt en 1912) lie P à L : log L = a·log P + b. Les périodes vont de 1 à 70 jours pour des luminosités 1 000 à 30 000 L☉. Elles ont permis à Hubble de mesurer la distance d'Andromède (1924) et de prouver l'existence des galaxies extérieures. La tension de Hubble actuelle repose en partie sur les incertitudes dans l'étalonnage des Céphéides." },
+
+  { term: 'Chromosphère', cat: 'Physique solaire',
+    def: 'Couche de l\'atmosphère solaire visible lors des éclipses totales, d\'une couleur rose-rouge caractéristique.',
+    detail: "La chromosphère s'étend de 500 à ~2 000 km au-dessus de la photosphère, avec une température qui monte paradoxalement de ~4 400 K à ~25 000 K (problème du chauffage coronal). Sa couleur rouge-rose est due à la raie Hα à 656,3 nm de l'hydrogène atomique. Elle est structurée en spicules (jets de gaz de ~10 000 km de haut, durée de vie 5–15 min) et en filaments. La transition chromosphère-couronne s'effectue dans la région de transition, couche de 100 km à peine où la température bondit de 30 000 K à plus de 1 million de K. En astrophoto, les filtres Hα à bande étroite permettent d'imager la chromosphère solaire depuis le sol." },
+
+  { term: 'Comète', cat: 'Corps du système solaire',
+    def: 'Corps de glace et de poussière qui développe une chevelure (coma) et une queue en s\'approchant du Soleil.',
+    detail: "Le noyau cométaire (quelques km à quelques dizaines de km) est composé d'eau, CO₂, CO, poussières silicatées et matière organique. À l'approche du Soleil, la sublimation crée une coma gazeuse de ~100 000 km. Le vent solaire ionise une partie du gaz et forme la queue ionique (bleue, pointée à l'opposé du Soleil) ; la pression de radiation pousse les poussières dans la queue de poussière (blanche-jaune, courbée). Les comètes à courte période (< 200 ans) viennent de la ceinture de Kuiper ; les comètes à longue période du nuage d'Oort (~50 000 UA). La mission Rosetta (ESA, 2014-2016) a orbiré la comète 67P/Churyumov-Gerasimenko et détecté des acides aminés dans sa coma." },
+
+  { term: 'Conjonction', cat: 'Mécanique céleste',
+    def: 'Alignement apparent de deux astres ou plus sur la même droite vue depuis la Terre.',
+    detail: "En conjonction inférieure, une planète intérieure (Mercure, Vénus) se trouve entre la Terre et le Soleil ; en conjonction supérieure, elle est de l'autre côté du Soleil. Les conjonctions entre planètes extérieures et le Soleil rendent l'observation impossible. Une conjonction rapprochée de deux planètes (moins d'1°) est spectaculaire à l'œil nu. La grande conjonction Jupiter-Saturne de décembre 2020 (0,1° de séparation) était la plus proche depuis 1623. Les conjonctions de la Lune avec les planètes brillantes sont fréquentes (~mensuel) et idéales pour initier des débutants au repérage céleste." },
+
+  { term: 'Coronagraphe', cat: 'Instrumentation',
+    def: 'Instrument masquant le disque solaire pour observer la couronne ou les exoplanètes proches de leur étoile.',
+    detail: "Inventé par Bernard Lyot en 1930, le coronagraphe interne occulte le disque stellaire et bloque la lumière diffusée par optique de Lyot. Les coronagraphes externes (oculteur hors-axe) permettent des séparations angulaires plus grandes. Le contraste requis pour imager une exoplanète est de 10⁻⁹ à 10⁻¹⁰ pour une Terre-analogue, contre 10⁻⁵ pour un Jupiter chaud. JWST embarque le coronagraphe NIRCam (contraste ~10⁻⁵) et MIRI. Le futur télescope spatial Nancy Grace Roman visera 10⁻⁹ pour la chasse aux exoplanètes directement imagées. Les coronagraphes solaires (LASCO sur SOHO) permettent le suivi continu des éjections de masse coronale (CME)." },
+
+  { term: 'Déclinaison', cat: 'Coordonnées célestes',
+    def: 'Coordonnée céleste équivalente à la latitude, mesurée en degrés (−90° à +90°) depuis l\'équateur céleste.',
+    detail: "La déclinaison (δ) est la distance angulaire au nord (+) ou au sud (-) de l'équateur céleste. Un astre culmine à une hauteur h = 90° − |φ − δ| au méridien, avec φ la latitude de l'observateur. Les objets circumpolaires (visibles toute la nuit) satisfont |δ| > 90° − φ. Pour un observateur à Paris (φ = 48,9°), tout objet avec δ > 41,1° est circumpolaire. La déclinaison du Soleil varie entre +23,5° (solstice juin) et −23,5° (solstice décembre). La précession des équinoxes modifie la déclinaison des étoiles d'environ 20 arcsec/an, d'où l'importance d'utiliser des catalogues d'époque récente." },
+
+  { term: 'Écliptique', cat: 'Mécanique céleste',
+    def: 'Plan de l\'orbite terrestre autour du Soleil. Les planètes du système solaire sont toutes proches de ce plan.',
+    detail: "L'écliptique est incliné de 23,44° sur l'équateur céleste (obliquité de l'écliptique), responsable des saisons. Toutes les planètes du système solaire orbitent dans un plan proche de l'écliptique (Mercure : 7°, Vénus : 3,4°, Neptune : 1,8°), résidu du disque protoplanétaire originel. La latitude écliptique β et la longitude écliptique λ forment un système de coordonnées commode pour les éphémérides planétaires. L'obliquité varie lentement entre 22,1° et 24,5° sur un cycle de ~41 000 ans (cycles de Milanković), influençant les glaciations. Les nœuds lunaires (intersections de l'orbite de la Lune avec l'écliptique) contrôlent la survenue des éclipses." },
+
+  { term: 'Élongation', cat: 'Mécanique céleste',
+    def: 'Angle entre un astre et le Soleil vu depuis la Terre. Vénus atteint au maximum ~47° d\'élongation.',
+    detail: "L'élongation maximale (greatest elongation) se produit quand la ligne de visée est tangente à l'orbite de la planète inférieure. Pour Vénus, elle est de 45–47° selon la position de Vénus sur son orbite elliptique ; pour Mercure, de 18° à 28°. À grande élongation, la planète est visible plusieurs heures avant le coucher ou après le lever du Soleil. La configuration quadrature (élongation = 90°) concerne les planètes supérieures. Pour les comètes et astéroïdes, le suivi de l'élongation permet de planifier les fenêtres d'observation loin du fond de ciel solaire." },
+
+  { term: 'Équinoxe', cat: 'Mécanique céleste',
+    def: 'Moment de l\'année où le Soleil passe sur l\'équateur céleste. Durée nuit = durée jour. Deux par an.',
+    detail: "Aux équinoxes, la déclinaison du Soleil est nulle et le Soleil se lève exactement à l'est, se couche exactement à l'ouest, partout sur Terre. L'équinoxe vernal (point γ) est le zéro de l'ascension droite et de la longitude écliptique. La date des équinoxes varie de quelques jours à cause des années bissextiles et de la précession. L'équinoxe de mars tombe entre le 19 et le 21 mars. La légère asymétrie de durée du jour et de la nuit autour de l'équinoxe provient de la réfraction atmosphérique (~0,5°) et du fait que le Soleil n'est pas ponctuel (disque de 0,5°). Les équinoxes marquent aussi la transition de visibilité de nombreux objets du ciel profond entre hémisphères." },
+
+  { term: 'Exoplanète', cat: 'Exoplanètes',
+    def: 'Planète en orbite autour d\'une autre étoile que le Soleil. Plus de 5 500 confirmées en 2024.',
+    detail: "La première exoplanète confirmée autour d'une étoile de type solaire, 51 Peg b, a été découverte en 1995 par Mayor et Queloz (prix Nobel 2019) via la méthode des vitesses radiales. Les quatre méthodes principales sont : vitesses radiales (variation Doppler de l'étoile, ~20 % des détections), transits photométriques (Kepler/TESS, ~75 %), imagerie directe (<1 %), et microlentille gravitationnelle. Le satellite TESS a découvert plus de 7 000 candidats depuis 2018. JWST analyse les atmosphères par spectroscopie de transmission : CO₂ détecté sur WASP-39 b (2022). La zone habitable (liquid water zone) est définie par l'équilibre entre flux stellaire et albédo ; un facteur 2 en flux représente la différence Terre-Mars." },
+
+  { term: 'Fond diffus cosmologique', cat: 'Cosmologie',
+    def: 'Rayonnement fossile à 2,7 K émis 380 000 ans après le Big Bang, preuve clé du modèle standard.',
+    detail: "Le CMB (Cosmic Microwave Background) est un corps noir quasi parfait à T = 2,7255 K, découvert accidentellement par Penzias et Wilson (1965). Ses fluctuations de température (ΔT/T ≈ 10⁻⁵) reflètent les inhomogénéités primordiales qui ont donné naissance aux structures cosmiques. Planck (ESA, 2009-2013) a cartographié ces fluctuations à une résolution de 5 arcmin, contraignant les paramètres cosmologiques à 1 % de précision : Ω_m = 0,315, Ω_Λ = 0,685, H₀ = 67,4 km/s/Mpc. Les pics acoustiques du spectre de puissance (position du 1er pic à l = 220) prouvent la géométrie plate de l'univers. La polarisation du CMB (modes E et B) sonde l'inflation cosmique primordiale." },
+
+  { term: 'Géocroiseur', cat: 'Corps du système solaire',
+    def: 'Astéroïde dont l\'orbite croise celle de la Terre. Surveillés pour les risques d\'impact potentiel.',
+    detail: "Les NEAs (Near-Earth Asteroids) sont définis par un périhélie < 1,3 UA. Les géocroiseurs au sens strict (demi-grand axe > 1 UA, périhélie < 1,017 UA) sont les Apollon et Aten. La NASA et l'ESA maintiennent des programmes de surveillance (Spaceguard, Catalina Sky Survey) qui ont catalogué plus de 35 000 NEAs. L'énergie libérée par un impact est E = ½mv², proportionnelle à m et v² : un astéroïde de 140 m libère ~300 Mt TNT. Le système DART a dévié Dimorphos de 33 minutes sur sa période orbitale (2022), preuve de concept d'une défense planétaire cinétique. L'astéroïde Apophis (340 m) passera à 31 000 km de la Terre en 2029 — sans risque d'impact." },
+
+  { term: 'Héliocentrisme', cat: 'Histoire de l\'astronomie',
+    def: 'Modèle astronomique plaçant le Soleil au centre du système planétaire, défendu par Copernic dès 1543.',
+    detail: "Copernic publie son De revolutionibus orbium coelestium en 1543, proposant un Soleil central et des planètes en orbites circulaires. Ce modèle simplifie la description des rétrogradations planétaires (expliquées par la combinaison des mouvements terrestres et planétaires) mais ne prédit pas mieux que Ptolémée avec ses épicycles. Kepler (1609) abandonne les cercles au profit des ellipses et établit ses trois lois. Galilée (1610) apporte des preuves observationnelles : phases de Vénus, lunes de Jupiter. Newton (1687) donne le fondement dynamique avec sa loi de gravitation universelle. L'héliocentrisme strict est une approximation : le barycentre Soleil-Jupiter est légèrement en dehors du Soleil." },
+
+  { term: 'Hubble (loi de)', cat: 'Cosmologie',
+    def: 'Les galaxies s\'éloignent d\'autant plus vite qu\'elles sont lointaines : v = H₀ × d (H₀ ≈ 70 km/s/Mpc).',
+    detail: "Établie en 1929 par Hubble à partir des mesures de Céphéides, la loi v = H₀ × d est la preuve observationnelle de l'expansion de l'univers. H₀ est la constante de Hubble, actuellement objet d'une tension : Planck/CMB donne H₀ = 67,4 km/s/Mpc, les Céphéides+supernovas Ia donnent 73,0 km/s/Mpc (tension à 5σ). À z > 1 (décalage spectral), la loi linéaire cède la place à des corrections relativistes — la vitesse de récession peut dépasser c car c'est l'espace lui-même qui s'étend. La distance de Hubble c/H₀ ≈ 14,3 Gpc est l'ordre de grandeur de la taille de l'univers observable. Le paramètre de décélération q₀ = −Ω_Λ/2 + Ω_m/2 est négatif (q₀ ≈ −0,55) : l'expansion accélère." },
+
+  { term: 'Infrarouge', cat: 'Physique / Instrumentation',
+    def: 'Rayonnement électromagnétique au-delà du rouge visible. JWST observe dans l\'infrarouge proche et moyen.',
+    detail: "Le domaine infrarouge s'étend de 0,75 µm (fin du visible) à ~1 mm (début des micro-ondes). On le divise en proche (NIR : 0,75–2,5 µm), moyen (MIR : 2,5–25 µm) et lointain (FIR : 25–350 µm). L'atmosphère terrestre est transparente dans quelques fenêtres (bandes J, H, K, L, M à 1,25/1,65/2,2/3,5/5 µm) mais opaque dans le MIR, ce qui impose l'observation spatiale. JWST opère de 0,6 à 28 µm avec un miroir refroidi à 40 K (NIRCam/NIRSpec) et un détecteur MIRI à 7 K. L'IR permet de pénétrer les nuages de poussière interstellaire (τ_IR ≪ τ_visible), d'observer les proto-étoiles, et de détecter le rayonnement décalé vers le rouge des galaxies primordiales (z > 10)." },
+
+  { term: 'Libration', cat: 'Mécanique céleste',
+    def: 'Oscillation apparente de la Lune qui permet d\'observer légèrement plus de 50 % de sa surface au total.',
+    detail: "La Lune présente toujours la même face à cause du verrouillage de marée (rotation synchrone), mais trois types de librations permettent d'observer ~59 % de la surface totale. La libration en longitude (±7,9°) résulte de l'excentricité de l'orbite : la rotation uniforme de la Lune est légèrement décalée par rapport à son mouvement orbital non-uniforme (2ᵉ loi de Kepler). La libration en latitude (±6,7°) vient de l'inclinaison de l'équateur lunaire sur l'écliptique. La libration diurne (±1°) est un effet de parallaxe lié à la rotation terrestre. Ces oscillations sont prévisibles à la seconde près et permettent de planifier les observations des régions limbaires." },
+
+  { term: 'Luminosité absolue', cat: 'Astrophysique stellaire',
+    def: 'Quantité d\'énergie réellement émise par un astre, indépendamment de sa distance. Mesurée en magnitude absolue.',
+    detail: "La luminosité absolue L est la puissance totale rayonnée, exprimée en watts ou en L☉ (L☉ = 3,828 × 10²⁶ W). La magnitude absolue M est définie comme la magnitude apparente qu'aurait l'objet à 10 pc : M = m − 5 log(d/10 pc). La relation L/L☉ = 10^(0,4(M☉−M)) relie les deux. Pour les étoiles de la séquence principale, la relation masse-luminosité vaut L ∝ M^3,5–4. La bolométrie corrige la luminosité de toutes les longueurs d'onde ; la correction bolométrique BC varie de ~0 (étoiles G) à −5 (étoiles O très chaudes). Les modules de distance (m − M) permettent de remonter aux distances dans le cas de chandelles standard (supernovas Ia, Céphéides)." },
+
+  { term: 'Magnitude', cat: 'Photométrie',
+    def: 'Échelle logarithmique de brillance. Plus la valeur est basse (ou négative), plus l\'astre est brillant.',
+    detail: "L'échelle de magnitude est héritée d'Hipparque (~150 av. J.-C.). Pogson (1856) la formalise : une différence de 5 magnitudes correspond exactement à un rapport de flux 100. Donc 1 magnitude = facteur 10^0,4 ≈ 2,512. La magnitude limite à l'œil nu est ~6–6,5 ; des jumelles 10×50 atteignent ~9,5 ; un télescope de 200 mm ~13,5 ; HST ~31,5. La magnitude du Soleil est −26,7, de Sirius −1,46, de Pluton +14,2. La magnitude de surface (mag/arcsec²) quantifie la brillance des objets étendus (nébuleuses, galaxies). Le filtre photométrique doit être précisé : magnitudes B, V, R, I, J, H, K selon la bande spectrale." },
+
+  { term: 'Méridien (passage au)', cat: 'Observation',
+    def: 'Moment où un astre atteint sa hauteur maximale dans le ciel, en traversant le méridien local. Idéal pour observer.',
+    detail: "Le méridien céleste est le grand cercle passant par le zénith, le nadir et les pôles célestes. Au passage au méridien, un astre culmine à une hauteur h_max = 90° − |φ − δ| (pour δ < φ + 90°). C'est le moment où la masse d'air (airmass = 1/cos(z) avec z l'angle zénithal) est minimale, donc l'absorption atmosphérique et la turbulence sont au minimum. En astrophoto planétaire ou haute résolution, on cible systématiquement la fenêtre ±30 min autour du méridien. Les observatoires professionnels ont souvent un 'flip de méridien' sur les montures équatoriales à fourche, nécessitant un basculement de la configuration à ce moment." },
+
+  { term: 'Météorite', cat: 'Corps du système solaire',
+    def: 'Fragment de météoroïde ayant survécu à la traversée atmosphérique et atteint le sol terrestre.',
+    detail: "Les météorites se classent en trois familles : chondrites (~86 %), représentatives de la composition primitive du système solaire ; achondrites (~8 %), fragments d'astéroïdes différenciés ; et météorites de fer (~5 %), noyaux métalliques d'anciens planétésimaux. Les chondrites contiennent des chondres (sphérules de silicates fondus) et des inclusions CAI (calcium-aluminium) âgées de 4,567 milliards d'années — les plus vieux solides du système solaire. 99 % des météorites antarctiques sont des chondrites ordinaires ; parmi les exceptions rares : 260 météorites martiennes (SNC) identifiées et ~400 météorites lunaires. L'énergie de pénétration atmosphérique crée le phénomène de boule de feu (fireball) et l'onde de choc — l'événement de Tcheliabinsk (2013, ~20 m) a libéré ~500 kt." },
+
+  { term: 'Naine blanche', cat: 'Astrophysique stellaire',
+    def: 'Résidu dense d\'une étoile de faible masse après sa mort. Taille de la Terre, masse solaire.',
+    detail: "Une naine blanche est soutenue par la pression de dégénérescence des électrons, non par la fusion nucléaire. Sa densité est ~10⁶ g/cm³ (une cuillère à café pèse ~1 tonne). La masse maximale est la limite de Chandrasekhar : M_Ch = 1,44 M☉ — au-delà, la pression électronique ne peut résister à la gravité. La composition est principalement CO (carbone-oxygène) issu de la fusion de l'He. La naine blanche refroidit lentement sur des milliards d'années vers une naine noire hypothétique. En binaire serrée, l'accrétion de matière d'une compagne peut porter la masse à M_Ch et déclencher une supernova de type Ia (standard candle cosmologique). Sirius B est la naine blanche la plus proche (8,6 al)." },
+
+  { term: 'Nébuleuse', cat: 'Milieu interstellaire',
+    def: 'Nuage de gaz et de poussière interstellaire. Peut être émission (HII), réflexion, absorption ou planétaire.',
+    detail: "Les nébuleuses HII (régions ionisées par des étoiles OB voisines) émettent principalement en Hα (rouge), OIII (vert-bleu) et SII (rouge profond). Les nébuleuses de réflexion diffusent la lumière d'une étoile proche sans l'ioniser (souvent bleues car la diffusion de Rayleigh favorise le bleu). Les nébuleuses obscures (Barnard 68, piliers de la Création) sont des nuages denses opaques visibles en absorption. Les nébuleuses planétaires sont des enveloppes éjectées par des étoiles de type solaire mourantes (M57, M27) — leur nom est trompeur, sans rapport avec les planètes. L'Hα filtre le continuum et rend accessible la photographie depuis des sites pollués." },
+
+  { term: 'Opposition', cat: 'Mécanique céleste',
+    def: 'Configuration où une planète supérieure est à l\'opposé du Soleil vu de la Terre — idéale pour observer.',
+    detail: "À l'opposition, une planète extérieure est à son point le plus proche de la Terre (distance minimale) et visible toute la nuit (se lève au coucher du Soleil, culmine à minuit, se couche à l'aube). L'opposition périhélique, quand la planète est proche de son périhélie au moment de l'opposition, offre les meilleures conditions : Mars est à 55,7 millions de km lors d'une opposition périhélique (2003 : 55,76 Mkm, record historique récent) contre 101 Mkm lors d'une opposition aphélique. La fréquence des oppositions dépend de la période synodique : Mars s'oppose tous les ~26 mois, Jupiter tous les ~13 mois, Saturne tous les ~12,5 mois. L'opposition magnétique (surge d'opposition) est un bref éclat de brillance à opposé exact dû à l'opposition de rétrodiffusion de la lumière." },
+
+  { term: 'Parallaxe', cat: 'Astrométrie',
+    def: 'Décalage apparent d\'un objet proche selon le point d\'observation. Base de la mesure des distances stellaires.',
+    detail: "La parallaxe trigonométrique stellaire p est l'angle sous lequel on voit le demi-grand axe de l'orbite terrestre (1 UA) depuis l'étoile. La distance d = 1/p [parsecs] si p est en arcsec. Hipparcos (ESA, 1989-1993) a mesuré ~120 000 étoiles jusqu'à ~300 pc avec une précision de 1 mas. Gaia (ESA, 2013-) mesure plus d'un milliard d'étoiles jusqu'à ~10 kpc avec une précision de 10–25 µas, révolutionnant la cartographie de la Voie Lactée. La parallaxe est à la base de l'échelle de distances cosmiques : elle calibre les Céphéides, qui calibrent les supernovas Ia, qui calibrent H₀. Au-delà de ~5 kpc, les erreurs statistiques de Gaia deviennent comparables à la parallaxe elle-même." },
+
+  { term: 'Parsec', cat: 'Astrométrie',
+    def: 'Unité de distance : 3,26 années-lumière, soit 3,086 × 10¹³ km. La mesure de référence en astrophysique.',
+    detail: "Un parsec est défini comme la distance à laquelle 1 UA sous-tend un angle de 1 arcseconde (parallaxe annuelle). Mathématiquement : 1 pc = 1 UA / tan(1\") ≈ 1 UA / 1\" = 206 265 UA = 3,0857 × 10¹³ km = 3,2616 al. L'étoile la plus proche (Proxima Centauri) est à 1,295 pc. Le centre galactique est à ~8,2 kpc (kiloparsecs). La Voie Lactée a un diamètre de ~30 kpc. Les groupes et amas de galaxies se mesurent en Mpc (mégaparsecs) : Andromède est à 0,765 Mpc. L'univers observable (~14,2 Gpc) s'exprime en gigaparsecs." },
+
+  { term: 'Périgée', cat: 'Mécanique céleste',
+    def: 'Point de l\'orbite lunaire (ou d\'un satellite) le plus proche de la Terre. Super Lune = pleine Lune au périgée.',
+    detail: "La distance périgée vaut r_p = a(1−e). Pour la Lune, r_p ≈ 362 600 km. À ce point, la vitesse orbitale est maximale. La « Super Lune » est une pleine Lune ou nouvelle Lune coïncidant avec un périgée à moins de 90 % du périgée minimum annuel : elle apparaît ~14 % plus grande et ~30 % plus lumineuse qu'à l'apogée. Le terme n'est pas officiel en astronomie. Pour les satellites artificiels en LEO (Low Earth Orbit), le périgée détermine la durée de vie : sous ~200 km, le freinage atmosphérique résiduel cause une rentrée rapide. L'injection en orbite de transfert de Hohmann s'effectue en deux impulsions : l'une au périgée initial, l'autre à l'apogée cible." },
+
+  { term: 'Planète naine', cat: 'Corps du système solaire',
+    def: 'Corps suffisamment massif pour être sphérique, mais n\'ayant pas « nettoyé » son orbite. Ex : Pluton, Éris.',
+    detail: "La définition de l'UAI (2006) exige trois critères pour une planète : orbiter le Soleil, avoir une forme quasi sphérique (hydrostatique), et avoir « nettoyé » son voisinage orbital. Pluton échoue au 3ᵉ critère (paramètre Λ ≈ 0,077 ; la Terre a Λ ≈ 2,1 × 10⁵). Les cinq planètes naines reconnues sont Pluton, Éris, Makémaké, Hauméa et Cérès. Éris (2326 km) est légèrement plus petite que Pluton (2377 km) mais plus massive (1,27 M_Pluton) en raison d'une densité plus élevée. Des centaines d'objets trans-neptuniens (TNOs) pourraient remplir les critères d'une planète naine — les estimations vont de 50 à plusieurs centaines d'objets non encore découverts." },
+
+  { term: 'Point de Lagrange', cat: 'Mécanique céleste',
+    def: 'Position d\'équilibre gravitationnel dans un système à deux corps. JWST orbite autour du point L2 Soleil-Terre.',
+    detail: "Les cinq points de Lagrange L1–L5 sont les solutions d'équilibre du problème restreint à trois corps (Euler/Lagrange, 1772). L1 et L2 sont sur la ligne Soleil-Terre à ~1,5 million de km (rayon de la sphère de Hill ≈ (M_Terre/3M_Soleil)^(1/3) × 1 UA). L3 est sur la même ligne mais de l'autre côté du Soleil. L1 et L2 sont instables (durée de vie sans correction d'orbite ~23 jours) ; JWST et SOHO nécessitent des manœuvres régulières. L4 et L5, précédant et suivant la planète à 60° sur l'orbite, sont stables si M_primaire/M_secondaire > 24,96 : Jupiter y accumule ses troyens (~7 000 astéroïdes connus). La mission LISA (gravitationnel) orbitera autour de L4/L5 Terre-Soleil." },
+
+  { term: 'Précession', cat: 'Mécanique céleste',
+    def: 'Lent balancement de l\'axe de rotation terrestre, d\'une période de ~26 000 ans. Modifie l\'étoile polaire.',
+    detail: "La précession des équinoxes est causée par le couple gravitationnel exercé par le Soleil et la Lune sur le renflement équatorial terrestre (aplatissement f = 1/298). La vitesse de précession est ~50,3 arcsec/an, pour une période complète de ~25 772 ans. Dans ~12 000 ans, l'étoile polaire sera Véga (α Lyrae). La précession est combinée à la nutation (oscillation de l'axe de ~9 arcsec et période 18,6 ans liée aux nœuds lunaires). La précession du périhélie de Mercure (~43 arcsec/siècle inexpliqués par la mécanique newtonienne) a été le premier test de la relativité générale d'Einstein (1915)." },
+
+  { term: 'Pulsar', cat: 'Astrophysique stellaire',
+    def: 'Étoile à neutrons émettant des faisceaux radio périodiques. Horloge naturelle parmi les plus précises.',
+    detail: "Un pulsar est une étoile à neutrons (rayon ~10 km, masse ~1,4 M☉, densité ~10¹⁴ g/cm³) dont le champ magnétique intense (10⁸–10¹² T) canalise le rayonnement en deux faisceaux. La rotation rapide (milliseconde à quelques secondes) balaye le ciel comme un phare. Le premier pulsar (CP 1919) fut découvert par Jocelyn Bell en 1967. Les pulsars milliseconde (MSP, période ~1–10 ms) sont les horloges naturelles les plus stables : une précision de 10⁻¹⁵ en fréquence relative, comparable aux meilleures horloges atomiques. Le pulsar PSR B1913+16 (Hulse-Taylor) a fourni la première preuve indirecte des ondes gravitationnelles via la décroissance de son orbite binaire (prix Nobel 1993). PTA (Pulsar Timing Arrays) détecte les ondes gravitationnelles nanohertz." },
+
+  { term: 'Quasar', cat: 'Cosmologie',
+    def: 'Noyau de galaxie actif extrêmement lumineux alimenté par un trou noir supermassif. Visible à des milliards d\'al.',
+    detail: "Les quasars (QSO, quasi-stellar objects) sont des noyaux actifs de galaxies (AGN) alimentés par l'accrétion sur un trou noir de 10⁶ à 10¹⁰ M☉. L'efficacité de conversion masse-énergie de l'accrétion (~10 %) dépasse de loin la fusion nucléaire (~0,7 %). Le quasar 3C 273 (z = 0,158, découvert en 1963) est à 2,4 Gal et est visible aux jumelles (m_V = 12,8). Le quasar le plus lumineux connu, J0529-4351 (WISE+Gaia), dégage ~2 × 10¹⁴ L☉. À grand décalage spectral (z > 6), les quasars sondent l'époque de réionisation. Le spectre d'un quasar présente des raies d'émission larges (1 000–10 000 km/s de largeur) et la forêt Lyman-α dans l'UV." },
+
+  { term: 'Rapport F (ouverture)', cat: 'Optique / Instruments',
+    def: 'Rapport focal = focale / diamètre. Un f/5 est plus lumineux qu\'un f/10 : champ plus large, poses plus courtes.',
+    detail: "Le rapport F/D (ou f/number) détermine la luminosité intrinsèque d'un instrument : l'éclairement sur le capteur ∝ (D/f)² = 1/(F/D)². Un f/5 est donc 4 fois plus lumineux qu'un f/10 à même diamètre. La profondeur de champ augmente avec F/D. Pour l'astrophoto du ciel profond, un f/4–f/7 est idéal ; pour la photographie planétaire (fort grossissement), on utilise souvent f/20–f/40 en projection oculaire. La taille du champ sur le capteur est θ = 2 arctan(d/2f) avec d la taille du capteur. La résolution angulaire (limite de diffraction) ne dépend que du diamètre D : θ_min = 1,22 λ/D (critère de Rayleigh)." },
+
+  { term: 'Seeing', cat: 'Observation',
+    def: 'Qualité de la stabilité atmosphérique. Un mauvais seeing brouille les images hautes résolutions.',
+    detail: "Le seeing astronomique est causé par les turbulences atmosphériques (cellules de Kolmogorov) qui dévient les fronts d'onde lumineux. Il se quantifie par le paramètre de Fried r₀ : un bon seeing correspond à r₀ > 15 cm (FWHM étoile ≈ 0,5 arcsec), un mauvais à r₀ < 5 cm (FWHM > 2 arcsec). La FWHM d'une étoile non résolue = 0,98 λ/r₀. Les meilleurs sites mondiaux (Mauna Kea, VLT Paranal) ont un seeing médian de 0,6–0,7 arcsec. L'optique adaptative (AO) mesure et corrige les déformations en temps réel grâce à un miroir déformable (centaines d'actionneurs à ~1 kHz), atteignant la limite de diffraction du télescope (~0,05 arcsec pour un 8 m). Le seeing thermique local (heated ground, dôme) s'ajoute au seeing atmosphérique et peut dominer sur les petits télescopes." },
+
+  { term: 'Solstice', cat: 'Mécanique céleste',
+    def: 'Moment où le Soleil atteint sa déclinaison maximale (+23,5° en juin, −23,5° en décembre). Jours les plus longs/courts.',
+    detail: "Aux solstices, l'axe de rotation terrestre est maximalemment incliné vers ou loin du Soleil (23,44°). Le Soleil se lève et se couche à ses positions les plus extrêmes (nord-est/nord-ouest en été, sud-est/sud-ouest en hiver pour l'hémisphère nord). La durée du jour au solstice d'été à Paris (~48,9° N) est d'environ 16h12, contre ~8h10 au solstice d'hiver. L'obliquité de 23,44° varie entre 22,1° et 24,5° sur ~41 000 ans (cycle de Milanković), influençant les glaciations. Au pôle, le Soleil ne se couche pas pendant 6 mois (nuit polaire / jour polaire). Stonehenge et d'autres monuments mégalithiques sont alignés sur le lever du Soleil au solstice d'été." },
+
+  { term: 'Spectroscopie', cat: 'Astrophysique stellaire',
+    def: 'Décomposition de la lumière en spectre. Révèle la composition chimique, la vitesse radiale et la température des astres.',
+    detail: "Un spectrographe disperse la lumière via un prisme ou un réseau de diffraction (R = λ/Δλ = résolution spectrale). Les raies d'absorption (spectre de Fraunhofer) apparaissent quand l'atmosphère stellaire absorbe des longueurs d'onde précises (loi de Kirchhoff). La température stellaire détermine le type spectral (OBAFGKM) via la loi de Wien : λ_max = 2898 µm·K / T. L'effet Doppler décale les raies : Δλ/λ = v_r/c (z = v/c pour les vitesses non relativistes). Les spectrographes à haute résolution (HARPS, ESPRESSO, R ≈ 10⁵–10⁶) mesurent des vitesses radiales de ~0,3 m/s, permettant la détection d'exoplanètes. La spectroscopie de transit avec JWST analyse l'atmosphère des exoplanètes en transmettance : une différence de profondeur de transit en fonction de λ révèle la composition." },
+
+  { term: 'Supernova', cat: 'Astrophysique stellaire',
+    def: 'Explosion cataclysmique de fin de vie d\'une étoile massive (type II) ou d\'une naine blanche en accrétion (type Ia).',
+    detail: "Une SN de type II (effondrement gravitationnel) se produit quand le cœur d'une étoile massive (> 8 M☉) forme un noyau de fer (pas de fusion exothermique possible) et s'effondre en étoile à neutrons ou trou noir : l'onde de choc éjecte l'enveloppe à ~10 000 km/s. L'énergie libérée est ~3 × 10⁴⁶ J, dont 99 % en neutrinos. SN 1987A dans le Grand Nuage de Magellan est la plus proche observée depuis 400 ans (détection de 25 neutrinos sur Terre). Une SN de type Ia (naine blanche dépassant M_Chandrasekhar) est standardisable en luminosité après correction Phillips et sert de bougie standard cosmologique. Les SNe enrichissent le milieu interstellaire en éléments lourds (Fe, Ni, Si…) forgés dans les couches stellaires ; sans elles, pas de planètes rocheuses ni de vie." },
+
+  { term: 'Transit', cat: 'Exoplanètes',
+    def: 'Passage d\'un astre devant un autre plus grand. Détection principale des exoplanètes par la méthode des transits.',
+    detail: "Un transit planétaire produit une diminution de la luminosité de l'étoile hôte de δ = (R_p/R_*)² : un Jupiter-chaud (R_p ≈ 1,1 R_Jup) devant une étoile solaire cause une baisse de ~1 %, une Terre-analogue de ~0,008 %. La période orbitale est directement la période entre transits (loi de Kepler : T² ∝ a³). Kepler/K2 a détecté ~4 000 exoplanètes par cette méthode. La transmission spectroscopy (JWST) analyse les variations de profondeur en fonction de λ pendant le transit pour sonder l'atmosphère. La probabilité géométrique d'un transit est P ≈ R_*/a (~0,5 % pour une Terre-analogue), d'où la nécessité de monitorer des millions d'étoiles. Les transits de Mercure et Vénus devant le Soleil sont visibles depuis la Terre avec un filtre solaire." },
+
+  { term: 'Trou noir', cat: 'Astrophysique stellaire',
+    def: 'Région de l\'espace où la gravité est si intense que rien, pas même la lumière, ne peut s\'en échapper.',
+    detail: "Le rayon de Schwarzschild r_s = 2GM/c² définit l'horizon des événements : r_s = 3 km × (M/M☉). Un trou noir stellaire (5–100 M☉) naît de l'effondrement d'une étoile massive. Les trous noirs supermassifs (10⁶–10¹⁰ M☉) siègent au cœur de presque toutes les galaxies : Sgr A* (Voie Lactée, 4 × 10⁶ M☉) et M87* (6,5 × 10⁹ M☉, imagé en 2019 par l'Event Horizon Telescope en VLBI). Le rayonnement de Hawking (T_H = ℏc³/8πGMk_B) est infime pour les trous noirs stellaires (T_H ~ 10⁻⁸ K pour 1 M☉). LIGO/Virgo/KAGRA détecte les ondes gravitationnelles des fusions de trous noirs binaires depuis 2015. La singularité centrale (densité infinie) indique une rupture de la physique classique, requérant une théorie quantique de la gravitation." },
+
+  { term: 'Unité Astronomique (UA)', cat: 'Astrométrie',
+    def: 'Distance moyenne Terre-Soleil : 149,6 millions de km. Référence pour les distances du système solaire.',
+    detail: "L'UA est définie depuis 2012 comme exactement 149 597 870 700 m (anciennement définie par la constante gravitationnelle du Soleil GM☉). La mesure précise a été obtenue par radar sur Vénus et Mars dans les années 1960 (Shapiro). Les distances planétaires s'expriment naturellement en UA : Mercure 0,39 UA, Vénus 0,72, Mars 1,52, Jupiter 5,2, Neptune 30 UA. La ceinture de Kuiper s'étend de 30 à ~50 UA, le nuage d'Oort de ~2 000 à ~100 000 UA. Le signal radio met 8 min 20 s pour parcourir 1 UA. Voyager 1 se trouve actuellement à ~165 UA du Soleil. En astrophysique des exoplanètes, la zone habitable se situe typiquement entre 0,8 et 1,7 UA pour une étoile de type solaire." },
+
+  { term: 'Vitesse de libération', cat: 'Mécanique céleste',
+    def: 'Vitesse minimale pour échapper à l\'attraction d\'un corps. 11,2 km/s pour la Terre, 620 km/s pour le Soleil.',
+    detail: "La vitesse de libération v_esc = √(2GM/r) est dérivée de la conservation de l'énergie mécanique (E_c + E_p = 0). Elle est indépendante de la direction et de la masse du projectile. Pour la Terre : v_esc = 11,2 km/s ; pour Mars : 5,0 km/s (d'où son atmosphère peu retenue) ; pour Jupiter : 59,5 km/s ; pour le Soleil en surface : 617 km/s ; pour une naine blanche : ~5 000 km/s ; pour une étoile à neutrons : ~100 000 km/s (c/3). L'horizon des événements d'un trou noir est précisément défini par v_esc = c (r_s = 2GM/c²). La vitesse de libération galactique depuis le voisinage solaire est ~550 km/s — les étoiles hyperrapides (hypervelocity stars) éjectées du centre galactique peuvent la dépasser." },
+
+  { term: 'Zénith', cat: 'Coordonnées célestes',
+    def: 'Point du ciel situé exactement à la verticale de l\'observateur. Distance zénithale = 90° − hauteur.',
+    detail: "Le zénith est défini par la direction opposée au vecteur gravité local, donc influencé par l'aplatissement terrestre et les anomalies gravimétriques locales. La distance zénithale z = 90° − h (avec h la hauteur de l'astre) détermine la masse d'air traversée : X = sec(z) = 1/cos(z) pour un modèle d'atmosphère plane. À z = 60°, X = 2 (doublement de l'absorption). L'observation zénithale minimise l'absorption, la réfraction atmosphérique (nulle au zénith) et la turbulence. Le nadir est le point antipodal du zénith. La distance zénithale du pôle céleste est égale à 90° moins la latitude : à Paris (φ = 48,9° N), le pôle est à 48,9° de hauteur, soit 41,1° de distance zénithale." },
+
+  { term: 'Zodiaque', cat: 'Mécanique céleste',
+    def: 'Bande du ciel le long de l\'écliptique divisée en 12 constellations. Les planètes y circulent toujours.',
+    detail: "Le zodiaque est une bande de ±8–9° de latitude écliptique, correspondant aux orbites des planètes connues de l'Antiquité (jusqu'à Saturne) et de la Lune. Les 12 constellations zodiacales (définie par l'IAU en 1930) occupent des portions inégales de l'écliptique : Vierge couvre ~45°, Scorpion seulement ~7°. L'ophiuchus est traversé par l'écliptique mais n'est pas une constellation du zodiaque au sens traditionnel. La précession des équinoxes a décalé de ~1 signe le Soleil printanier depuis l'Antiquité : le signe astrologique du Bélier correspond désormais astronomiquement aux Poissons. Les planètes du système solaire ne s'éloignent jamais de plus de quelques degrés de l'écliptique, ce qui rend le zodiaque indispensable au repérage planétaire." },
 ].sort((a, b) => a.term.localeCompare(b.term, 'fr'))
 
 function GlossaireView() {
-  const [q, setQ] = useState('')
+  const [q, setQ]               = useState('')
+  const [selected, setSelected] = useState(null)
+  const [aiAnswer, setAiAnswer] = useState(null)
+  const [aiLoading, setAiLoading] = useState(false)
+
   const filtered = useMemo(() => {
     const s = q.trim().toLowerCase()
     return s ? GLOSSAIRE.filter(g => g.term.toLowerCase().includes(s) || g.def.toLowerCase().includes(s)) : GLOSSAIRE
   }, [q])
+
+  function openTerm(g) { setSelected(g); setAiAnswer(null); setAiLoading(false) }
+
+  async function askAIGlossaire(term, def, detail) {
+    setAiLoading(true)
+    setAiAnswer(null)
+    try {
+      const messages = [
+        { role: 'user', content: 'Tu es un expert en astronomie et astrophysique. Réponds toujours en français, de façon très approfondie et pédagogique (8 à 10 phrases). Inclus des formules, des ordres de grandeur, des exemples concrets et les liens avec d\'autres concepts clés.' },
+        { role: 'assistant', content: 'Compris, je réponds en expert avec formules et ordres de grandeur.' },
+        { role: 'user', content: `Donne-moi une explication exhaustive du concept astronomique suivant.\n\nTerme : ${term}\nDéfinition courte : ${def}\nDétails connus : ${detail}\n\nApprofondis encore davantage : curiosités, histoire de la découverte, applications actuelles, et questions encore ouvertes sur ce sujet.` },
+      ]
+      const reply = await callAI(messages)
+      setAiAnswer((reply || '').trim() || '…')
+    } catch (e) {
+      setAiAnswer(e.message === 'no-key'
+        ? "Configurez une clé API dans les Paramètres pour activer les réponses IA."
+        : "Erreur de connexion. Vérifiez votre clé API dans les Paramètres.")
+    } finally {
+      setAiLoading(false)
+    }
+  }
+
   return (
     <div className="enter pad" style={{ paddingTop: 14 }}>
       <div style={{ position: 'relative', marginBottom: 14 }}>
@@ -482,23 +649,100 @@ function GlossaireView() {
           <circle cx="8.5" cy="8.5" r="5.5" /><line x1="13.5" y1="13.5" x2="17.5" y2="17.5" />
         </svg>
       </div>
+
       {filtered.length === 0 && (
         <div className="meta" style={{ textAlign: 'center', padding: '32px 0', color: 'var(--faint)' }}>
           Aucun terme trouvé
         </div>
       )}
+
       <div style={{ display: 'flex', flexDirection: 'column', gap: 9 }}>
         {filtered.map(g => (
-          <div key={g.term} style={{ padding: '13px 15px', borderRadius: 13,
-            background: 'var(--surface-1)', border: '1px solid var(--line)' }}>
-            <div className="h-card" style={{ fontSize: 14.5, marginBottom: 5 }}>{g.term}</div>
-            <div className="body" style={{ fontSize: 13, lineHeight: 1.5, color: 'var(--text-2)' }}>{g.def}</div>
-          </div>
+          <button key={g.term} onClick={() => openTerm(g)} className="press"
+            style={{ textAlign: 'left', padding: '13px 15px', borderRadius: 13, cursor: 'pointer',
+              background: 'var(--surface-1)', border: '1px solid var(--line)',
+              display: 'flex', alignItems: 'flex-start', gap: 10 }}>
+            <span style={{ flex: 1, minWidth: 0 }}>
+              <span className="h-card" style={{ fontSize: 14.5, display: 'block', marginBottom: 4 }}>{g.term}</span>
+              <span className="body" style={{ fontSize: 12.5, lineHeight: 1.5, color: 'var(--text-2)' }}>{g.def}</span>
+            </span>
+            <span style={{ fontSize: 9.5, padding: '2px 7px', borderRadius: 99, flexShrink: 0, marginTop: 2,
+              background: 'var(--surface-2)', border: '1px solid var(--line)',
+              color: 'var(--faint)', fontFamily: 'var(--mono)', whiteSpace: 'nowrap' }}>{g.cat}</span>
+          </button>
         ))}
       </div>
+
       <div className="meta" style={{ textAlign: 'center', marginTop: 18, color: 'var(--faint)' }}>
         {filtered.length} terme{filtered.length > 1 ? 's' : ''}
       </div>
+
+      {/* ── Sheet détail + IA ── */}
+      <Sheet open={!!selected} onClose={() => setSelected(null)}>
+        {selected && (
+          <div>
+            <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 99, fontFamily: 'var(--mono)',
+              background: 'var(--surface-2)', border: '1px solid var(--line)',
+              color: 'var(--faint)', letterSpacing: '.06em' }}>{selected.cat}</span>
+
+            <div className="h-sec" style={{ fontSize: 26, marginTop: 12, marginBottom: 10, lineHeight: 1.15 }}>
+              {selected.term}
+            </div>
+
+            <p className="body serif-body" style={{ fontSize: 14, lineHeight: 1.6, color: 'var(--dim)',
+              fontStyle: 'italic', marginBottom: 20, paddingBottom: 18, borderBottom: '1px solid var(--line)' }}>
+              {selected.def}
+            </p>
+
+            <p className="body serif-body" style={{ fontSize: 14.5, lineHeight: 1.7, marginBottom: 0 }}>
+              {selected.detail}
+            </p>
+
+            {/* ── Bouton IA ── */}
+            <div style={{ marginTop: 28, paddingTop: 22, borderTop: '1px solid var(--line)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
+                <span style={{ width: 26, height: 26, borderRadius: '50%', flexShrink: 0, display: 'flex',
+                  alignItems: 'center', justifyContent: 'center', color: '#1a130a',
+                  background: 'linear-gradient(180deg,var(--gold-2),var(--gold))' }}>
+                  <IcSpark size={14} />
+                </span>
+                <span className="eyebrow">Aller encore plus loin</span>
+              </div>
+
+              <button
+                onClick={() => askAIGlossaire(selected.term, selected.def, selected.detail)}
+                disabled={aiLoading}
+                style={{ width: '100%', padding: '12px 16px', borderRadius: 13,
+                  cursor: aiLoading ? 'default' : 'pointer', opacity: aiLoading ? 0.5 : 1,
+                  background: 'var(--gold-soft)', border: '1px solid var(--gold-line)',
+                  color: 'var(--gold)', fontSize: 14, fontFamily: 'var(--mono)',
+                  letterSpacing: '.04em', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                <IcSpark size={15} />
+                Approfondir avec l'IA
+              </button>
+
+              {aiLoading && (
+                <div style={{ marginTop: 14, padding: '12px 16px', borderRadius: 12,
+                  background: 'rgba(217,179,108,0.07)', border: '1px solid var(--gold-line)',
+                  display: 'flex', gap: 5 }}>
+                  {[0, 1, 2].map(i => (
+                    <span key={i} style={{ width: 7, height: 7, borderRadius: '50%', background: 'var(--gold)',
+                      animation: 'pulse 1.2s ease-in-out infinite', animationDelay: i * 0.18 + 's' }} />
+                  ))}
+                </div>
+              )}
+
+              {aiAnswer && !aiLoading && (
+                <div style={{ marginTop: 14, padding: '14px 16px', borderRadius: 12,
+                  background: 'rgba(217,179,108,0.07)', border: '1px solid var(--gold-line)',
+                  fontSize: 14, lineHeight: 1.68, color: 'var(--text)', fontFamily: 'var(--serif)' }}>
+                  {aiAnswer}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+      </Sheet>
     </div>
   )
 }
