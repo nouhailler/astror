@@ -5,54 +5,133 @@ import {
 import { Sheet } from './ui'
 
 export const HELP_CONTENT = {
-  sky: { title: 'Ciel', icon: IcSky,
-    intro: "La carte du ciel de ce soir, calculée pour votre position et orientée vers le zénith.",
-    points: ["Touchez un astre pour ses détails : magnitude, altitude, distance", "Filtrez par planètes, étoiles ou ciel profond", "Liste « Maintenant visible » triée par éclat"] },
+  sky: { title: 'Carte du Ciel', icon: IcSky,
+    intro: "La carte du ciel en temps réel, calculée pour votre position GPS et l'heure actuelle. Touchez un astre pour ses informations complètes, ou activez le mode boussole pour le retrouver dans le ciel.",
+    points: [
+      "Touchez un astre pour ses détails : type, magnitude, altitude, azimut, distance et fiche enrichie avec panel IA contextuel",
+      "Mode boussole : pointez votre téléphone vers le ciel, une flèche directionnelle et un radar vous guident avec précision vers l'objet choisi",
+      "Filtres par catégorie (planètes, étoiles, ciel profond) et liste « Visibles ce soir » triée par éclat — mise à jour en direct",
+    ] },
+
   eph: { title: 'Éphémérides', icon: IcMoon,
-    intro: "Tous les horaires et événements du jour : Lune, Soleil et alertes d'observation.",
-    points: ["Phase lunaire, illumination et distance Terre-Lune", "Lever / coucher du Soleil et crépuscules astronomiques", "Alertes : passages de l'ISS, conjonctions, stations spatiales"] },
+    intro: "Tous les horaires et données astronomiques du jour pour votre position : Lune, Soleil, alertes en temps réel et prochains événements avec compte à rebours.",
+    points: [
+      "Lune : phase exacte, illumination, âge (en jours), distance Terre-Lune et horaires de lever / coucher calculés pour votre lieu",
+      "Soleil : lever, coucher, crépuscule nautique et crépuscule astronomique — la limite après laquelle le ciel est vraiment noir",
+      "Alertes activables : passages de l'ISS, conjonctions Lune-planète, stations spatiales — avec compte à rebours jusqu'au prochain événement",
+    ] },
+
   explore: { title: 'Explorer', icon: IcOrbit,
-    intro: "Un voyage guidé dans le cosmos, du système solaire aux confins de l'univers.",
-    points: ["Les 8 planètes et le Soleil avec leurs caractéristiques", "Images du télescope spatial James Webb", "Anomalies cosmiques et grandes théories"] },
+    intro: "Un voyage guidé dans le cosmos : les 8 planètes du système solaire en direct, les dernières images du James Webb et les grandes questions ouvertes de l'astrophysique.",
+    points: [
+      "Système solaire : fiche de chaque planète (diamètre, distance, composition, lunes…) avec badge « Visible ce soir » calculé en direct et panel IA",
+      "James Webb : dernières images chargées depuis la NASA avec description et lien vers l'article d'origine",
+      "Anomalies cosmiques et grandes théories (matière noire, trous noirs, inflation…) — chaque entrée enrichie par un panel IA et un lien Wikipédia",
+    ] },
+
   feed: { title: 'Veille', icon: IcBook,
-    intro: "L'actualité spatiale et les ressources pour aller plus loin.",
-    points: ["Actualités, conférences, personnalités et bibliothèque", "Ajoutez vos propres entrées avec le bouton « Ajouter »", "Photos du ciel : les meilleures sources en ligne"] },
+    intro: "L'actualité spatiale et les ressources pour approfondir vos connaissances : photo du jour NASA, articles éducatifs et bibliothèque de liens sélectionnés.",
+    points: [
+      "Photo astronomique du jour (APOD) chargée en direct depuis la NASA avec titre et description",
+      "Actualités spatiales éducatives récupérées en temps réel — articles, missions, découvertes",
+      "Bibliothèque de ressources : conférences, chaînes YouTube, livres de référence et sites spécialisés — ajoutez vos propres entrées",
+    ] },
+
   tools: { title: 'Outils', icon: IcGrid,
-    intro: "Votre boîte à outils d'observateur : dix modules pour préparer, observer et apprendre.",
-    points: ["Observer, Lune, Planètes, Événements, Astrophoto…", "Satellites, Apprendre, Communauté, Assistant IA", "Touchez une tuile pour ouvrir un module"] },
+    intro: "Votre boîte à outils d'astronome amateur : dix modules pour préparer vos sessions, observer, photographier, apprendre et rester informé — tous personnalisés selon votre profil.",
+    points: [
+      "Préparation et observation : Observer, Lune, Planètes, Événements, Astrophoto, Satellites",
+      "Apprendre et explorer : Quiz, Parcours, Glossaire, Explorations cosmiques, Assistant IA",
+      "Touchez une tuile pour ouvrir le module ; chaque outil est adapté à votre position GPS, votre matériel et votre niveau",
+    ] },
+
   ai: { title: 'Assistant', icon: IcSpark,
-    intro: "Un assistant expert en astronomie, disponible à tout moment.",
-    points: ["Posez vos questions sur le ciel, la théorie ou le matériel", "Réponses précises et concises", "Touchez une suggestion pour démarrer"] },
+    intro: "Un assistant conversationnel expert en astronomie, disponible à tout moment. Il connaît votre position, votre niveau et vos instruments pour vous conseiller de façon concrète.",
+    points: [
+      "Posez vos questions librement : observation du soir, choix d'instrument, astrophysique, conquête spatiale, cosmologie…",
+      "11 catégories de suggestions prêtes à l'emploi : Utilisation d'Astror, Observer, Instruments, Astrophoto, Système solaire, Ciel profond…",
+      "Alimenté par Claude (Anthropic) ou OpenRouter — configurez votre clé API dans les Paramètres pour activer les réponses en temps réel",
+    ] },
+
   tool_observe: { title: 'Observer', icon: IcTele,
-    intro: "Préparez votre session d'observation de A à Z.",
-    points: ["Conditions du ciel : nuages, seeing, transparence, Bortle", "Meilleurs créneaux et horaires de lever / coucher", "Journal personnel et catalogues (Messier, NGC, IC, Caldwell)"] },
+    intro: "Préparez votre session d'observation de A à Z : conditions météo en direct, meilleurs créneaux de la nuit, horaires de lever/coucher et catalogues d'objets classés par difficulté.",
+    points: [
+      "Conditions en direct (via API météo) : couverture nuageuse, seeing (turbulence atmosphérique en arcsec), transparence et indice Bortle — chacun avec barre de qualité colorée",
+      "Créneaux optimaux de la nuit : horaires calculés pour votre position avec note Excellent / Bon / Médiocre et impact des nuages en temps réel",
+      "Journal personnel (ajout et suppression de sessions avec date, lieu, objet, notes et matériel) + catalogues : Visibles ce soir, Recommandés pour votre matériel, Messier, NGC, IC, Caldwell",
+    ] },
+
   tool_moon: { title: 'Lune', icon: IcMoon,
-    intro: "Tout sur la Lune, en temps réel.",
-    points: ["Phase actuelle, âge, illumination, distance", "Calendrier des prochaines phases", "Cartographie : mers, cratères et zones à observer"] },
+    intro: "Tout sur la Lune en temps réel : phase exacte, données orbitales actuelles et cartographie interactive des mers et cratères les plus spectaculaires.",
+    points: [
+      "Disque lunaire animé avec phase exacte, illumination (%), âge en jours, distance Terre-Lune et diamètre apparent — plus un conseil IA sur les zones à observer ce soir",
+      "Calendrier des 4 prochaines phases (nouvelle Lune, premier quartier, pleine Lune, dernier quartier) avec dates précises",
+      "Cartographie : 4 mers majeures (dont Mare Tranquillitatis, site d'Apollo 11) et 4 cratères remarquables (Copernic, Tycho, Clavius, Platon) — chacun avec fiche IA d'observation",
+    ] },
+
   tool_planets: { title: 'Planètes', icon: IcOrbit,
-    intro: "Les planètes ce soir, et un aperçu dans l'oculaire.",
-    points: ["Position, magnitude et taille apparente", "Conjonctions, oppositions et élongations", "Simulation de chaque planète au télescope"] },
+    intro: "Les 7 planètes ce soir : position, magnitude, taille angulaire, et simulation visuelle dans l'oculaire pour savoir exactement ce que vous verrez avec votre télescope.",
+    points: [
+      "Tableau des 7 planètes (Vénus à Neptune) : magnitude, taille apparente en arcsec, niveau de visibilité et position de ce soir — avec panel IA récapitulatif",
+      "Simulation oculaire réaliste : bandes nuageuses et tache rouge de Jupiter, anneaux de Saturne avec inclinaison actuelle, taille à l'échelle selon la focale",
+      "Conjonctions, oppositions et élongations à venir : dates, séparations angulaires et détails pour chaque événement planétaire",
+    ] },
+
   tool_events: { title: 'Événements', icon: IcComet,
-    intro: "Ne manquez aucun rendez-vous céleste.",
-    points: ["Éclipses, pluies de météores, comètes, superlunes", "Passages de l'ISS et occultations", "Notifications personnalisables"] },
+    intro: "Ne manquez aucun rendez-vous céleste sur les 18 prochains mois : éclipses, pluies de météores, comètes, événements spéciaux — et notifications pour être alerté à l'avance.",
+    points: [
+      "Calendrier sur 18 mois filtrable par catégorie (éclipses, météores, spécial) — chaque événement avec date, description et panel IA de préparation à l'observation",
+      "Panneau « 7 derniers jours » dans l'onglet Notifications pour retrouver les événements passés récents",
+      "Notifications personnalisables par type : passages ISS, planètes bien placées, pluies de météores, éclipses — activées avec accord de votre navigateur",
+    ] },
+
   tool_astrophoto: { title: 'Astrophoto', icon: IcCamera,
-    intro: "Planifiez et réglez vos prises de vue.",
-    points: ["Fenêtres de pose, heure bleue, Voie Lactée", "Temps d'exposition (règles 500 / NPF)", "Simulateur de champ et de cadrage"] },
+    intro: "Planifiez vos prises de vue et calculez vos réglages : fenêtre de nuit astronomique, conditions seeing/météo en direct, Voie Lactée et calculateurs d'exposition calibrés.",
+    points: [
+      "Fenêtre de nuit : coucher du Soleil, heure bleue, crépuscule astronomique et aube — avec météo en direct (seeing, transparence, nuages, humidité, température)",
+      "Position du cœur galactique et saison Voie Lactée pour choisir la meilleure nuit, plus l'état de la Lune (interférence lumineuse)",
+      "Calculateurs de temps de pose (règle 500 et règle NPF haute résolution) selon votre focale et capteur (plein format, APS-C, Micro 4/3), et simulateur de cadrage avec M31 et la Lune à l'échelle",
+    ] },
+
   tool_satellites: { title: 'Satellites', icon: IcSat,
-    intro: "Suivez ce qui orbite au-dessus de vous.",
-    points: ["Position de l'ISS et passages visibles ce soir", "Starlink et autres satellites brillants", "Missions en cours, lancements et sondes lointaines"] },
+    intro: "Suivez en temps réel ce qui orbite au-dessus de vous : position live de l'ISS, passages visibles calculés pour votre ville, missions spatiales actuelles et sondes aux confins du système solaire.",
+    points: [
+      "ISS en direct : altitude, vitesse orbitale, position géographique (lat/lng) et statut (côté jour, éclipsée ou visible) — mis à jour toutes les 10 secondes",
+      "Passages ISS dans les 24 h : heure, durée, direction et altitude maximale — plus Tiangong, Starlink et Hubble détaillés par l'IA selon votre position",
+      "Exploration : missions spatiales en cours avec actualités, lancements à venir, et distances en temps réel de Voyager 1/2, New Horizons et Pioneer 10/11 depuis le Soleil",
+    ] },
+
   tool_education: { title: 'Apprendre', icon: IcCap,
-    intro: "Apprenez l'astronomie à votre rythme.",
-    points: ["Quiz éclair et défis quotidiens", "Parcours pédagogiques progressifs", "Contenus : histoire, cosmologie, astrophysique"] },
+    intro: "Apprenez l'astronomie à votre rythme : quiz interactif sur 40 questions, contenus d'actualité et glossaire de 50 termes avec définitions enrichies par l'IA.",
+    points: [
+      "Quiz : 40 questions réparties en 6 catégories (Système solaire, Cosmologie, Astrophysique, Observation, Histoire, Instruments) avec explication détaillée de chaque réponse",
+      "Contenus : photo du jour NASA (APOD) et articles éducatifs récents chargés en direct depuis le web",
+      "Glossaire de 50 termes astronomiques — cliquez un terme pour ouvrir une fiche avec définition approfondie générée par l'IA",
+    ] },
+
   tool_community: { title: 'Communauté', icon: IcUsers,
-    intro: "Partagez et rencontrez d'autres passionnés.",
-    points: ["Fil de partage d'observations et de photos", "Classement des meilleures images", "Sorties, clubs et soirées d'observation"] },
+    intro: "Partagez vos observations et rencontrez d'autres passionnés : fil de partage, galerie de photos et événements locaux.",
+    points: [
+      "Fil de partage : publiez vos observations, comptes-rendus de session et anecdotes de la nuit",
+      "Galerie et classement des meilleures photos astrophotographiques de la communauté",
+      "Événements locaux : soirées d'observation, clubs, rencontres et sorties en groupe",
+    ] },
+
   tool_ai: { title: "Aide à l'observation", icon: IcSpark,
-    intro: "Une IA qui connaît votre ciel et votre matériel.",
-    points: ["« Que puis-je observer ce soir avec un Dobson 200 mm ? »", "Conseils adaptés à votre position et vos instruments", "Suggestions prêtes à l'emploi"] },
+    intro: "Un assistant IA personnalisé qui connaît votre ville, votre niveau et votre matériel déclarés à l'installation. Posez-lui n'importe quelle question sur le ciel de ce soir ou sur l'astronomie en général.",
+    points: [
+      "Contexte personnel : l'IA sait depuis quelle ville vous observez, votre niveau (débutant, amateur, confirmé) et vos instruments (à l'œil nu, jumelles, lunette, télescope…)",
+      "Suggestions organisées en 11 catégories : utilisation d'Astror, observation, instruments, astrophoto, système solaire, ciel profond, astrophysique, cosmologie, conquête spatiale…",
+      "Nécessite une clé API (Anthropic ou OpenRouter) — saisissez-la dans les Paramètres (⚙️) pour activer les réponses en temps réel ; sans clé, des réponses types sont affichées",
+    ] },
+
   tool_extras: { title: 'Explorations', icon: IcGem,
-    intro: "Des explorations ludiques pour prendre du recul sur le cosmos.",
-    points: ["Générateur de Top 10 des objets du soir", "Échelle interactive de l'Univers", "Simulateur d'impact et cartes immersives"] },
+    intro: "Des explorations interactives pour prendre du recul sur l'immensité du cosmos : simulateurs visuels, top 10 personnalisé selon votre position et la saison, et six voyages immersifs enrichis par l'IA.",
+    points: [
+      "Explorateur d'échelles : 9 visuels distincts de l'Everest (8 849 m) à l'Univers observable — montagne, Lune cratérisée, Terre avec continents, Jupiter rayé, Soleil, géante rouge, anneaux orbitaux, Voie Lactée spiralée, toile cosmique",
+      "Simulateur d'impact : choisissez la masse de l'impacteur (de 10³ à 10³⁰ kg) et observez le cratère s'agrandir en temps réel sur une Terre à l'échelle, avec énergie, équivalent TNT et diamètre calculés",
+      "Top 10 personnalisé : liste générée selon votre GPS et la saison avec fiches détaillées + conseil IA par objet — 6 voyages immersifs (du Soleil aux trous noirs) avec textes enrichis, données clés et analyse IA",
+    ] },
 }
 
 export function TopBar({ onHome, onHelp }) {
