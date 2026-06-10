@@ -221,47 +221,73 @@ export default function CommunityPage({ onBack }) {
         </div>
       )}
 
-      {/* ── Classement (Google Sheets) ── */}
+      {/* ── Classement (Google Sheets requis) ── */}
       {seg === 'rank' && (
-        <div className="enter">
-          {rankNotConfigured && (
-            <StatusBanner bg="rgba(217,179,108,.07)" border="var(--gold-line)" color="var(--dim)">
-              <span style={{ fontFamily: 'var(--mono)', fontSize: 10, color: 'var(--gold)',
-                display: 'block', marginBottom: 3 }}>DÉMO</span>
-              Configurez une feuille Google Sheets publique dans les{' '}
-              <strong style={{ color: 'var(--gold)' }}>Paramètres → Communauté · Classement</strong>{' '}
-              pour afficher votre classement en direct. Colonnes attendues : Rang · Auteur · Titre · Votes · Description.
-            </StatusBanner>
-          )}
-          {rankFailed && (
-            <StatusBanner bg="rgba(226,141,126,.06)" border="rgba(226,141,126,.28)" color="var(--warn)">
-              Impossible de charger la feuille Google Sheets. Vérifiez que l'URL est correcte et que la feuille est partagée en lecture publique.
-            </StatusBanner>
-          )}
+        <div className="enter pad" style={{ paddingTop: 14 }}>
+          {/* Bannière démo permanente quand non configuré */}
+          <div style={{ borderRadius: 16, overflow: 'hidden',
+            background: 'linear-gradient(180deg,var(--surface-2),var(--surface-1))',
+            border: '1px solid var(--line)', marginBottom: 14 }}>
+            <div style={{ padding: '14px 16px', display: 'flex', alignItems: 'flex-start', gap: 12 }}>
+              <span style={{ fontSize: 22, flexShrink: 0, lineHeight: 1 }}>
+                {rankData ? '✅' : '❌'}
+              </span>
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 5 }}>
+                  <span style={{ fontFamily: 'var(--mono)', fontSize: 10, letterSpacing: '.08em',
+                    color: rankData ? 'var(--good)' : 'var(--warn)',
+                    background: rankData ? 'rgba(100,210,150,.12)' : 'rgba(226,141,126,.12)',
+                    border: `1px solid ${rankData ? 'rgba(100,210,150,.3)' : 'rgba(226,141,126,.3)'}`,
+                    borderRadius: 5, padding: '2px 7px' }}>
+                    {rankData ? 'EN DIRECT' : 'DÉMO'}
+                  </span>
+                </div>
+                <div className="body" style={{ fontSize: 13, lineHeight: 1.5, color: 'var(--dim)' }}>
+                  {rankData
+                    ? 'Classement chargé depuis votre Google Sheets.'
+                    : <>
+                        Cette section nécessite une <strong style={{ color: 'var(--text)' }}>Google Sheets publique</strong> que vous gérez vous-même.
+                        Configurez l'URL dans les{' '}
+                        <strong style={{ color: 'var(--gold)' }}>Paramètres → Communauté · Classement</strong>.
+                      </>
+                  }
+                </div>
+                {rankFailed && (
+                  <div style={{ marginTop: 8, fontSize: 12.5, color: 'var(--warn)' }}>
+                    Impossible de charger la feuille. Vérifiez que l'URL est correcte et que la feuille est partagée en lecture publique.
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
 
-          <ToolSection
-            title={rankData ? 'Photos du mois · en direct' : 'Photos du mois'}
-            style={{ paddingTop: 4 }}
-          >
-            {rankLoading && !rankData && !rankNotConfigured && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                {[0, 1, 2].map(i => <SkeletonCard key={i} />)}
-              </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+            <span className="h-sec" style={{ fontSize: 15 }}>Photos du mois</span>
+            {!rankData && (
+              <span style={{ fontFamily: 'var(--mono)', fontSize: 9.5, letterSpacing: '.06em',
+                color: 'var(--warn)', background: 'rgba(226,141,126,.1)',
+                border: '1px solid rgba(226,141,126,.25)', borderRadius: 4, padding: '2px 6px' }}>
+                DÉMO
+              </span>
             )}
-            {!rankLoading && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                {(rankData || COM_RANK_STATIC).map(r => (
-                  <RankCard key={r.rank} r={r} isLive={!!rankData} />
-                ))}
-              </div>
-            )}
-            {rankData && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 12 }}>
-                <span className="dot pulse" style={{ background: 'var(--good)', width: 7, height: 7 }} />
-                <span className="meta" style={{ color: 'var(--good)', fontSize: 11 }}>données en direct · Google Sheets</span>
-              </div>
-            )}
-          </ToolSection>
+          </div>
+
+          {rankLoading && !rankData && !rankNotConfigured && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {[0, 1, 2].map(i => <SkeletonCard key={i} />)}
+            </div>
+          )}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {(rankData || COM_RANK_STATIC).map(r => (
+              <RankCard key={r.rank} r={r} isLive={!!rankData} />
+            ))}
+          </div>
+          {rankData && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 12 }}>
+              <span className="dot pulse" style={{ background: 'var(--good)', width: 7, height: 7 }} />
+              <span className="meta" style={{ color: 'var(--good)', fontSize: 11 }}>données en direct · Google Sheets</span>
+            </div>
+          )}
         </div>
       )}
 
