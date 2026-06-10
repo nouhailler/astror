@@ -1,7 +1,8 @@
 import { useState, useMemo } from 'react'
-import { IcSpark, IcGlobe, IcTimer, IcOrbit, IcComet, IcStar, IcRocket, IcZap } from './icons'
+import { IcSpark, IcGlobe, IcTimer, IcOrbit, IcComet, IcStar, IcRocket, IcZap, IcPin } from './icons'
 import { ToolPage, ToolHero, ToolSection, ToolSeg } from './tool-ui'
 import { Sheet, AiInfoPanel, DataRow } from './ui'
+import { onbLoad } from './onboarding'
 
 // ─── Échelle ─────────────────────────────────────────────────────────────────
 
@@ -180,17 +181,167 @@ LIGO a détecté des dizaines de fusions de trous noirs depuis 2015. En 2019, l'
 
 // ─── Composants ──────────────────────────────────────────────────────────────
 
+function ScaleVisual({ idx, size }) {
+  const s = Math.max(size, 10)
+  const r = s / 2
+
+  if (idx === 0) { // Everest — mountain
+    return (
+      <div style={{ position: 'relative', width: s * 1.6, height: s, flexShrink: 0, transition: 'all .4s cubic-bezier(.34,1.56,.64,1)' }}>
+        <div style={{ position: 'absolute', bottom: 0, left: '50%', transform: 'translateX(-50%)',
+          width: 0, height: 0,
+          borderLeft: `${s * 0.8}px solid transparent`,
+          borderRight: `${s * 0.8}px solid transparent`,
+          borderBottom: `${s}px solid #7a6a5a` }} />
+        <div style={{ position: 'absolute', bottom: s * 0.6, left: '50%', transform: 'translateX(-50%)',
+          width: 0, height: 0,
+          borderLeft: `${s * 0.35}px solid transparent`,
+          borderRight: `${s * 0.35}px solid transparent`,
+          borderBottom: `${s * 0.42}px solid rgba(255,255,255,0.75)` }} />
+      </div>
+    )
+  }
+
+  if (idx === 1) { // Moon — gray sphere with craters
+    return (
+      <div style={{ width: s, height: s, borderRadius: '50%', flexShrink: 0, position: 'relative', overflow: 'hidden',
+        transition: 'all .4s cubic-bezier(.34,1.56,.64,1)',
+        background: 'radial-gradient(circle at 38% 36%, #d0cfc8, #9e9d96 50%, #6e6d68)',
+        boxShadow: `0 0 ${r * 0.3}px rgba(180,180,160,0.3)` }}>
+        {s > 14 && <>
+          <div style={{ position: 'absolute', width: '20%', height: '20%', borderRadius: '50%', background: 'rgba(0,0,0,0.22)', top: '30%', left: '40%' }} />
+          <div style={{ position: 'absolute', width: '14%', height: '14%', borderRadius: '50%', background: 'rgba(0,0,0,0.18)', top: '55%', left: '25%' }} />
+          <div style={{ position: 'absolute', width: '10%', height: '10%', borderRadius: '50%', background: 'rgba(0,0,0,0.2)', top: '22%', left: '22%' }} />
+        </>}
+      </div>
+    )
+  }
+
+  if (idx === 2) { // Earth — blue sphere with continents
+    return (
+      <div style={{ width: s, height: s, borderRadius: '50%', flexShrink: 0, position: 'relative', overflow: 'hidden',
+        transition: 'all .4s cubic-bezier(.34,1.56,.64,1)',
+        background: 'radial-gradient(circle at 36% 32%, #4fa3d4, #1a6ea8 50%, #0d3d6e)',
+        boxShadow: `0 0 ${r * 0.4}px rgba(79,163,212,0.35)` }}>
+        {s > 10 && <>
+          <div style={{ position: 'absolute', width: '38%', height: '32%', borderRadius: '40% 60% 50% 55%', background: '#3a9e5a', top: '22%', left: '28%', opacity: 0.85 }} />
+          <div style={{ position: 'absolute', width: '24%', height: '22%', borderRadius: '50%', background: '#3a9e5a', top: '48%', left: '12%', opacity: 0.8 }} />
+          <div style={{ position: 'absolute', width: '20%', height: '16%', borderRadius: '45% 55% 60% 40%', background: '#4aae6a', top: '32%', left: '62%', opacity: 0.75 }} />
+          <div style={{ position: 'absolute', width: '18%', height: '8%', borderRadius: '50%', background: 'rgba(255,255,255,0.75)', top: '5%', left: '30%' }} />
+          <div style={{ position: 'absolute', width: '15%', height: '7%', borderRadius: '50%', background: 'rgba(255,255,255,0.75)', bottom: '4%', left: '36%' }} />
+        </>}
+      </div>
+    )
+  }
+
+  if (idx === 3) { // Jupiter — orange banded sphere
+    return (
+      <div style={{ width: s, height: s, borderRadius: '50%', flexShrink: 0, position: 'relative', overflow: 'hidden',
+        transition: 'all .4s cubic-bezier(.34,1.56,.64,1)',
+        background: 'radial-gradient(circle at 38% 35%, #e8c89e, #c8824a 40%, #8c4a1a)',
+        boxShadow: `0 0 ${r * 0.3}px rgba(200,130,74,0.4)` }}>
+        {[18, 33, 48, 63, 78].map(t => (
+          <div key={t} style={{ position: 'absolute', left: 0, right: 0, height: '8%', top: `${t}%`,
+            background: 'rgba(110,45,10,0.35)' }} />
+        ))}
+      </div>
+    )
+  }
+
+  if (idx === 4) { // Sun — gold orb with corona glow
+    return (
+      <div style={{ width: s, height: s, borderRadius: '50%', flexShrink: 0,
+        transition: 'all .4s cubic-bezier(.34,1.56,.64,1)',
+        background: 'radial-gradient(circle at 36% 32%, var(--gold-2), var(--gold) 40%, #8c5c18)',
+        boxShadow: `0 0 ${r * 0.8}px rgba(217,179,108,0.65), 0 0 ${r * 1.8}px rgba(217,179,108,0.2)` }} />
+    )
+  }
+
+  if (idx === 5) { // R Doradus — red giant with large glow
+    return (
+      <div style={{ width: s, height: s, borderRadius: '50%', flexShrink: 0,
+        transition: 'all .4s cubic-bezier(.34,1.56,.64,1)',
+        background: 'radial-gradient(circle at 38% 36%, #ff9070, #e04020 50%, #7a1a0a)',
+        boxShadow: `0 0 ${r * 0.8}px rgba(224,64,32,0.55), 0 0 ${r * 1.8}px rgba(224,64,32,0.2)` }} />
+    )
+  }
+
+  if (idx === 6) { // Solar System — orbital rings
+    const rings = [0.28, 0.42, 0.58, 0.74, 0.92]
+    return (
+      <div style={{ width: s, height: s, flexShrink: 0, transition: 'all .4s cubic-bezier(.34,1.56,.64,1)' }}>
+        <svg width={s} height={s} viewBox={`0 0 ${s} ${s}`} overflow="visible">
+          {rings.map((f, i) => (
+            <ellipse key={i} cx={s / 2} cy={s / 2} rx={s / 2 * f} ry={s / 2 * f * 0.26}
+              fill="none" stroke="rgba(217,179,108,0.32)" strokeWidth={s > 80 ? 1.2 : 0.7} />
+          ))}
+          <circle cx={s / 2} cy={s / 2} r={s * 0.07} fill="var(--gold)" opacity={0.9} />
+          {rings.map((f, i) => {
+            const rx = s / 2 * f, ry = s / 2 * f * 0.26
+            return <circle key={i} cx={s / 2 + rx * 0.7} cy={s / 2 - ry * 0.7} r={Math.max(1.5, s * 0.018)}
+              fill="rgba(217,179,108,0.7)" />
+          })}
+        </svg>
+      </div>
+    )
+  }
+
+  if (idx === 7) { // Milky Way — spiral galaxy
+    return (
+      <div style={{ width: s, height: s, flexShrink: 0, transition: 'all .4s cubic-bezier(.34,1.56,.64,1)' }}>
+        <svg width={s} height={s} viewBox={`0 0 ${s} ${s}`}>
+          <circle cx={s / 2} cy={s / 2} r={s / 2} fill="rgba(8,5,20,0.7)" />
+          <ellipse cx={s / 2} cy={s / 2} rx={s * 0.44} ry={s * 0.09} fill="rgba(200,190,255,0.18)" />
+          {[0, Math.PI].map((offset, ai) => {
+            const pts = []
+            for (let t = 0; t <= Math.PI * 1.35; t += 0.1) {
+              const rad = (s * 0.048) * Math.exp(t * 0.37)
+              if (rad > s * 0.45) break
+              pts.push(`${s / 2 + rad * Math.cos(t + offset)},${s / 2 + rad * Math.sin(t + offset) * 0.36}`)
+            }
+            return <polyline key={ai} points={pts.join(' ')} fill="none"
+              stroke="rgba(200,190,255,0.6)" strokeWidth={s > 80 ? 2 : 1} strokeLinecap="round" />
+          })}
+          <circle cx={s / 2} cy={s / 2} r={s * 0.055} fill="rgba(240,235,255,0.92)" />
+        </svg>
+      </div>
+    )
+  }
+
+  // idx === 8: Universe observable — cosmic web
+  return (
+    <div style={{ width: s, height: s, flexShrink: 0, transition: 'all .4s cubic-bezier(.34,1.56,.64,1)' }}>
+      <svg width={s} height={s} viewBox={`0 0 ${s} ${s}`}>
+        <circle cx={s / 2} cy={s / 2} r={s / 2} fill="rgba(5,3,15,0.8)" />
+        <circle cx={s / 2} cy={s / 2} r={s / 2 - 0.5} fill="none" stroke="rgba(255,255,255,0.05)" />
+        {[
+          [0.25, 0.30], [0.50, 0.18], [0.72, 0.35], [0.80, 0.60],
+          [0.60, 0.78], [0.30, 0.72], [0.15, 0.55], [0.42, 0.52],
+          [0.65, 0.50], [0.35, 0.40], [0.55, 0.38], [0.22, 0.46],
+        ].map(([fx, fy], i) => (
+          <circle key={i} cx={s * fx} cy={s * fy} r={s > 60 ? 2.2 : 1.2} fill="rgba(200,195,240,0.72)" />
+        ))}
+        {[
+          [[0.25,0.30],[0.42,0.52]], [[0.42,0.52],[0.65,0.50]], [[0.50,0.18],[0.65,0.50]],
+          [[0.65,0.50],[0.80,0.60]], [[0.30,0.72],[0.42,0.52]], [[0.15,0.55],[0.35,0.40]],
+          [[0.35,0.40],[0.55,0.38]], [[0.55,0.38],[0.72,0.35]], [[0.22,0.46],[0.42,0.52]],
+        ].map(([[x1,y1],[x2,y2]], i) => (
+          <line key={i} x1={s*x1} y1={s*y1} x2={s*x2} y2={s*y2}
+            stroke="rgba(200,195,240,0.18)" strokeWidth="0.5" />
+        ))}
+      </svg>
+    </div>
+  )
+}
+
 function ScaleExplorer() {
   const [idx, setIdx] = useState(4)
   const cur = SCALE[idx]
-  const orbSize = cur.px
 
   return (
     <div style={{ padding: 18, borderRadius: 18, background: 'radial-gradient(circle at 50% 0%, #0c1128, #040609)', border: '1px solid var(--line)' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 220, position: 'relative' }}>
-        <div style={{ width: orbSize, height: orbSize, borderRadius: '50%', flexShrink: 0, transition: 'all .4s cubic-bezier(.34,1.56,.64,1)',
-          background: 'radial-gradient(circle at 36% 32%, var(--gold-2), var(--gold) 40%, #8c5c18)',
-          boxShadow: `0 0 ${orbSize * 0.4}px rgba(217,179,108,0.4)` }} />
+        <ScaleVisual idx={idx} size={cur.px} />
         <div className="eyebrow" style={{ position: 'absolute', bottom: 14, left: 0, right: 0, textAlign: 'center' }}>
           {cur.name} · {cur.size}
         </div>
@@ -205,14 +356,43 @@ function ScaleExplorer() {
   )
 }
 
+function EarthCrater({ craterKm }) {
+  const earthSize = 192
+  const craterPx = Math.min(earthSize * 0.92, Math.max(5, (craterKm / 6371) * earthSize))
+
+  return (
+    <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 18 }}>
+      <div style={{ width: earthSize, height: earthSize, borderRadius: '50%', position: 'relative', overflow: 'hidden',
+        background: 'radial-gradient(circle at 36% 32%, #4fa3d4, #1a6ea8 50%, #0d3d6e)',
+        boxShadow: '0 0 22px rgba(79,163,212,0.28), inset 0 0 32px rgba(0,0,0,0.28)' }}>
+        <div style={{ position: 'absolute', width: '38%', height: '32%', borderRadius: '40% 60% 50% 55%', background: '#3a9e5a', top: '22%', left: '28%', opacity: 0.85 }} />
+        <div style={{ position: 'absolute', width: '24%', height: '22%', borderRadius: '50%', background: '#3a9e5a', top: '48%', left: '12%', opacity: 0.8 }} />
+        <div style={{ position: 'absolute', width: '20%', height: '16%', borderRadius: '45% 55% 60% 40%', background: '#4aae6a', top: '32%', left: '62%', opacity: 0.75 }} />
+        <div style={{ position: 'absolute', width: '18%', height: '8%', borderRadius: '50%', background: 'rgba(255,255,255,0.75)', top: '5%', left: '30%' }} />
+        <div style={{ position: 'absolute', width: '15%', height: '7%', borderRadius: '50%', background: 'rgba(255,255,255,0.75)', bottom: '4%', left: '36%' }} />
+        <div style={{
+          position: 'absolute', borderRadius: '50%',
+          width: craterPx, height: craterPx,
+          top: '50%', left: '50%',
+          transform: 'translate(-50%, -50%)',
+          transition: 'width .3s, height .3s',
+          background: 'radial-gradient(circle, rgba(200,90,30,0.95) 0%, rgba(230,110,50,0.75) 35%, rgba(110,55,20,0.55) 70%, transparent)',
+          boxShadow: craterPx > 20 ? `0 0 ${craterPx * 0.25}px rgba(230,110,50,0.5)` : 'none',
+        }} />
+      </div>
+    </div>
+  )
+}
+
 function ImpactSim() {
   const [mass, setMass] = useState(5)
   const joules = (10 ** mass).toExponential(1)
   const mt = (10 ** (mass - 15.6)).toFixed(mass < 18 ? 2 : 0)
-  const crater = (10 ** ((mass - 15) / 3)).toFixed(1)
+  const craterKm = parseFloat((10 ** ((mass - 15) / 3)).toFixed(1))
 
   return (
     <div style={{ padding: 16, borderRadius: 16, background: 'var(--surface-1)', border: '1px solid var(--line)' }}>
+      <EarthCrater craterKm={craterKm} />
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 4 }}>
         <span className="field-label" style={{ margin: 0 }}>Masse (log kg)</span>
         <span className="data" style={{ fontSize: 14, color: 'var(--gold)' }}>10^{mass} kg</span>
@@ -222,7 +402,7 @@ function ImpactSim() {
       <div className="metric-grid" style={{ gridTemplateColumns: '1fr 1fr 1fr' }}>
         <div className="metric"><div className="m-k">Énergie</div><div className="m-v" style={{ fontSize: 13 }}>{joules} J</div></div>
         <div className="metric"><div className="m-k">Équiv. TNT</div><div className="m-v" style={{ fontSize: 13 }}>{parseFloat(mt) < 0.01 ? '<0.01' : mt} Mt</div></div>
-        <div className="metric"><div className="m-k">Cratère</div><div className="m-v" style={{ fontSize: 13 }}>{crater} km</div></div>
+        <div className="metric"><div className="m-k">Cratère</div><div className="m-v" style={{ fontSize: 13 }}>{craterKm} km</div></div>
       </div>
     </div>
   )
@@ -230,8 +410,12 @@ function ImpactSim() {
 
 function Top10({ onPick }) {
   const [list, setList] = useState(null)
+  const profile = useMemo(() => onbLoad(), [])
+  const city = profile?.location?.city || null
 
-  const month = new Date().getMonth() + 1
+  const now = new Date()
+  const month = now.getMonth() + 1
+  const todayLabel = now.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
 
   const seasonLabel = useMemo(() => {
     if ([12, 1, 2].includes(month)) return 'hiver'
@@ -263,6 +447,16 @@ function Top10({ onPick }) {
 
   return (
     <div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12,
+        padding: '8px 12px', borderRadius: 10, background: 'var(--surface-1)', border: '1px solid var(--line)' }}>
+        {city && (
+          <>
+            <span style={{ color: 'var(--gold)', display: 'flex', alignItems: 'center' }}><IcPin size={13} /></span>
+            <span className="meta" style={{ color: 'var(--gold)', flex: 1 }}>{city}</span>
+          </>
+        )}
+        <span className="meta" style={{ color: 'var(--faint)', marginLeft: city ? 0 : 'auto' }}>{todayLabel}</span>
+      </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
         {list.map((o, i) => {
           const inSeason = !o.months || o.months.includes(month)
