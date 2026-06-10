@@ -3,12 +3,87 @@ import { IcSpark, IcSend, IcArrowLeft } from './icons'
 import { onbLoad } from './onboarding'
 import { callAI } from './claudeApi'
 
-const AI_SUGGEST = [
-  'Que puis-je observer ce soir avec un Dobson 200 mm ?',
-  'Quels objets sont visibles depuis ma position à 23 h ?',
-  "Comment trouver la galaxie d'Andromède ce soir ?",
-  "Le ciel est-il bon pour l'astrophoto cette nuit ?",
-  'Conseille-moi 3 cibles faciles pour débuter',
+const AI_CATEGORIES = [
+  {
+    label: 'Observer',
+    questions: [
+      'Que puis-je observer ce soir avec un Dobson 200 mm ?',
+      'Quels objets sont visibles depuis ma position à 23 h ?',
+      "Comment trouver la galaxie d'Andromède ce soir ?",
+    ],
+  },
+  {
+    label: 'Instruments',
+    questions: [
+      "Quelle monture choisir pour débuter l'astrophoto avec un budget de 500 € ?",
+      "Quelle est la différence entre un télescope Newton et un Schmidt-Cassegrain ?",
+      "Comment collimater un télescope Newton 150/750 ?",
+    ],
+  },
+  {
+    label: 'Astrophoto',
+    questions: [
+      "Le ciel est-il bon pour l'astrophoto cette nuit ?",
+      "Quel temps de pose pour M42 avec un APS-C à f/5 ?",
+      "Comment réduire le bruit de fond sur une photo de nébuleuse ?",
+    ],
+  },
+  {
+    label: 'Système solaire',
+    questions: [
+      "Quand Saturne sera-t-il en opposition cette année ?",
+      "Quelle est la meilleure période pour observer Mars ?",
+      "Comment distinguer une comète d'un astéroïde au télescope ?",
+    ],
+  },
+  {
+    label: 'Ciel profond',
+    questions: [
+      "Conseille-moi 3 cibles faciles pour débuter l'observation du ciel profond.",
+      "Quelle est la différence entre un amas ouvert et un amas globulaire ?",
+      "Quelles nébuleuses sont visibles à l'œil nu depuis une zone Bortle 4 ?",
+    ],
+  },
+  {
+    label: 'Astrophysique',
+    questions: [
+      "Comment se forme un trou noir stellaire ?",
+      "Quelle est la différence entre une naine blanche et une étoile à neutrons ?",
+      "Pourquoi les étoiles massives vivent-elles moins longtemps que les naines rouges ?",
+    ],
+  },
+  {
+    label: 'Cosmologie',
+    questions: [
+      "Qu'est-ce que la matière noire et comment sait-on qu'elle existe ?",
+      "Quelle est la différence entre le Big Bang et l'inflation cosmique ?",
+      "Comment JWST observe-t-il les premières galaxies de l'univers ?",
+    ],
+  },
+  {
+    label: 'Conquête spatiale',
+    questions: [
+      "Quelles sont les prochaines missions habitées vers la Lune ?",
+      "Comment fonctionne la vie à bord de l'ISS ?",
+      "Quelles sont les avancées récentes du programme Artemis de la NASA ?",
+    ],
+  },
+  {
+    label: 'Agences spatiales',
+    questions: [
+      "Quelle est la différence entre la NASA, l'ESA et Roscosmos en termes de missions ?",
+      "Quelles missions l'ESA prépare-t-elle pour 2025–2030 ?",
+      "Comment SpaceX a-t-il changé l'industrie spatiale depuis 2015 ?",
+    ],
+  },
+  {
+    label: 'Fusées & lanceurs',
+    questions: [
+      "Quelle est la différence entre Ariane 6 et le Falcon 9 de SpaceX ?",
+      "Comment fonctionne le système de récupération des premiers étages de fusée ?",
+      "Quels sont les lanceurs capables d'atteindre la Lune aujourd'hui ?",
+    ],
+  },
 ]
 
 const AI_FALLBACK = {
@@ -56,6 +131,7 @@ export default function AiPage({ onBack }) {
   const [msgs, setMsgs] = useState([{ role: 'bot', text: `Bonsoir. Je connais votre ciel (${city}) et votre matériel — demandez-moi quoi observer ce soir, comment trouver un objet, ou si les conditions sont bonnes.` }])
   const [input, setInput] = useState('')
   const [busy, setBusy] = useState(false)
+  const [suggestCat, setSuggestCat] = useState(AI_CATEGORIES[0].label)
   const scrollRef = useRef(null)
 
   useEffect(() => { const el = scrollRef.current; if (el) el.scrollTop = el.scrollHeight }, [msgs, busy])
@@ -101,10 +177,28 @@ export default function AiPage({ onBack }) {
         {msgs.length <= 1 && (
           <div style={{ marginTop: 8 }}>
             <div className="eyebrow dim" style={{ marginBottom: 10 }}>Suggestions</div>
+            {/* Chips catégories */}
+            <div style={{ display: 'flex', gap: 7, flexWrap: 'wrap', marginBottom: 12 }}>
+              {AI_CATEGORIES.map(c => (
+                <button key={c.label} onClick={() => setSuggestCat(c.label)}
+                  style={{ fontSize: 11, padding: '4px 10px', borderRadius: 99, cursor: 'pointer',
+                    fontFamily: 'var(--mono)', letterSpacing: '.04em',
+                    background: suggestCat === c.label ? 'var(--gold-soft)' : 'var(--surface-1)',
+                    border: '1px solid ' + (suggestCat === c.label ? 'var(--gold-line)' : 'var(--line)'),
+                    color: suggestCat === c.label ? 'var(--gold)' : 'var(--faint)' }}>
+                  {c.label}
+                </button>
+              ))}
+            </div>
+            {/* Questions de la catégorie active */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-              {AI_SUGGEST.map((s, i) => (
-                <button key={i} onClick={() => send(s)} className="press" style={{ textAlign: 'left', padding: '11px 14px', borderRadius: 12,
-                  background: 'var(--surface-1)', border: '1px solid var(--line-2)', color: 'var(--dim)', fontSize: 13, cursor: 'pointer', fontFamily: 'var(--serif)' }}>{s}</button>
+              {(AI_CATEGORIES.find(c => c.label === suggestCat)?.questions ?? []).map((s, i) => (
+                <button key={i} onClick={() => send(s)} className="press"
+                  style={{ textAlign: 'left', padding: '11px 14px', borderRadius: 12,
+                    background: 'var(--surface-1)', border: '1px solid var(--line-2)',
+                    color: 'var(--dim)', fontSize: 13, cursor: 'pointer', fontFamily: 'var(--serif)' }}>
+                  {s}
+                </button>
               ))}
             </div>
           </div>
