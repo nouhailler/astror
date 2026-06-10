@@ -1,14 +1,13 @@
 # Astror — Contexte de reprise
 
-**Date de dernière mise à jour :** 2026-06-08
+**Date de dernière mise à jour :** 2026-06-10
 
 ---
 
 ## Ce qu'est le projet
 
 Application mobile PWA pour astronomes amateurs, entièrement en français.
-Stack : **Vite + React 18 + vite-plugin-pwa** (Workbox). Données statiques (pas de backend).
-Déployable sur Netlify via `netlify.toml`.
+Stack : **Vite + React 18 + vite-plugin-pwa** (Workbox). Déployable sur Netlify via `netlify.toml`.
 
 ---
 
@@ -32,31 +31,41 @@ src/
 ├── main.jsx            # Point d'entrée ReactDOM
 ├── App.jsx             # Shell : TabBar 6 onglets, onboarding gate, TopBar, HelpSheet, SettingsSheet
 ├── app.css             # Design system complet (CSS custom properties, layout, composants)
-├── data.js             # Toutes les données statiques (exports nommés)
+├── data.js             # Données statiques résiduelles (exports nommés)
 ├── icons.jsx           # Tous les composants SVG icônes (exports nommés)
-├── ui.jsx              # Composants partagés : ScreenHeader, Sheet, ChipRow, Bar, useCountdown…
+├── ui.jsx              # Composants partagés : ScreenHeader, Sheet, ChipRow, Bar, AiInfoPanel, useCountdown…
 ├── tool-ui.jsx         # Primitives outils : ToolPage, ToolHero, ToolSection, ToolSeg, Metric…
+│
+├── api.js              # Toutes les API externes + hook useLiveData :
+│                       #   ISS (wheretheiss.at, 10 s), météo (open-meteo), news (spaceflightnewsapi),
+│                       #   lancements (lldev.thespacedevs), APOD (NASA DEMO_KEY),
+│                       #   images Wikipedia/Wikimedia, couvertures livres, passages ISS (satellite.js + TLE)
+├── astro.js            # Calculs locaux via astronomy-engine : lune, soleil, planètes, événements
+├── claudeApi.js        # Wrapper OpenRouter — clé dans localStorage astror_api_key_v1
+├── notifications.js    # Web Notifications API
 │
 ├── onboarding.jsx      # Onboarding 7 étapes + onbLoad/onbSave/onbWasSeen/onbMarkSeen
 ├── settings.jsx        # SettingsSheet (default export) — wraps Sheet internally
 ├── help.jsx            # TopBar + HelpSheet + HELP_CONTENT
 │
-├── sky.jsx             # Onglet Ciel : carte SVG, filtres, fiche objet
-├── ephemerides.jsx     # Onglet Éphémérides : Lune, météo, alertes, événements
-├── explore.jsx         # Onglet Explorer : planètes, JWST, anomalies, théories
-├── feed.jsx            # Onglet Veille : actualités, ajout utilisateur (localStorage)
-├── assistant.jsx       # Onglet Assistant : chat avec window.claude.complete()
+├── sky.jsx             # Onglet Ciel : carte SVG, boussole AR (deviceorientation), filtres, fiche objet
+├── ephemerides.jsx     # Onglet Éphémérides : Lune, météo dynamique, alertes, événements calculés
+├── explore.jsx         # Onglet Explorer : visibilité planètes live, images JWST Wikimedia, liens Wikipedia
+├── feed.jsx            # Onglet Veille : actualités, conférences (images Wikipedia), livres (couvertures),
+│                       #                 personnalités (photos Wikipedia), ajout utilisateur (localStorage)
+├── assistant.jsx       # Onglet Assistant : chat OpenRouter
 ├── tools.jsx           # Onglet Outils : grille ToolsHub + routeur OutilsScreen
 │
-├── tool-observe.jsx    # Outil Observer : journal (localStorage astror_journal_v1)
-├── tool-moon.jsx       # Outil Lune : suivi + carte
-├── tool-planets.jsx    # Outil Planètes : éphémérides + simulateur oculaire
-├── tool-events.jsx     # Outil Événements : calendrier + notifications
-├── tool-astrophoto.jsx # Outil Astrophoto : calculs expo + simulateur cadrage
-├── tool-satellites.jsx # Outil Satellites : ISS + missions + lancements
-├── tool-education.jsx  # Outil Apprendre : quiz + parcours + contenus
+├── tool-observe.jsx    # Outil Observer : journal (localStorage) + créneaux dynamiques + météo
+├── tool-moon.jsx       # Outil Lune : phase + carte lunaire
+├── tool-planets.jsx    # Outil Planètes : éphémérides astronomy-engine + simulateur oculaire
+├── tool-events.jsx     # Outil Événements : calendrier calculé + notifications
+├── tool-astrophoto.jsx # Outil Astrophoto : calculs expo dynamiques + simulateur cadrage + planning
+├── tool-satellites.jsx # Outil Satellites : ISS live, passages satellite.js + TLE, IA panel
+├── tool-education.jsx  # Outil Apprendre : quiz (40 q., catégories, chrono, joker 50/50),
+│                       #                   défi du jour, XP global, parcours, APOD, glossaire 47 termes
 ├── tool-community.jsx  # Outil Communauté : fil + classement + sorties
-├── tool-ai.jsx         # Outil Assistant IA : chat contextuel (onbLoad pour profil)
+├── tool-ai.jsx         # Outil Assistant IA : chat contextuel (profil via onbLoad)
 └── tool-extras.jsx     # Outil Explorations : ScaleExplorer + ImpactSim + Top10
 ```
 
@@ -66,10 +75,16 @@ src/
 
 | Clé | Contenu |
 |---|---|
-| `astror_profile_v1` | Profil utilisateur : location, level, interests, gear, alerts |
+| `astror_profile_v1` | Profil : `{ city, lat, lng }`, niveau, intérêts, matériel, alertes |
 | `astror_onboarded_v1` | Flag booléen : onboarding vu |
-| `astror_veille_v1` | Entrées Veille ajoutées par l'utilisateur |
 | `astror_journal_v1` | Sessions du journal d'observation |
+| `astror_veille_v1` | Entrées Veille ajoutées par l'utilisateur |
+| `astror_quiz_v1` | Stats quiz : streak, bestScore, totalPlayed, lastDate |
+| `astror_xp_v1` | XP total accumulé + date du dernier défi complété |
+| `astror_parcours_v1` | Progression (%) par parcours pédagogique |
+| `astror_api_key_v1` | Clé OpenRouter (séparée du profil) |
+| `astror_conf_imgs_v1` | Cache images Wikipedia des conférences |
+| `astror_book_covers_v1` | Cache couvertures livres (Open Library / Google Books) |
 
 ---
 
@@ -79,9 +94,10 @@ src/
 - **`SettingsSheet`** est un `export default` qui gère son propre `<Sheet>` en interne — ne pas le re-wrapper.
 - **`Onboarding`** est un `export default`, les helpers (`onbLoad`, etc.) sont des exports nommés.
 - **`window.openAstrorSettings`** est enregistré dans `App.jsx` via `useEffect` — c'est le seul endroit.
-- **`IcWrench` et `IcPlanet`** ont été ajoutés à `icons.jsx` en fin de session (ils manquaient du prototype).
-- Les apostrophes françaises dans les strings JS doivent être en **double quotes** `"..."` pour éviter les erreurs de build (ex : `"l'ISS"` pas `'l'ISS'`).
+- **`profile.location`** est un objet `{ city, lat, lng }` (migration automatique dans `onbLoad()`).
+- Les apostrophes françaises dans les strings JS doivent être en **double quotes** `"..."` pour éviter les erreurs de build.
 - Les `.ph` (placeholder divs) remplacent les `<image-slot>` custom elements du prototype.
+- **`useLiveData(fetchFn)`** dans `api.js` : hook universel pour les appels API avec cache et rafraîchissement.
 
 ---
 
@@ -89,21 +105,20 @@ src/
 
 - **Build** : ✅ propre (`npm run build` passe sans erreur)
 - **Dev server** : ✅ fonctionnel (`npm run dev`)
-- **Git** : commit initial poussé sur `main` (33 fichiers, 10 368 lignes)
+- **Tests** : ✅ 21 tests Vitest (`npm test`)
+- **Git** : 36 commits — branche `main` à jour sur GitHub
 - **Netlify** : prêt à connecter (le `netlify.toml` est en place)
 
 ---
 
 ## Ce qui reste à faire / améliorations possibles
 
-1. **Données dynamiques** : remplacer les données statiques (`data.js`) par de vraies API (position réelle, météo, ISS live, etc.)
-2. **Géolocalisation** : utiliser `navigator.geolocation` pour la position réelle au lieu du profil texte
-3. **Assistant IA** : brancher `window.claude.complete()` sur l'API Anthropic (Claude SDK)
-4. **Notifications push** : implémenter les vraies alertes pour l'ISS et les événements célestes
-5. **Tests** : aucun test écrit pour l'instant
-6. **Accessibilité** : revoir les contrastes et les labels ARIA
-7. **Internationalisation** : tout est en français hard-codé, pas de i18n
-8. **PWA icons** : seul `favicon.svg` est fourni — ajouter `icon-192.png` et `icon-512.png` pour un meilleur score Lighthouse
+1. **Parcours pédagogiques** : les cartes avancent via le quiz, mais il n'y a pas de vrai contenu de leçon à l'intérieur (cliquer un parcours ne fait rien)
+2. **Communauté** : données entièrement statiques (pas de backend/API communautaire)
+3. **Tests** : couverture à étendre (21 tests surtout sur les calculs astro)
+4. **PWA offline** : certains appels API échouent silencieusement hors-ligne
+5. **i18n** : tout est en français hard-codé
+6. **Notifications push** : les notifications locales fonctionnent, les push web nécessiteraient un backend
 
 ---
 
@@ -115,7 +130,7 @@ cd /home/patrick/Documents/Claude/Projects/Astror/astror-app
 npm run dev        # Serveur de développement
 npm run build      # Build de production → dist/
 npm run preview    # Prévisualiser le build
+npm test           # Tests Vitest
 
-git status
-git log --oneline
+git log --oneline  # Historique des commits
 ```
