@@ -1,76 +1,154 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect, useRef } from 'react'
 import { IcTrophy, IcFlame, IcCheckCircle, IcClose, IcPlay } from './icons'
 import { Sheet } from './ui'
 import { ToolPage, ToolSection, ToolSeg } from './tool-ui'
 import { useLiveData, fetchAPODArticle } from './api'
 
-// ─── Quiz pool : 20 questions, 5 tirées aléatoirement par session ───────────
+// ─── Quiz pool : 40 questions avec catégories ───────────────────────────────
+
+const CAT_COLORS = {
+  'Système solaire': { bg: 'rgba(100,160,255,.12)', bd: 'rgba(100,160,255,.35)', cl: '#7ab3ff' },
+  'Cosmologie':      { bg: 'rgba(180,130,255,.12)', bd: 'rgba(180,130,255,.35)', cl: '#c49dff' },
+  'Astrophysique':   { bg: 'rgba(255,170,100,.12)', bd: 'rgba(255,170,100,.35)', cl: '#ffb870' },
+  'Observation':     { bg: 'rgba(100,210,160,.12)', bd: 'rgba(100,210,160,.35)', cl: '#7dd4a8' },
+  'Histoire':        { bg: 'rgba(217,179,108,.12)', bd: 'rgba(217,179,108,.35)', cl: 'var(--gold)' },
+  'Instruments':     { bg: 'rgba(200,200,200,.08)', bd: 'rgba(200,200,200,.25)', cl: 'var(--faint)' },
+}
 
 const QUIZ_POOL = [
-  { q: 'Quelle planète possède le système d\'anneaux le plus visible ?',
+  // ── Système solaire ──
+  { cat: 'Système solaire', q: 'Quelle planète possède le système d\'anneaux le plus visible ?',
     opts: ['Jupiter', 'Saturne', 'Uranus', 'Neptune'], a: 1,
     why: 'Les anneaux de Saturne, faits de glace et de poussière, sont visibles dès une lunette de 60 mm.' },
-  { q: 'Que mesure l\'échelle de Bortle ?',
-    opts: ['La magnitude des étoiles', 'La pollution lumineuse', 'La distance des galaxies', 'La phase lunaire'], a: 1,
-    why: 'L\'échelle de Bortle (1–9) quantifie la noirceur du ciel, de 1 (parfait) à 9 (centre-ville).' },
-  { q: 'À quelle distance se trouve la galaxie d\'Andromède (M31) ?',
-    opts: ['250 000 al', '2,5 millions d\'al', '25 millions d\'al', '2,5 milliards d\'al'], a: 1,
-    why: 'M31 est à 2,5 millions d\'années-lumière — l\'objet le plus lointain visible à l\'œil nu.' },
-  { q: 'Qu\'est-ce que le « seeing » en astronomie ?',
-    opts: ['La transparence du ciel', 'La turbulence atmosphérique', 'La pollution lumineuse', 'L\'humidité ambiante'], a: 1,
-    why: 'Le seeing mesure la turbulence de l\'air, qui fait scintiller et brouiller les images.' },
-  { q: 'Quel est le nom de la plus grande lune de Saturne ?',
+  { cat: 'Système solaire', q: 'Quel est le nom de la plus grande lune de Saturne ?',
     opts: ['Europe', 'Ganymède', 'Titan', 'Io'], a: 2,
     why: 'Titan, plus grand que Mercure, possède une atmosphère dense d\'azote et méthane.' },
-  { q: 'En quelle année Edwin Hubble a-t-il prouvé l\'expansion de l\'univers ?',
-    opts: ['1912', '1929', '1945', '1965'], a: 1,
-    why: 'En 1929, Hubble publie la loi de récession des galaxies, preuve directe de l\'expansion cosmique.' },
-  { q: 'Quelle mission a photographié Pluton en gros plan pour la première fois ?',
-    opts: ['Cassini', 'Voyager 1', 'New Horizons', 'Dawn'], a: 2,
-    why: 'New Horizons a survolé Pluton le 14 juillet 2015, révélant montagnes de glace et plaine Tombaugh.' },
-  { q: 'Qu\'est-ce qu\'une étoile de type spectral O ?',
-    opts: ['Froide et rouge', 'Chaude et bleue', 'Naine blanche', 'Géante orange'], a: 1,
-    why: 'Les étoiles O sont les plus chaudes (>30 000 K), bleues, et les plus massives — elles vivent quelques millions d\'années.' },
-  { q: 'Quelle est la période de rotation sidérale de la Lune ?',
+  { cat: 'Système solaire', q: 'Quelle est la période de rotation sidérale de la Lune ?',
     opts: ['24 heures', '27,3 jours', '29,5 jours', '365 jours'], a: 1,
     why: 'La Lune tourne en 27,3 jours — exactement sa période orbitale, d\'où on voit toujours la même face.' },
-  { q: 'Quel instrument a détecté des ondes gravitationnelles pour la première fois, en 2015 ?',
-    opts: ['Hubble', 'ALMA', 'LIGO', 'VLT'], a: 2,
-    why: 'LIGO a détecté la fusion de deux trous noirs le 14 septembre 2015, confirmant la relativité générale.' },
-  { q: 'Dans quelle constellation se trouve la nébuleuse d\'Orion (M42) ?',
-    opts: ['Taurus', 'Orion', 'Persée', 'Gémeaux'], a: 1,
-    why: 'M42 est visible à l\'œil nu dans le baudrier d\'Orion — une pouponnière d\'étoiles à 1 344 al.' },
-  { q: 'Qu\'est-ce qu\'une nébuleuse planétaire ?',
-    opts: ['Nuage d\'une jeune étoile', 'Enveloppe éjectée par une étoile mourante', 'Restes d\'une supernova', 'Un amas globulaire lointain'], a: 1,
-    why: 'Quand une étoile de type solaire s\'éteint, elle éjecte ses couches externes — sans rapport avec les planètes.' },
-  { q: 'Quelle est la magnitude apparente du Soleil ?',
-    opts: ['-12,7', '-26,7', '-4,2', '1,0'], a: 1,
-    why: 'Le Soleil a une magnitude de −26,7, de loin l\'astre le plus brillant du ciel.' },
-  { q: 'Quelle planète tourne « couchée » avec une inclinaison axiale de ~98° ?',
+  { cat: 'Système solaire', q: 'Quelle planète tourne « couchée » avec une inclinaison axiale de ~98° ?',
     opts: ['Neptune', 'Jupiter', 'Uranus', 'Vénus'], a: 2,
     why: 'L\'axe d\'Uranus est incliné à 97,8° — probablement suite à un impact colossal dans le passé.' },
-  { q: 'Que signifie l\'acronyme JWST ?',
-    opts: ['James Webb Space Telescope', 'Joint Wide Survey Telescope', 'Jupiter Webb Space Tool', 'James Wren Star Telescope'], a: 0,
-    why: 'JWST observe dans l\'infrarouge depuis le point L2, à 1,5 million de km de la Terre.' },
-  { q: 'Qu\'est-ce qu\'une Céphéide en astronomie ?',
-    opts: ['Une étoile à neutrons', 'Une étoile variable pulsante indicatrice de distance', 'Une naine blanche froide', 'Un quasar proche'], a: 1,
-    why: 'Les Céphéides pulsent avec une période liée à leur luminosité, permettant de mesurer des distances extragalactiques.' },
-  { q: 'Quel phénomène provoque la scintillation des étoiles mais pas des planètes ?',
-    opts: ['La distance', 'Le diamètre apparent — les planètes sont des disques', 'La température', 'La phase lunaire'], a: 1,
-    why: 'Les planètes ont un disque angulaire : la turbulence se moyenne, réduisant la scintillation.' },
-  { q: 'Quel est le type spectral du Soleil selon la classification de Harvard ?',
-    opts: ['K5V', 'G2V', 'F0III', 'M4V'], a: 1,
-    why: 'Le Soleil est une naine G2V — une étoile de milieu de vie, ni trop chaude ni trop froide.' },
-  { q: 'Quelle est la distance approximative du centre galactique depuis la Terre ?',
+  { cat: 'Système solaire', q: 'Quel est le plus grand volcan du système solaire ?',
+    opts: ['Mauna Kea', 'Olympus Mons', 'Elysium Mons', 'Ascraeus Mons'], a: 1,
+    why: 'Olympus Mons sur Mars culmine à ~22 km de hauteur et s\'étend sur 600 km de diamètre.' },
+  { cat: 'Système solaire', q: 'Combien de temps met la lumière du Soleil pour atteindre la Terre ?',
+    opts: ['1 minute', '8 minutes 20 secondes', '15 minutes', '4 heures'], a: 1,
+    why: 'La distance Terre-Soleil (~150 millions de km) est parcourue par la lumière en 8 min 20 s.' },
+  { cat: 'Système solaire', q: 'Quelle particularité de l\'orbite de Mercure a confirmé la relativité générale ?',
+    opts: ['Son excentricité', 'La précession de son périhélie', 'Sa vitesse de rotation', 'Son inclinaison'], a: 1,
+    why: 'La précession du périhélie de Mercure (43 arcsec/siècle) ne s\'explique que par la relativité générale d\'Einstein.' },
+  { cat: 'Système solaire', q: 'Quelle planète possède la plus longue journée du système solaire ?',
+    opts: ['Mercure', 'Vénus', 'Mars', 'Jupiter'], a: 1,
+    why: 'Vénus tourne si lentement qu\'un jour vénusien dure ~243 jours terrestres — plus long que son année.' },
+  // ── Cosmologie ──
+  { cat: 'Cosmologie', q: 'À quelle distance se trouve la galaxie d\'Andromède (M31) ?',
+    opts: ['250 000 al', '2,5 millions d\'al', '25 millions d\'al', '2,5 milliards d\'al'], a: 1,
+    why: 'M31 est à 2,5 millions d\'années-lumière — l\'objet le plus lointain visible à l\'œil nu.' },
+  { cat: 'Cosmologie', q: 'Quelle est la distance approximative du centre galactique depuis la Terre ?',
     opts: ['2 600 al', '8 200 parsecs', '1 000 parsecs', '50 000 al'], a: 1,
     why: 'Le centre de la Voie Lactée se trouve à ~8 200 parsecs (26 700 al), dans la direction du Sagittaire.' },
-  { q: 'Qu\'est-ce que l\'aberration chromatique dans une lunette astronomique ?',
+  { cat: 'Cosmologie', q: 'Qu\'est-ce que l\'énergie noire ?',
+    opts: ['Un trou noir massif', 'La force accélérant l\'expansion de l\'univers', 'De l\'antimatière', 'Une étoile mourante'], a: 1,
+    why: 'L\'énergie noire représente ~68 % du contenu de l\'univers. Elle contrecarre la gravité et accélère l\'expansion.' },
+  { cat: 'Cosmologie', q: 'Qu\'est-ce que la matière noire ?',
+    opts: ['Des trous noirs', 'Une masse non lumineuse détectée uniquement par ses effets gravitationnels', 'Du gaz froid', 'Des neutrinos'], a: 1,
+    why: 'La matière noire (~27 % de l\'univers) ne rayonne pas, mais son effet gravitationnel est visible sur les courbes de rotation galactiques.' },
+  { cat: 'Cosmologie', q: 'Quel est l\'âge estimé de l\'univers ?',
+    opts: ['4,6 milliards d\'années', '13,8 milliards d\'années', '10 milliards d\'années', '20 milliards d\'années'], a: 1,
+    why: 'L\'âge de l\'univers est évalué à 13,8 milliards d\'années d\'après le fond diffus cosmologique et la constante de Hubble.' },
+  // ── Astrophysique ──
+  { cat: 'Astrophysique', q: 'Qu\'est-ce qu\'une étoile de type spectral O ?',
+    opts: ['Froide et rouge', 'Chaude et bleue', 'Naine blanche', 'Géante orange'], a: 1,
+    why: 'Les étoiles O sont les plus chaudes (>30 000 K), bleues, et les plus massives — elles vivent quelques millions d\'années.' },
+  { cat: 'Astrophysique', q: 'Qu\'est-ce qu\'une nébuleuse planétaire ?',
+    opts: ['Nuage d\'une jeune étoile', 'Enveloppe éjectée par une étoile mourante', 'Restes d\'une supernova', 'Un amas globulaire lointain'], a: 1,
+    why: 'Quand une étoile de type solaire s\'éteint, elle éjecte ses couches externes — sans rapport avec les planètes.' },
+  { cat: 'Astrophysique', q: 'Quelle est la magnitude apparente du Soleil ?',
+    opts: ['-12,7', '-26,7', '-4,2', '1,0'], a: 1,
+    why: 'Le Soleil a une magnitude de −26,7, de loin l\'astre le plus brillant du ciel.' },
+  { cat: 'Astrophysique', q: 'Qu\'est-ce qu\'une Céphéide en astronomie ?',
+    opts: ['Une étoile à neutrons', 'Une étoile variable pulsante indicatrice de distance', 'Une naine blanche froide', 'Un quasar proche'], a: 1,
+    why: 'Les Céphéides pulsent avec une période liée à leur luminosité, permettant de mesurer des distances extragalactiques.' },
+  { cat: 'Astrophysique', q: 'Quel est le type spectral du Soleil selon la classification de Harvard ?',
+    opts: ['K5V', 'G2V', 'F0III', 'M4V'], a: 1,
+    why: 'Le Soleil est une naine G2V — une étoile de milieu de vie, ni trop chaude ni trop froide.' },
+  { cat: 'Astrophysique', q: 'Quel est le destin d\'une étoile 10 fois plus massive que le Soleil ?',
+    opts: ['Naine blanche', 'Nébuleuse planétaire', 'Supernova puis étoile à neutrons ou trou noir', 'Géante rouge stable'], a: 2,
+    why: 'Les étoiles très massives terminent en supernova, laissant une étoile à neutrons ou un trou noir selon leur masse finale.' },
+  { cat: 'Astrophysique', q: 'Comment s\'appelle la couche superficielle visible du Soleil ?',
+    opts: ['Chromosphère', 'Couronne', 'Photosphère', 'Zone radiative'], a: 2,
+    why: 'La photosphère est la couche visible du Soleil, à ~5 778 K. C\'est d\'elle que provient la lumière que nous voyons.' },
+  { cat: 'Astrophysique', q: 'Qu\'est-ce qu\'une étoile à neutrons ?',
+    opts: ['Une étoile froide', 'Le résidu ultra-dense d\'une supernova, ~1,4 masse solaire pour 10 km de rayon', 'Une naine brune', 'Un trou noir de faible masse'], a: 1,
+    why: 'Les étoiles à neutrons sont si denses qu\'une cuillère à café de leur matière pèserait ~1 milliard de tonnes.' },
+  // ── Observation ──
+  { cat: 'Observation', q: 'Que mesure l\'échelle de Bortle ?',
+    opts: ['La magnitude des étoiles', 'La pollution lumineuse du ciel', 'La distance des galaxies', 'La phase lunaire'], a: 1,
+    why: 'L\'échelle de Bortle (1–9) quantifie la noirceur du ciel, de 1 (parfait) à 9 (centre-ville).' },
+  { cat: 'Observation', q: 'Qu\'est-ce que le « seeing » en astronomie ?',
+    opts: ['La transparence du ciel', 'La turbulence atmosphérique', 'La pollution lumineuse', 'L\'humidité ambiante'], a: 1,
+    why: 'Le seeing mesure la turbulence de l\'air, qui fait scintiller et brouiller les images.' },
+  { cat: 'Observation', q: 'Dans quelle constellation se trouve la nébuleuse d\'Orion (M42) ?',
+    opts: ['Taurus', 'Orion', 'Persée', 'Gémeaux'], a: 1,
+    why: 'M42 est visible à l\'œil nu dans le baudrier d\'Orion — une pouponnière d\'étoiles à 1 344 al.' },
+  { cat: 'Observation', q: 'Quel phénomène provoque la scintillation des étoiles mais pas des planètes ?',
+    opts: ['La distance', 'Le diamètre apparent — les planètes sont des disques', 'La température', 'La phase lunaire'], a: 1,
+    why: 'Les planètes ont un disque angulaire : la turbulence se moyenne, réduisant la scintillation.' },
+  { cat: 'Observation', q: 'Quel est le grossissement maximum utile d\'un télescope de 200 mm d\'ouverture ?',
+    opts: ['100×', '200×', '400×', '800×'], a: 2,
+    why: 'La règle pratique est 2× le diamètre en mm : pour 200 mm → 400× max par temps parfait de seeing.' },
+  { cat: 'Observation', q: 'Qu\'est-ce que la magnitude limite visuelle d\'un télescope ?',
+    opts: ['Le grossissement maximum', 'La plus faible magnitude d\'étoile discernable', 'La distance maximale observable', 'Le champ de vue en degrés'], a: 1,
+    why: 'Elle dépend du diamètre d\'ouverture : un télescope de 200 mm atteint ~13,5 mag par ciel parfait.' },
+  // ── Histoire ──
+  { cat: 'Histoire', q: 'En quelle année Edwin Hubble a-t-il prouvé l\'expansion de l\'univers ?',
+    opts: ['1912', '1929', '1945', '1965'], a: 1,
+    why: 'En 1929, Hubble publie la loi de récession des galaxies, preuve directe de l\'expansion cosmique.' },
+  { cat: 'Histoire', q: 'Quelle mission a photographié Pluton en gros plan pour la première fois ?',
+    opts: ['Cassini', 'Voyager 1', 'New Horizons', 'Dawn'], a: 2,
+    why: 'New Horizons a survolé Pluton le 14 juillet 2015, révélant montagnes de glace et plaine Tombaugh.' },
+  { cat: 'Histoire', q: 'En quelle année a eu lieu le premier alunissage habité ?',
+    opts: ['1967', '1969', '1972', '1975'], a: 1,
+    why: 'Apollo 11 s\'est posé sur la Lune le 20 juillet 1969 — Neil Armstrong fut le premier humain à marcher dessus.' },
+  { cat: 'Histoire', q: 'Qui a proposé le modèle héliocentrique moderne en 1543 ?',
+    opts: ['Galilée', 'Kepler', 'Copernic', 'Newton'], a: 2,
+    why: 'Nicolas Copernic publie son modèle héliocentrique dans « De revolutionibus » en 1543, l\'année de sa mort.' },
+  { cat: 'Histoire', q: 'Quelle est la première image directe d\'un trou noir, publiée en 2019 ?',
+    opts: ['Sagittarius A*', 'M87*', 'Cygnus X-1', 'NGC 1277'], a: 1,
+    why: 'Le projet Event Horizon Telescope a publié l\'image de M87* en avril 2019 — un trou noir de 6,5 milliards de masses solaires.' },
+  { cat: 'Histoire', q: 'Quel télescope spatial a succédé à Hubble pour l\'observation infrarouge ?',
+    opts: ['Spitzer', 'Chandra', 'James Webb', 'Kepler'], a: 2,
+    why: 'JWST, lancé en décembre 2021 et opérationnel en 2022, observe dans l\'infrarouge depuis le point L2.' },
+  // ── Instruments ──
+  { cat: 'Instruments', q: 'Quel instrument a détecté des ondes gravitationnelles pour la première fois, en 2015 ?',
+    opts: ['Hubble', 'ALMA', 'LIGO', 'VLT'], a: 2,
+    why: 'LIGO a détecté la fusion de deux trous noirs le 14 septembre 2015, confirmant la relativité générale.' },
+  { cat: 'Instruments', q: 'Que signifie l\'acronyme JWST ?',
+    opts: ['James Webb Space Telescope', 'Joint Wide Survey Telescope', 'Jupiter Webb Space Tool', 'James Wren Star Telescope'], a: 0,
+    why: 'JWST observe dans l\'infrarouge depuis le point L2, à 1,5 million de km de la Terre.' },
+  { cat: 'Instruments', q: 'Qu\'est-ce que l\'aberration chromatique dans une lunette astronomique ?',
     opts: ['Vibrations dues au vent', 'Dispersion des couleurs par la lentille', 'Reflets parasites', 'Déformation du champ'], a: 1,
     why: 'Un objectif simple ne focalise pas toutes les longueurs d\'onde au même point, créant des halos colorés.' },
+  { cat: 'Instruments', q: 'Quel satellite ESA mesure les parallaxes stellaires avec une précision sub-microseconde d\'arc ?',
+    opts: ['Herschel', 'Gaia', 'Planck', 'XMM-Newton'], a: 1,
+    why: 'Gaia a cartographié plus d\'un milliard d\'étoiles avec une précision angulaire jamais atteinte, révolutionnant l\'astrométrie.' },
+  { cat: 'Instruments', q: 'Qu\'est-ce qu\'une monture équatoriale en astronomie ?',
+    opts: ['Un trépied léger', 'Une monture dont un axe est parallèle à l\'axe terrestre', 'Un système de mise au point motorisé', 'Un type d\'oculaire'], a: 1,
+    why: 'La monture équatoriale compense la rotation terrestre avec un seul axe (axe polaire), idéale pour le suivi et l\'astrophoto.' },
+  { cat: 'Instruments', q: 'Que mesure un astromètre photométrique comme Kepler ou TESS ?',
+    opts: ['Les distances par parallaxe', 'Les variations de luminosité d\'étoiles pour détecter des transits', 'Le spectre des étoiles', 'La position des astéroïdes'], a: 1,
+    why: 'Kepler et TESS surveillent la luminosité de milliers d\'étoiles simultanément pour détecter le passage d\'exoplanètes.' },
+  { cat: 'Instruments', q: 'Qu\'est-ce que le rapport focal (f/D) d\'un télescope ?',
+    opts: ['La longueur du tube', 'La focale divisée par le diamètre', 'Le diamètre de l\'oculaire', 'L\'angle de champ'], a: 1,
+    why: 'Un f/5 est lumineux (grand champ, poses courtes) ; un f/10 est lent mais offre un fort grossissement naturel.' },
 ]
 
-function pickQuestions(n = 5) {
-  return [...QUIZ_POOL].sort(() => Math.random() - 0.5).slice(0, n)
+const QUIZ_CATS = ['Tout', ...Object.keys(CAT_COLORS)]
+
+function pickQuestions(n = 5, cat = 'Tout') {
+  const pool = cat === 'Tout' ? QUIZ_POOL : QUIZ_POOL.filter(q => q.cat === cat)
+  return [...pool].sort(() => Math.random() - 0.5).slice(0, Math.min(n, pool.length))
 }
 
 // ─── Défis du jour : pool de 28, rotation par date ──────────────────────────
@@ -306,50 +384,107 @@ function GlossaireView() {
 
 // ─── Composant Quiz ──────────────────────────────────────────────────────────
 
-function Quiz({ onComplete }) {
-  const [questions] = useState(() => pickQuestions(5))
-  const [i, setI]         = useState(0)
-  const [picked, setPicked] = useState(null)
-  const [score, setScore]   = useState(0)
-  const [done, setDone]     = useState(false)
-  const [stats, setStats]   = useState(null)
+const CHRONO_SECS = 15
+
+function Quiz({ onComplete, cat = 'Tout', chrono = false }) {
+  const [questions]          = useState(() => pickQuestions(5, cat))
+  const [i, setI]            = useState(0)
+  const [picked, setPicked]  = useState(null)
+  const [score, setScore]    = useState(0)
+  const [bonusXp, setBonusXp]= useState(0)
+  const [done, setDone]      = useState(false)
+  const [stats, setStats]    = useState(null)
+  const [jokerUsed, setJokerUsed] = useState(false)
+  const [eliminated, setEliminated] = useState([])
+  const [timeLeft, setTimeLeft]    = useState(CHRONO_SECS)
+  const [timedOut, setTimedOut]    = useState(false)
+  const timerRef = useRef(null)
+
   const cur = questions[i]
+
+  // Timer chrono
+  useEffect(() => {
+    if (!chrono || picked != null || done) return
+    setTimeLeft(CHRONO_SECS)
+    setTimedOut(false)
+    timerRef.current = setInterval(() => {
+      setTimeLeft(t => {
+        if (t <= 1) {
+          clearInterval(timerRef.current)
+          setTimedOut(true)
+          setPicked(-1)
+          return 0
+        }
+        return t - 1
+      })
+    }, 1000)
+    return () => clearInterval(timerRef.current)
+  }, [i, chrono, done])
 
   const choose = (idx) => {
     if (picked != null) return
+    clearInterval(timerRef.current)
     setPicked(idx)
-    if (idx === cur.a) setScore(s => s + 1)
+    const correct = idx === cur.a
+    if (correct) {
+      setScore(s => s + 1)
+      if (chrono && timeLeft >= 10) setBonusXp(b => b + 5)
+    }
   }
 
   const nextQ = () => {
     if (i + 1 >= questions.length) {
-      const saved = recordQuiz(score)
+      const saved = recordQuiz(score + Math.floor(bonusXp / 10))
       setStats(saved)
       setDone(true)
-      onComplete?.(score, questions.length)
+      onComplete?.(score, questions.length, bonusXp)
       return
     }
     setI(i + 1)
     setPicked(null)
+    setEliminated([])
+    setTimedOut(false)
   }
 
-  const restart = () => { setI(0); setPicked(null); setScore(0); setDone(false); setStats(null) }
+  const useJoker = () => {
+    if (jokerUsed || picked != null) return
+    const wrongIdxs = cur.opts.map((_, i) => i).filter(i => i !== cur.a)
+    const toElim = wrongIdxs.sort(() => Math.random() - 0.5).slice(0, 2)
+    setEliminated(toElim)
+    setJokerUsed(true)
+  }
+
+  const restart = () => {
+    setI(0); setPicked(null); setScore(0); setBonusXp(0)
+    setDone(false); setStats(null); setJokerUsed(false)
+    setEliminated([]); setTimeLeft(CHRONO_SECS); setTimedOut(false)
+  }
+
+  const catStyle = cur ? (CAT_COLORS[cur.cat] || {}) : {}
 
   if (done && stats) {
+    const totalXpGained = score * 10 + bonusXp
     return (
       <div style={{ padding: 20, borderRadius: 18, textAlign: 'center',
         background: 'linear-gradient(180deg, rgba(217,179,108,.1), var(--surface-1))',
         border: '1px solid var(--gold-line)' }}>
         <span style={{ width: 56, height: 56, borderRadius: '50%', margin: '0 auto 14px', display: 'flex',
           alignItems: 'center', justifyContent: 'center', color: '#1a130a',
-          background: 'linear-gradient(160deg,var(--gold-2),var(--gold))' }}><IcTrophy size={28} /></span>
+          background: 'linear-gradient(160deg,var(--gold-2),var(--gold))' }}>
+          <IcTrophy size={28} />
+        </span>
         <div className="h-sec" style={{ fontSize: 22 }}>{score} / {questions.length}</div>
         <div className="body" style={{ fontSize: 13.5, margin: '8px 0 10px' }}>
           {score === questions.length ? 'Sans faute, bravo !'
             : score >= Math.ceil(questions.length / 2) ? 'Beau score, continuez à explorer.'
             : 'Le ciel n\'attend que vous — réessayez !'}
         </div>
-        <div style={{ display: 'flex', justifyContent: 'center', gap: 14, marginBottom: 18, flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 10, marginBottom: 18, flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 12,
+            color: 'var(--gold)', padding: '4px 10px', borderRadius: 99,
+            background: 'var(--gold-soft)', border: '1px solid var(--gold-line)' }}>
+            <IcTrophy size={13} /> +{totalXpGained} XP{bonusXp > 0 ? ` (dont ${bonusXp} bonus chrono)` : ''}
+          </div>
           {stats.streak > 1 && (
             <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 12,
               color: 'var(--gold)', padding: '4px 10px', borderRadius: 99,
@@ -358,8 +493,8 @@ function Quiz({ onComplete }) {
             </div>
           )}
           {stats.bestScore > 0 && (
-            <div style={{ fontSize: 12, color: 'var(--faint)', display: 'flex', alignItems: 'center',
-              padding: '4px 10px', borderRadius: 99, background: 'var(--surface-1)', border: '1px solid var(--line)' }}>
+            <div style={{ fontSize: 12, color: 'var(--faint)', padding: '4px 10px', borderRadius: 99,
+              background: 'var(--surface-1)', border: '1px solid var(--line)' }}>
               Record : {stats.bestScore}/{questions.length}
             </div>
           )}
@@ -369,37 +504,102 @@ function Quiz({ onComplete }) {
     )
   }
 
+  const chronoPct = (timeLeft / CHRONO_SECS) * 100
+  const chronoColor = timeLeft > 8 ? 'var(--good)' : timeLeft > 4 ? 'var(--gold)' : 'var(--bad)'
+
   return (
     <div style={{ padding: 18, borderRadius: 18,
       background: 'linear-gradient(180deg,var(--surface-2),var(--surface-1))', border: '1px solid var(--line)' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+
+      {/* Header : progression + cat + score */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
         <span className="eyebrow">Question {i + 1} / {questions.length}</span>
-        <span className="data" style={{ fontSize: 12, color: 'var(--gold)' }}>{score} pt</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          {cur.cat && (
+            <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 99, fontFamily: 'var(--mono)',
+              letterSpacing: '.05em', background: catStyle.bg, border: '1px solid ' + catStyle.bd, color: catStyle.cl }}>
+              {cur.cat}
+            </span>
+          )}
+          <span className="data" style={{ fontSize: 12, color: 'var(--gold)' }}>{score} ✓</span>
+        </div>
       </div>
-      <div className="h-card" style={{ fontSize: 16, lineHeight: 1.3, marginBottom: 16, fontFamily: 'var(--serif)' }}>{cur.q}</div>
+
+      {/* Barre chrono */}
+      {chrono && (
+        <div style={{ marginBottom: 12 }}>
+          <div style={{ height: 4, borderRadius: 2, background: 'var(--line)', overflow: 'hidden' }}>
+            <div style={{ height: '100%', width: chronoPct + '%', background: chronoColor,
+              transition: 'width 1s linear, background 0.3s' }} />
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 4 }}>
+            <span style={{ fontSize: 11, color: chronoColor, fontFamily: 'var(--mono)' }}>
+              {timedOut ? 'Temps écoulé !' : timeLeft + 's'}
+            </span>
+          </div>
+        </div>
+      )}
+
+      <div className="h-card" style={{ fontSize: 16, lineHeight: 1.35, marginBottom: 16, fontFamily: 'var(--serif)' }}>
+        {cur.q}
+      </div>
+
       <div style={{ display: 'flex', flexDirection: 'column', gap: 9 }}>
         {cur.opts.map((o, idx) => {
           const isA = idx === cur.a, isP = idx === picked
+          const isElim = eliminated.includes(idx)
           let bd = 'var(--line-2)', bg = 'var(--surface-1)', cl = 'var(--text)'
+          if (isElim && picked == null) { bd = 'var(--line)'; bg = 'transparent'; cl = 'var(--faint)' }
           if (picked != null) {
             if (isA)       { bd = 'rgba(132,211,169,.5)'; bg = 'rgba(132,211,169,.1)'; cl = 'var(--good)' }
             else if (isP)  { bd = 'rgba(226,141,126,.5)'; bg = 'rgba(226,141,126,.1)'; cl = 'var(--bad)'  }
+            else if (isElim) { bd = 'var(--line)'; bg = 'transparent'; cl = 'var(--faint)' }
           }
           return (
-            <button key={idx} onClick={() => choose(idx)} className="press"
+            <button key={idx}
+              onClick={() => !isElim && choose(idx)}
+              className="press"
               style={{ textAlign: 'left', display: 'flex', alignItems: 'center', gap: 11,
-                padding: '13px 14px', borderRadius: 12, cursor: picked == null ? 'pointer' : 'default',
+                padding: '13px 14px', borderRadius: 12,
+                cursor: picked == null && !isElim ? 'pointer' : 'default',
                 background: bg, border: '1px solid ' + bd, color: cl, fontSize: 14,
-                fontWeight: 500, fontFamily: 'var(--sans)' }}>
+                fontWeight: 500, fontFamily: 'var(--sans)',
+                textDecoration: isElim ? 'line-through' : 'none',
+                opacity: isElim ? 0.45 : 1 }}>
               <span style={{ flex: 1 }}>{o}</span>
               {picked != null && isA && <IcCheckCircle size={18} />}
               {picked != null && isP && !isA && <IcClose size={16} />}
+              {chrono && picked != null && isA && timeLeft >= 10 && timeLeft < CHRONO_SECS && (
+                <span style={{ fontSize: 10, color: 'var(--gold)', fontFamily: 'var(--mono)' }}>+5 XP</span>
+              )}
             </button>
           )
         })}
       </div>
-      {picked != null && (
+
+      {/* Joker 50/50 */}
+      {picked == null && !timedOut && (
+        <div style={{ marginTop: 12, display: 'flex', justifyContent: 'flex-end' }}>
+          <button onClick={useJoker} disabled={jokerUsed}
+            style={{ fontSize: 11.5, padding: '5px 11px', borderRadius: 99, cursor: jokerUsed ? 'default' : 'pointer',
+              background: jokerUsed ? 'var(--surface-1)' : 'rgba(217,179,108,.12)',
+              border: '1px solid ' + (jokerUsed ? 'var(--line)' : 'var(--gold-line)'),
+              color: jokerUsed ? 'var(--faint)' : 'var(--gold)', fontFamily: 'var(--mono)',
+              opacity: jokerUsed ? 0.5 : 1 }}>
+            {jokerUsed ? '50/50 utilisé' : '⚡ Joker 50/50'}
+          </button>
+        </div>
+      )}
+
+      {(picked != null || timedOut) && (
         <div style={{ marginTop: 14 }}>
+          {timedOut && picked === -1 && (
+            <div style={{ fontSize: 13, padding: '8px 12px', borderRadius: 10, marginBottom: 10,
+              background: 'rgba(226,141,126,.08)', border: '1px solid rgba(226,141,126,.3)',
+              color: 'var(--bad)' }}>
+              Temps écoulé — la bonne réponse était : <strong>{cur.opts[cur.a]}</strong>
+            </div>
+          )}
           <div className="body tight serif-body"
             style={{ fontSize: 13, padding: '11px 13px', borderRadius: 11,
               background: 'var(--surface-1)', border: '1px solid var(--line)' }}>
@@ -424,15 +624,17 @@ export default function EducationPage({ onBack }) {
   const [quizStats, setQuizStats] = useState(quizLoad)
   const [xp, setXp]             = useState(xpLoad)
   const [defiDone, setDefiDone] = useState(defiDoneToday)
+  const [quizCat, setQuizCat]   = useState('Tout')
+  const [chronoMode, setChronoMode] = useState(false)
 
   const defi = getTodayDefi()
   const { data: apodArticle } = useLiveData(fetchAPODArticle)
 
-  const onQuizComplete = (score, total) => {
+  const onQuizComplete = (score, total, bonusXp) => {
     setQuizStats(quizLoad())
     setXp(xpLoad())
     setParcours(prev => advanceParcours(prev, score, total))
-    setTimeout(() => setQuizKey(k => k + 1), 4000)
+    setTimeout(() => setQuizKey(k => k + 1), 4500)
   }
 
   const onDefiDone = () => {
@@ -517,7 +719,37 @@ export default function EducationPage({ onBack }) {
           </div>
 
           <ToolSection title="Quiz éclair">
-            <Quiz key={quizKey} onComplete={onQuizComplete} />
+            {/* Filtres catégorie */}
+            <div style={{ display: 'flex', gap: 7, flexWrap: 'wrap', marginBottom: 12 }}>
+              {QUIZ_CATS.map(c => {
+                const active = quizCat === c
+                const cs = CAT_COLORS[c] || {}
+                return (
+                  <button key={c} onClick={() => { setQuizCat(c); setQuizKey(k => k + 1) }}
+                    style={{ fontSize: 11, padding: '4px 10px', borderRadius: 99, cursor: 'pointer',
+                      fontFamily: 'var(--mono)', letterSpacing: '.04em',
+                      background: active ? (cs.bg || 'var(--gold-soft)') : 'var(--surface-1)',
+                      border: '1px solid ' + (active ? (cs.bd || 'var(--gold-line)') : 'var(--line)'),
+                      color: active ? (cs.cl || 'var(--gold)') : 'var(--faint)' }}>
+                    {c}
+                  </button>
+                )
+              })}
+            </div>
+            {/* Toggle chrono */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
+              <button onClick={() => { setChronoMode(m => !m); setQuizKey(k => k + 1) }}
+                style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '6px 12px', borderRadius: 99,
+                  cursor: 'pointer', fontSize: 12, fontFamily: 'var(--mono)',
+                  background: chronoMode ? 'rgba(226,141,126,.12)' : 'var(--surface-1)',
+                  border: '1px solid ' + (chronoMode ? 'rgba(226,141,126,.4)' : 'var(--line)'),
+                  color: chronoMode ? 'var(--bad)' : 'var(--faint)' }}>
+                <span style={{ fontSize: 14 }}>⏱</span>
+                Mode chrono {chronoMode ? 'ON' : 'OFF'}
+                {chronoMode && <span style={{ fontSize: 10, opacity: .7 }}>· +5 XP si ≥ 10s restantes</span>}
+              </button>
+            </div>
+            <Quiz key={quizKey} onComplete={onQuizComplete} cat={quizCat} chrono={chronoMode} />
           </ToolSection>
 
           <ToolSection title="Parcours pédagogiques">
