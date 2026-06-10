@@ -1,13 +1,279 @@
 import { useState, useEffect, useMemo, useRef } from 'react'
-import { IcOrbit, IcChevron } from './icons'
+import { IcOrbit, IcChevron, IcClose } from './icons'
 import { ScreenHeader, SettingsBtn, DataRow, Sheet, AiInfoPanel } from './ui'
 import { PLANETS, ANOMALIES, THEORIES } from './data'
 import { getPlanetPositions } from './astro'
-import { fetchJWSTImages } from './api'
+import { fetchJWSTImages, fetchNASAImages } from './api'
 import { onbLoad } from './onboarding'
 
-// Mapping des IDs français (data.js) vers IDs astronomy-engine (astro.js)
 const ASTRO_ID = { mercure: 'mercury', saturne: 'saturn' }
+
+// ─── Lightbox (plein écran) ───────────────────────────────────────────────────
+
+function Lightbox({ photo, onClose }) {
+  useEffect(() => {
+    const handler = (e) => { if (e.key === 'Escape') onClose() }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [onClose])
+
+  return (
+    <div onClick={onClose}
+      style={{ position: 'fixed', inset: 0, zIndex: 200, background: 'rgba(0,0,0,.96)',
+        display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+        padding: '24px 16px' }}>
+      <img src={photo.thumbUrl} alt={photo.caption}
+        style={{ maxWidth: '100%', maxHeight: '72vh', objectFit: 'contain', borderRadius: 10 }} />
+      {photo.caption && (
+        <p style={{ color: 'rgba(255,255,255,.75)', fontSize: 13, marginTop: 18, textAlign: 'center',
+          fontFamily: 'var(--serif)', lineHeight: 1.5, maxWidth: 360, padding: '0 8px' }}>
+          {photo.caption}
+        </p>
+      )}
+      <div style={{ marginTop: 14, color: 'rgba(255,255,255,.3)', fontSize: 11.5,
+        fontFamily: 'var(--mono)', letterSpacing: '.06em' }}>
+        Touchez pour fermer
+      </div>
+    </div>
+  )
+}
+
+// ─── Galerie photo NASA ───────────────────────────────────────────────────────
+
+function PhotoGallery({ query, title = 'Photos NASA · JPL' }) {
+  const [photos, setPhotos] = useState(null)
+  const [lightbox, setLightbox] = useState(null)
+  const fetched = useRef(false)
+
+  useEffect(() => {
+    if (fetched.current) return
+    fetched.current = true
+    fetchNASAImages(query, 6)
+      .then(setPhotos)
+      .catch(() => setPhotos([]))
+  }, [query])
+
+  if (!photos) {
+    return (
+      <div style={{ marginTop: 22 }}>
+        <div className="eyebrow dim" style={{ color: 'var(--faint)', marginBottom: 10 }}>{title}</div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+          {[0, 1, 2, 3].map(i => (
+            <div key={i} style={{ height: 110, borderRadius: 12, background: 'var(--surface-1)',
+              animation: 'pulse 1.4s ease-in-out infinite', animationDelay: i * 0.12 + 's' }} />
+          ))}
+        </div>
+      </div>
+    )
+  }
+
+  if (!photos.length) return null
+
+  return (
+    <>
+      <div style={{ marginTop: 22 }}>
+        <div className="eyebrow dim" style={{ color: 'var(--faint)', marginBottom: 10 }}>{title}</div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+          {photos.map((ph, i) => (
+            <button key={i} onClick={() => setLightbox(ph)} className="press"
+              style={{ padding: 0, border: '1px solid var(--line)', borderRadius: 12, overflow: 'hidden',
+                background: 'var(--surface-1)', cursor: 'pointer', textAlign: 'left' }}>
+              <div style={{ height: 110, overflow: 'hidden', background: '#060c1c' }}>
+                <img src={ph.thumbUrl} alt={ph.caption}
+                  style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+              </div>
+              {ph.caption && (
+                <div style={{ padding: '6px 9px 9px', fontSize: 10.5, lineHeight: 1.3,
+                  color: 'var(--faint)', fontFamily: 'var(--mono)',
+                  overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  {ph.caption}
+                </div>
+              )}
+            </button>
+          ))}
+        </div>
+      </div>
+      {lightbox && <Lightbox photo={lightbox} onClose={() => setLightbox(null)} />}
+    </>
+  )
+}
+
+// ─── Visuel planète (photo réelle + fallback CSS) ─────────────────────────────
+
+function PlanetOrb({ p, size = 92 }) {
+  const ring = p.id === 'saturne' || p.id === 'uranus'
+  return (
+    <div style={{ position: 'relative', width: size, height: size,
+      display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div style={{ width: size, height: size, borderRadius: '50%',
+        background: `radial-gradient(circle at 34% 30%, ${p.glow}, ${p.color} 58%, #0a0f1d 130%)`,
+        boxShadow: `0 0 30px ${p.color}44, inset -8px -8px 20px rgba(0,0,0,.45)` }} />
+      {ring && (
+        <div style={{ position: 'absolute', width: size * 1.7, height: size * 0.5,
+          border: `${size * 0.06}px solid ${p.glow}`, borderRadius: '50%', opacity: .55,
+          transform: 'rotate(-18deg)', borderTopColor: 'transparent', borderBottomColor: `${p.glow}88` }} />
+      )}
+    </div>
+  )
+}
+
+function PlanetPhoto({ p, size = 92, borderRadius = '50%' }) {
+  const [imgOk, setImgOk] = useState(!!p.img)
+  if (!imgOk) return <PlanetOrb p={p} size={size} />
+  return (
+    <div style={{ width: size, height: size, borderRadius, overflow: 'hidden', flexShrink: 0,
+      boxShadow: `0 0 28px ${p.color}55, 0 4px 18px rgba(0,0,0,.55)` }}>
+      <img src={p.img} alt={p.name}
+        style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+        onError={() => setImgOk(false)} />
+    </div>
+  )
+}
+
+// ─── Carte planète (grille) ───────────────────────────────────────────────────
+
+function PlanetCard({ p, pos, onPick }) {
+  return (
+    <button onClick={() => onPick(p)} className="press" style={{ flexShrink: 0, width: 150,
+      background: 'linear-gradient(180deg,var(--surface-2),var(--surface-1))', border: '1px solid var(--line)',
+      borderRadius: 'var(--r-l)', padding: 18, cursor: 'pointer', textAlign: 'left' }}>
+      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 14 }}>
+        <PlanetPhoto p={p} size={92} />
+      </div>
+      <div className="meta" style={{ color: 'var(--gold)', marginBottom: 3 }}>{p.dist}</div>
+      <div className="h-card" style={{ fontSize: 16 }}>{p.name}</div>
+      <div style={{ fontSize: 11.5, color: 'var(--faint)', marginTop: 2, marginBottom: pos ? 8 : 0 }}>{p.sub}</div>
+      {pos && (
+        <span className={'tag' + (pos.visible ? ' live' : ' neutral')} style={{ fontSize: 10 }}>
+          {pos.visible ? 'Visible ce soir' : 'Non visible'}
+        </span>
+      )}
+    </button>
+  )
+}
+
+// ─── Fiche planète (Sheet) ────────────────────────────────────────────────────
+
+function PlanetSheetContent({ planet, pos }) {
+  const [imgOk, setImgOk] = useState(!!planet.img)
+
+  return (
+    <div>
+      {/* Hero photo */}
+      <div style={{ borderRadius: 16, overflow: 'hidden', marginBottom: 16, height: 220,
+        background: `radial-gradient(circle at 34% 30%, ${planet.glow}, ${planet.color} 58%, #0a0f1d 130%)`,
+        position: 'relative' }}>
+        {planet.img && imgOk && (
+          <img src={planet.img} alt={planet.name}
+            style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+            onError={() => setImgOk(false)} />
+        )}
+        {(!planet.img || !imgOk) && (
+          <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <PlanetOrb p={planet} size={140} />
+          </div>
+        )}
+      </div>
+
+      <div style={{ textAlign: 'center', marginBottom: 20 }}>
+        <div className="tag" style={{ marginBottom: 8 }}>{planet.sub}</div>
+        <div className="h-sec" style={{ fontSize: 28 }}>{planet.name}</div>
+      </div>
+
+      {pos && (
+        <div style={{ display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap', marginBottom: 18 }}>
+          <span className={'tag' + (pos.visible ? ' live' : ' neutral')}>
+            {pos.visible ? 'Visible ce soir' : 'Non visible ce soir'}
+          </span>
+          <span className="tag neutral">Dist. {pos.distLabel}</span>
+          <span className="tag neutral">mag {pos.mag}</span>
+        </div>
+      )}
+
+      <p className="body serif-body" style={{ fontSize: 15, lineHeight: 1.6, textAlign: 'center', margin: '0 0 14px' }}>
+        {planet.note}
+      </p>
+
+      <AiInfoPanel cacheKey={`explore_planet_${planet.id}`} style={{ marginBottom: 18 }}
+        buildPrompt={`Planète ${planet.name} (${planet.sub}) : diamètre ${planet.diam}, masse ${planet.mass}, distance ${planet.dist}, température ${planet.temp}, ${planet.moons} lune(s).
+${planet.note}
+En 4 phrases, décris ce qu'un astronome amateur peut voir de ${planet.name} avec un télescope, les aspects les plus fascinants, et une anecdote marquante sur cette planète.`} />
+
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 24px' }}>
+        <DataRow k="Diamètre" v={planet.diam} accent />
+        <DataRow k="Masse" v={planet.mass} />
+        <DataRow k="Jour" v={planet.day} />
+        <DataRow k="Année" v={planet.year} />
+        <DataRow k="Lunes" v={planet.moons} />
+        <DataRow k="Distance orb." v={planet.dist} />
+        <DataRow k="Température" v={planet.temp} />
+        {pos && <DataRow k="Distance actuelle" v={pos.distLabel} accent />}
+        {pos && <DataRow k="Magnitude" v={`mag ${pos.mag}`} />}
+      </div>
+
+      {/* Galerie NASA dynamique */}
+      <PhotoGallery
+        query={planet.nameEn || planet.name + ' planet NASA'}
+        title="Photos NASA · JPL"
+      />
+    </div>
+  )
+}
+
+// ─── Fiche Soleil ─────────────────────────────────────────────────────────────
+
+function SunSheet({ open, onClose }) {
+  const [heroUrl, setHeroUrl] = useState(null)
+
+  useEffect(() => {
+    if (!open || heroUrl) return
+    fetchNASAImages('solar dynamics observatory full disk', 1)
+      .then(photos => { if (photos.length) setHeroUrl(photos[0].thumbUrl) })
+      .catch(() => {})
+  }, [open])
+
+  return (
+    <Sheet open={open} onClose={onClose}>
+      {/* Hero */}
+      <div style={{ borderRadius: 16, overflow: 'hidden', marginBottom: 16, height: 220,
+        background: 'radial-gradient(circle at 50% 50%, #fff9e6 0%, #ffd200 20%, #ff8000 55%, #c03800 85%, #5c1200 100%)' }}>
+        {heroUrl && (
+          <img src={heroUrl} alt="Le Soleil"
+            style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+        )}
+      </div>
+
+      <div className="tag" style={{ marginBottom: 8 }}>Étoile naine jaune · G2V</div>
+      <div className="h-sec" style={{ fontSize: 28, marginBottom: 14 }}>Le Soleil</div>
+
+      <p className="body serif-body" style={{ fontSize: 14.5, lineHeight: 1.65, margin: '0 0 14px' }}>
+        Notre étoile, à 150 millions de km. Diamètre de 1,39 million de km, il représente 99,86&nbsp;%
+        de la masse du système solaire. Sa photosphère brûle à 5 500&nbsp;°C tandis que sa couronne
+        dépasse 1 million de degrés — un paradoxe encore inexpliqué.
+      </p>
+
+      <AiInfoPanel cacheKey="explore_sun" style={{ marginBottom: 18 }}
+        buildPrompt="Le Soleil — étoile naine jaune G2V, âge 4,6 Ga, luminosité 3,83×10²⁶ W, rotation différentielle (25 j à l'équateur, 35 j aux pôles). En 4 phrases, décris les phénomènes les plus spectaculaires observables (couronne, éruptions, taches, proéminences) et leur impact sur la Terre et les observateurs." />
+
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 24px', marginBottom: 4 }}>
+        <DataRow k="Diamètre" v="1,39 M km" accent />
+        <DataRow k="Masse" v="1,99 × 10³⁰ kg" />
+        <DataRow k="Température surface" v="5 500 °C" />
+        <DataRow k="Température couronne" v="> 1 000 000 °C" />
+        <DataRow k="Distance Terre" v="1 UA · 150 M km" />
+        <DataRow k="Âge" v="4,6 milliards d'ans" />
+      </div>
+
+      {/* Galerie Couronne + Taches */}
+      <PhotoGallery query="solar corona chromosphere sunspot" title="Couronne · Chromosphère · Taches" />
+
+      {/* Galerie Éruptions + Proéminences */}
+      <PhotoGallery query="solar flare prominence eruption SDO" title="Éruptions · Proéminences solaires" />
+    </Sheet>
+  )
+}
+
+// ─── Vue Système solaire ──────────────────────────────────────────────────────
 
 function WikiLink({ url }) {
   if (!url) return null
@@ -24,80 +290,44 @@ function WikiLink({ url }) {
   )
 }
 
-function Orb({ p, size = 96 }) {
-  const ring = p.id === 'saturne' || p.id === 'uranus'
-  return (
-    <div style={{ position: 'relative', width: size, height: size, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <div style={{ width: size, height: size, borderRadius: '50%',
-        background: `radial-gradient(circle at 34% 30%, ${p.glow}, ${p.color} 58%, #0a0f1d 130%)`,
-        boxShadow: `0 0 30px ${p.color}44, inset -8px -8px 20px rgba(0,0,0,.45)` }} />
-      {ring && (
-        <div style={{ position: 'absolute', width: size * 1.7, height: size * 0.5,
-          border: `${size * 0.06}px solid ${p.glow}`, borderRadius: '50%', opacity: .55,
-          transform: 'rotate(-18deg)', borderTopColor: 'transparent', borderBottomColor: `${p.glow}88` }} />
-      )}
-    </div>
-  )
-}
-
-const SEGMENTS = [
-  { key: 'solar', label: 'Système solaire' },
-  { key: 'jwst', label: 'James Webb' },
-  { key: 'anomaly', label: 'Anomalies' },
-  { key: 'theory', label: 'Théories' },
-]
-
-function Segmented({ value, onChange }) {
-  return (
-    <div style={{ display: 'flex', gap: 7, overflowX: 'auto', padding: '2px 18px 4px', scrollbarWidth: 'none' }}>
-      {SEGMENTS.map(s => (
-        <button key={s.key} className={'chip' + (value === s.key ? ' on' : '')} onClick={() => onChange(s.key)}>{s.label}</button>
-      ))}
-    </div>
-  )
-}
-
-function SolarView({ onPick, planetPositions }) {
+function SolarView({ onPick, onSun, planetPositions }) {
   return (
     <div className="enter">
       <p className="body" style={{ padding: '6px 18px 4px', fontSize: 12.5 }}>
-        Huit planètes en orbite autour du Soleil. Touchez pour les caractéristiques physiques.
+        Huit planètes en orbite autour du Soleil. Touchez pour les caractéristiques et les photos.
       </p>
       <div style={{ display: 'flex', gap: 14, overflowX: 'auto', padding: '12px 18px 18px', scrollbarWidth: 'none' }}>
         {PLANETS.map(p => {
           const astroId = ASTRO_ID[p.id] ?? p.id
           const pos = planetPositions.find(x => x.id === astroId)
-          return (
-            <button key={p.id} onClick={() => onPick(p)} className="press" style={{ flexShrink: 0, width: 150,
-              background: 'linear-gradient(180deg,var(--surface-2),var(--surface-1))', border: '1px solid var(--line)',
-              borderRadius: 'var(--r-l)', padding: 18, cursor: 'pointer', textAlign: 'left' }}>
-              <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 14 }}><Orb p={p} size={92} /></div>
-              <div className="meta" style={{ color: 'var(--gold)', marginBottom: 3 }}>{p.dist}</div>
-              <div className="h-card" style={{ fontSize: 16 }}>{p.name}</div>
-              <div style={{ fontSize: 11.5, color: 'var(--faint)', marginTop: 2, marginBottom: pos ? 8 : 0 }}>{p.sub}</div>
-              {pos && (
-                <span className={'tag' + (pos.visible ? ' live' : ' neutral')} style={{ fontSize: 10 }}>
-                  {pos.visible ? 'Visible ce soir' : 'Non visible'}
-                </span>
-              )}
-            </button>
-          )
+          return <PlanetCard key={p.id} p={p} pos={pos} onPick={onPick} />
         })}
       </div>
+
+      {/* Carte Soleil cliquable */}
       <div className="pad">
-        <div className="card" style={{ padding: 16, display: 'flex', gap: 13, alignItems: 'center' }}>
-          <span style={{ width: 38, height: 38, borderRadius: 11, display: 'flex', alignItems: 'center',
-            justifyContent: 'center', color: 'var(--gold)', background: 'var(--gold-soft)',
-            border: '1px solid var(--gold-line)', flexShrink: 0 }}><IcOrbit size={20} /></span>
-          <div style={{ flex: 1 }}>
-            <div className="h-card" style={{ fontSize: 14 }}>Le Soleil</div>
-            <div className="body tight" style={{ fontSize: 12 }}>Étoile naine jaune · 1,39 M km · 99,86 % de la masse du système</div>
+        <button onClick={onSun} className="press" style={{ width: '100%', textAlign: 'left', padding: 0,
+          background: 'linear-gradient(180deg,var(--surface-2),var(--surface-1))', border: '1px solid var(--line)',
+          borderRadius: 'var(--r-l)', overflow: 'hidden', cursor: 'pointer' }}>
+          <div style={{ height: 110, overflow: 'hidden',
+            background: 'radial-gradient(circle at 50% 60%, #fff9e6 0%, #ffd200 22%, #ff8000 55%, #c03800 85%, #5c1200 100%)' }} />
+          <div style={{ padding: '12px 16px', display: 'flex', gap: 13, alignItems: 'center' }}>
+            <span style={{ width: 38, height: 38, borderRadius: 11, display: 'flex', alignItems: 'center',
+              justifyContent: 'center', color: 'var(--gold)', background: 'var(--gold-soft)',
+              border: '1px solid var(--gold-line)', flexShrink: 0 }}><IcOrbit size={20} /></span>
+            <div style={{ flex: 1 }}>
+              <div className="h-card" style={{ fontSize: 15 }}>Le Soleil</div>
+              <div className="body tight" style={{ fontSize: 12 }}>Étoile naine jaune G2V · 1,39 M km · 99,86 % de la masse du système</div>
+            </div>
+            <IcChevron size={17} className="arrow" />
           </div>
-        </div>
+        </button>
       </div>
     </div>
   )
 }
+
+// ─── Vue James Webb ───────────────────────────────────────────────────────────
 
 function JwstView() {
   const [images, setImages] = useState(null)
@@ -199,6 +429,8 @@ function JwstView() {
   )
 }
 
+// ─── Vue Anomalies ────────────────────────────────────────────────────────────
+
 function AnomalyView({ onPick }) {
   return (
     <div className="enter pad">
@@ -219,6 +451,8 @@ function AnomalyView({ onPick }) {
     </div>
   )
 }
+
+// ─── Vue Théories ─────────────────────────────────────────────────────────────
 
 function TheoryView({ onPick }) {
   return (
@@ -246,11 +480,33 @@ function TheoryView({ onPick }) {
   )
 }
 
+// ─── Segments ─────────────────────────────────────────────────────────────────
+
+const SEGMENTS = [
+  { key: 'solar', label: 'Système solaire' },
+  { key: 'jwst', label: 'James Webb' },
+  { key: 'anomaly', label: 'Anomalies' },
+  { key: 'theory', label: 'Théories' },
+]
+
+function Segmented({ value, onChange }) {
+  return (
+    <div style={{ display: 'flex', gap: 7, overflowX: 'auto', padding: '2px 18px 4px', scrollbarWidth: 'none' }}>
+      {SEGMENTS.map(s => (
+        <button key={s.key} className={'chip' + (value === s.key ? ' on' : '')} onClick={() => onChange(s.key)}>{s.label}</button>
+      ))}
+    </div>
+  )
+}
+
+// ─── Écran principal ──────────────────────────────────────────────────────────
+
 export default function ExploreScreen() {
   const [seg, setSeg] = useState('solar')
   const [planet, setPlanet] = useState(null)
   const [anom, setAnom] = useState(null)
   const [theo, setTheo] = useState(null)
+  const [sunOpen, setSunOpen] = useState(false)
 
   const profile = useMemo(() => onbLoad(), [])
   const lat = profile.location?.lat ?? 48.8566
@@ -270,7 +526,7 @@ export default function ExploreScreen() {
       <ScreenHeader eyebrow="Explorer le cosmos" title="Explorer" right={<SettingsBtn />} />
       <Segmented value={seg} onChange={setSeg} />
       <div style={{ marginTop: 6 }}>
-        {seg === 'solar'   && <SolarView onPick={setPlanet} planetPositions={planetPositions} />}
+        {seg === 'solar'   && <SolarView onPick={setPlanet} onSun={() => setSunOpen(true)} planetPositions={planetPositions} />}
         {seg === 'jwst'    && <JwstView />}
         {seg === 'anomaly' && <AnomalyView onPick={setAnom} />}
         {seg === 'theory'  && <TheoryView onPick={setTheo} />}
@@ -278,43 +534,11 @@ export default function ExploreScreen() {
 
       {/* Fiche planète */}
       <Sheet open={!!planet} onClose={() => setPlanet(null)}>
-        {planet && (() => {
-          const pos = getPos(planet)
-          return (
-            <div>
-              <div style={{ display: 'flex', justifyContent: 'center', margin: '6px 0 16px' }}><Orb p={planet} size={128} /></div>
-              <div style={{ textAlign: 'center', marginBottom: 20 }}>
-                <div className="tag" style={{ marginBottom: 8 }}>{planet.sub}</div>
-                <div className="h-sec" style={{ fontSize: 28 }}>{planet.name}</div>
-              </div>
-              {pos && (
-                <div style={{ display: 'flex', gap: 10, justifyContent: 'center', marginBottom: 18 }}>
-                  <span className={'tag' + (pos.visible ? ' live' : ' neutral')}>
-                    {pos.visible ? 'Visible ce soir' : 'Non visible ce soir'}
-                  </span>
-                  <span className="tag neutral">Dist. {pos.distLabel}</span>
-                  <span className="tag neutral">mag {pos.mag}</span>
-                </div>
-              )}
-              <p className="body serif-body" style={{ fontSize: 15, lineHeight: 1.6, textAlign: 'center', margin: '0 0 14px' }}>{planet.note}</p>
-              <AiInfoPanel cacheKey={`explore_planet_${planet.id}`} style={{ marginBottom: 18 }} buildPrompt={`Planète ${planet.name} (${planet.sub}) : diamètre ${planet.diam}, masse ${planet.mass}, distance ${planet.dist}, température ${planet.temp}, ${planet.moons} lune(s).
-${planet.note}
-En 4 phrases, décris ce qu'un astronome amateur peut voir de ${planet.name} avec un télescope, les aspects les plus fascinants, et une anecdote marquante sur cette planète.`} />
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 24px' }}>
-                <DataRow k="Diamètre" v={planet.diam} accent />
-                <DataRow k="Masse" v={planet.mass} />
-                <DataRow k="Jour" v={planet.day} />
-                <DataRow k="Année" v={planet.year} />
-                <DataRow k="Lunes" v={planet.moons} />
-                <DataRow k="Distance orb." v={planet.dist} />
-                <DataRow k="Température" v={planet.temp} />
-                {pos && <DataRow k="Distance actuelle" v={pos.distLabel} accent />}
-                {pos && <DataRow k="Magnitude" v={`mag ${pos.mag}`} />}
-              </div>
-            </div>
-          )
-        })()}
+        {planet && <PlanetSheetContent planet={planet} pos={getPos(planet)} />}
       </Sheet>
+
+      {/* Fiche Soleil */}
+      <SunSheet open={sunOpen} onClose={() => setSunOpen(false)} />
 
       {/* Fiche anomalie */}
       <Sheet open={!!anom} onClose={() => setAnom(null)}>

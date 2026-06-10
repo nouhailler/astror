@@ -541,6 +541,23 @@ function parseCsvLine(line) {
   return cols
 }
 
+// ─── NASA Images API ──────────────────────────────────────────────────────────
+
+export async function fetchNASAImages(query, limit = 6) {
+  const r = await fetch(
+    `https://images-api.nasa.gov/search?q=${encodeURIComponent(query)}&media_type=image&page_size=${limit + 4}`
+  )
+  if (!r.ok) throw new Error('nasa-api')
+  const d = await r.json()
+  return (d.collection?.items || [])
+    .filter(it => it.links?.[0]?.href)
+    .slice(0, limit)
+    .map(it => ({
+      thumbUrl: it.links[0].href,
+      caption:  (it.data?.[0]?.title || '').replace(/^NASA\//, '').trim(),
+    }))
+}
+
 export async function fetchCommunityRanking(sheetUrl) {
   if (!sheetUrl) throw new Error('no-sheet')
   const m = sheetUrl.match(/\/spreadsheets\/d\/([a-zA-Z0-9_-]+)/)
