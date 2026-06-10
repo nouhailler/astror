@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-import { IcSpark, IcSend, IcArrowLeft } from './icons'
+import { IcSpark, IcSend, IcArrowLeft, IcSliders } from './icons'
 import { onbLoad } from './onboarding'
 import { callAI } from './claudeApi'
 
@@ -185,6 +185,13 @@ export default function AiPage({ onBack }) {
             <span className="dot pulse" style={{ background: 'var(--good)' }} /> IA · {city}
           </div>
         </div>
+        <button className="press" onClick={() => window.openAstrorSettings && window.openAstrorSettings()}
+          aria-label="Paramètres"
+          style={{ width: 38, height: 38, borderRadius: 999, border: '1px solid var(--line-2)',
+            background: 'rgba(255,255,255,0.03)', color: 'var(--dim)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flexShrink: 0 }}>
+          <IcSliders size={17} />
+        </button>
       </div>
 
       <div ref={scrollRef} style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '16px 18px 8px' }}>

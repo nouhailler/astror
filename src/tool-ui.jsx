@@ -1,11 +1,18 @@
-import { IcArrowLeft } from './icons'
+import { IcArrowLeft, IcSliders } from './icons'
 
 export function ToolPage({ title, onBack, children }) {
   return (
     <div className="screen pad-b">
       <div className="tool-head">
-        <button className="tool-back press" onClick={onBack}><IcArrowLeft size={19} /></button>
-        <div className="h-sec" style={{ fontSize: 19 }}>{title}</div>
+        <button className="tool-back press" onClick={onBack} aria-label="Retour"><IcArrowLeft size={19} /></button>
+        <div className="h-sec" style={{ fontSize: 19, flex: 1 }}>{title}</div>
+        <button className="press" onClick={() => window.openAstrorSettings && window.openAstrorSettings()}
+          aria-label="Paramètres"
+          style={{ width: 38, height: 38, borderRadius: 999, border: '1px solid var(--line-2)',
+            background: 'rgba(255,255,255,0.03)', color: 'var(--dim)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flexShrink: 0 }}>
+          <IcSliders size={17} />
+        </button>
       </div>
       <div style={{ padding: '6px 0 0' }}>{children}</div>
     </div>
