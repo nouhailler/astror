@@ -487,14 +487,18 @@ export default function SkyScreen() {
     return p.location?.lat != null ? p.location : { city: 'Paris', lat: 48.8566, lng: 2.3522 }
   }, [])
 
-  // positions recalculées chaque minute
+  // positions recalculées chaque minute (temps réel) ou à l'heure simulée
   const [now, setNow] = useState(() => new Date())
+  const [offsetMin, setOffsetMin] = useState(0) // curseur temporel : 0 à +12 h
   useEffect(() => {
     const id = setInterval(() => setNow(new Date()), 60000)
     return () => clearInterval(id)
   }, [])
-  const objects = useMemo(() => getSkyPositions(SKY_OBJECTS, now, loc.lat, loc.lng), [now, loc])
-  const constellations = useMemo(() => getConstellationPoints(CONSTELLATIONS, now, loc.lat, loc.lng), [now, loc])
+  const simDate = useMemo(() => new Date(now.getTime() + offsetMin * 60000), [now, offsetMin])
+  const simulating = offsetMin > 0
+  const simLabel = simDate.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
+  const objects = useMemo(() => getSkyPositions(SKY_OBJECTS, simDate, loc.lat, loc.lng), [simDate, loc])
+  const constellations = useMemo(() => getConstellationPoints(CONSTELLATIONS, simDate, loc.lat, loc.lng), [simDate, loc])
 
   const chips = [
     { key: 'all', label: 'Tout' }, { key: 'planet', label: 'Planètes' },
@@ -524,10 +528,34 @@ export default function SkyScreen() {
 
       <div className="pad">
         <SkyDome filter={filter} objects={objects} constellations={constellations} onPick={setPick} />
+
+        {/* Curseur temporel : de maintenant à +12 h */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 11, marginTop: 10 }}>
+          <IcClock size={15} style={{ color: simulating ? 'var(--gold)' : 'var(--faint)', flexShrink: 0 }} />
+          <input type="range" min={0} max={720} step={15} value={offsetMin}
+            onChange={e => setOffsetMin(+e.target.value)}
+            aria-label="Simuler le ciel à une heure ultérieure"
+            style={{ flex: 1, accentColor: 'var(--gold)', cursor: 'pointer' }} />
+          <span className="data" style={{ width: 44, textAlign: 'right', fontSize: 13,
+            color: simulating ? 'var(--gold)' : 'var(--faint)' }}>{simLabel}</span>
+        </div>
+        {simulating && (
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, marginTop: 7 }}>
+            <span className="meta" style={{ color: 'var(--gold)' }}>
+              Ciel simulé à {simLabel}{simDate.getDate() !== now.getDate() ? ' (demain)' : ''}
+            </span>
+            <button onClick={() => setOffsetMin(0)} className="press"
+              style={{ padding: '3px 10px', borderRadius: 99, cursor: 'pointer', fontSize: 10.5,
+                fontFamily: 'var(--mono)', textTransform: 'uppercase', letterSpacing: '.06em',
+                background: 'rgba(255,255,255,.04)', border: '1px solid var(--line-2)', color: 'var(--dim)' }}>
+              Maintenant
+            </button>
+          </div>
+        )}
       </div>
 
       <div className="pad">
-        <SectionTitle action="Magnitude ↑">Maintenant visible</SectionTitle>
+        <SectionTitle action="Magnitude ↑">{simulating ? `Visible à ${simLabel}` : 'Maintenant visible'}</SectionTitle>
         <div className="card-2" style={{ overflow: 'hidden' }}>
           {list.length === 0 && (
             <div className="body tight" style={{ padding: '16px 15px', fontSize: 13, color: 'var(--faint)' }}>

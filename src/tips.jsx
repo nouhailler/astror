@@ -9,6 +9,7 @@ export const TIPS = {
   sky: [
     "Touchez un astre sur la carte pour ouvrir sa fiche : magnitude, altitude, distance et analyse IA.",
     "Glissez le doigt sur la carte pour la faire tourner, ou touchez la boussole pour l'aligner automatiquement avec la direction que vous regardez.",
+    "Le curseur sous la carte simule le ciel jusqu'à 12 h en avance : vérifiez ce qui sera levé à 3 h du matin avant de programmer votre réveil.",
     "Dans la fiche d'un objet, lancez le mode boussole : pointez le téléphone vers le ciel, le radar vous guide jusqu'à lui.",
     "Les boutons ▶ et ? en haut à droite ouvrent une démo pas à pas et l'aide de chaque écran d'Astror.",
   ],
