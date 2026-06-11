@@ -109,6 +109,34 @@ describe('getSkyPositions', () => {
     expect(jup.mag).toBeLessThan(0) // Jupiter toujours négative
     expect(jup.dist).toMatch(/UA$/)
   })
+
+  it('computes the Moon with phase, distance in km and constellation', () => {
+    const moon = getSkyPositions(SKY_OBJECTS, date, ...paris).find(o => o.id === 'moon')
+    expect(moon.mag).toBeLessThan(-8)
+    expect(moon.dist).toMatch(/km$/)
+    expect(moon.info).toMatch(/% illuminée/)
+    expect(moon.cons).not.toBe('—')
+  })
+
+  it('puts Polaris at an altitude close to the latitude', () => {
+    const pol = getSkyPositions(SKY_OBJECTS, date, ...paris).find(o => o.id === 'polaris')
+    expect(Math.abs(pol.alt - paris[0])).toBeLessThan(2)
+  })
+
+  it('puts Sirius below the horizon on a June night in Paris', () => {
+    const sirius = getSkyPositions(SKY_OBJECTS, date, ...paris).find(o => o.id === 'sirius')
+    expect(sirius.alt).toBeLessThan(0)
+  })
+
+  it('computes rise/set for every fixed object beyond the 8 star slots', () => {
+    const objs = getSkyPositions(SKY_OBJECTS, date, ...paris)
+    const fixed = objs.filter(o => o.ra != null)
+    expect(fixed.length).toBeGreaterThan(8)
+    // les non-circumpolaires ont des horaires HH:MM
+    const sirius = fixed.find(o => o.id === 'sirius')
+    expect(sirius.rise).toMatch(/\d{2}:\d{2}/)
+    expect(sirius.set).toMatch(/\d{2}:\d{2}/)
+  })
 })
 
 describe('getConstellationPoints', () => {

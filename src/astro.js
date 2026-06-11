@@ -505,16 +505,44 @@ function fmtAU(au) {
   return au.toFixed(2).replace('.', ',') + ' UA'
 }
 
+// Constellations traversées par la Lune (noms anglais d'astronomy-engine → FR)
+const CONS_FR = {
+  Aries:'Bélier', Taurus:'Taureau', Gemini:'Gémeaux', Cancer:'Cancer', Leo:'Lion',
+  Virgo:'Vierge', Libra:'Balance', Scorpius:'Scorpion', Ophiuchus:'Ophiuchus',
+  Sagittarius:'Sagittaire', Capricornus:'Capricorne', Aquarius:'Verseau', Pisces:'Poissons',
+  Cetus:'Baleine', Orion:'Orion', Sextans:'Sextant', Auriga:'Cocher', Scutum:'Écu',
+  Corvus:'Corbeau', Crater:'Coupe', Hydra:'Hydre',
+}
+
 /**
  * Enrichit les SKY_OBJECTS avec alt/az/mag/lever/coucher calculés en direct.
- * Planètes via leur éphéméride ; objets fixes via ra/dec (J2000).
+ * Lune et planètes via leur éphéméride ; objets fixes via ra/dec (J2000).
  * En cas d'échec, les valeurs statiques de data.js servent de secours.
  */
 export function getSkyPositions(objects, date = new Date(), lat = 48.8566, lng = 2.3522) {
   const obs = new Astronomy.Observer(lat, lng, 0)
-  let starSlot = 1
   return objects.map(o => {
     try {
+      if (o.id === 'moon') {
+        const eq    = Astronomy.Equator(Astronomy.Body.Moon, date, obs, true, true)
+        const hor   = Astronomy.Horizon(date, obs, eq.ra, eq.dec, 'normal')
+        const illum = Astronomy.Illumination(Astronomy.Body.Moon, date)
+        const phase = Astronomy.MoonPhase(date)
+        const pct   = Math.round((1 - Math.cos(phase * Math.PI / 180)) / 2 * 100)
+        const rise  = Astronomy.SearchRiseSet(Astronomy.Body.Moon, obs, +1, date, 1)
+        const set   = Astronomy.SearchRiseSet(Astronomy.Body.Moon, obs, -1, date, 1)
+        const km    = Math.round(illum.geo_dist * 149597870.7)
+        let cons = o.cons
+        try {
+          const eqj = Astronomy.Equator(Astronomy.Body.Moon, date, obs, false, true)
+          const c = Astronomy.Constellation(eqj.ra, eqj.dec)
+          cons = CONS_FR[c.name] || c.name
+        } catch {}
+        return { ...o, alt: Math.round(hor.altitude), az: Math.round(hor.azimuth),
+          mag: +illum.mag.toFixed(1), rise: fmtTime(rise), set: fmtTime(set),
+          dist: km.toLocaleString('fr-FR') + ' km', cons,
+          info: `${phaseName(phase)} · ${pct} % illuminée. ${o.info}` }
+      }
       const body = SKY_BODIES[o.id]
       if (body) {
         const eq    = Astronomy.Equator(body, date, obs, true, true)
@@ -526,13 +554,13 @@ export function getSkyPositions(objects, date = new Date(), lat = 48.8566, lng =
           mag: +illum.mag.toFixed(1), rise: fmtTime(rise), set: fmtTime(set),
           dist: fmtAU(illum.geo_dist) }
       }
-      if (o.ra != null && starSlot <= 8) {
+      if (o.ra != null) {
         const hor = Astronomy.Horizon(date, obs, o.ra, o.dec, 'normal')
-        const starBody = Astronomy.Body['Star' + starSlot++]
-        Astronomy.DefineStar(starBody, o.ra, o.dec, 1000)
+        // un seul slot étoile, redéfini pour chaque objet
+        Astronomy.DefineStar(Astronomy.Body.Star1, o.ra, o.dec, 1000)
         let r = null, s = null
-        try { r = Astronomy.SearchRiseSet(starBody, obs, +1, date, 1) } catch {}
-        try { s = Astronomy.SearchRiseSet(starBody, obs, -1, date, 1) } catch {}
+        try { r = Astronomy.SearchRiseSet(Astronomy.Body.Star1, obs, +1, date, 1) } catch {}
+        try { s = Astronomy.SearchRiseSet(Astronomy.Body.Star1, obs, -1, date, 1) } catch {}
         return { ...o, alt: Math.round(hor.altitude), az: Math.round(hor.azimuth),
           rise: r ? fmtTime(r) : '—', set: s ? fmtTime(s) : '—' }
       }

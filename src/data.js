@@ -20,6 +20,32 @@ export const SKY_OBJECTS = [
     info:'Amas globulaire de ~300 000 étoiles. Spectaculaire dans un 200 mm.', dist:'22 000 al', rise:'—', set:'—' },
   { id:'m57', kind:'Nébuleuse', name:'M57 — Anneau', mag:8.8, alt:75, az:305, ra:18.8931, dec:33.03, r:1.7, color:'#9fd6c2', cons:'Lyre', deep:true,
     info:'Nébuleuse planétaire en anneau. Nécessite un télescope ; visible entre Sheliak et Sulafat.', dist:'2 300 al', rise:'—', set:'—' },
+  { id:'moon', kind:'Lune', name:'Lune', mag:-12.5, alt:30, az:120, r:5.8, color:'#e8e4da', cons:'—',
+    info:'Notre satellite naturel. Le terminateur (limite jour/nuit) offre les reliefs les plus spectaculaires.', dist:'384 400 km', rise:'--:--', set:'--:--' },
+  { id:'sirius', kind:'Étoile', name:'Sirius', mag:-1.46, alt:-25, az:340, ra:6.7525, dec:-16.716, r:3.4, color:'#e8f0ff', cons:'Grand Chien',
+    info:'L\'étoile la plus brillante du ciel nocturne. Binaire : sa compagne Sirius B est une naine blanche.', dist:'8,6 al', rise:'—', set:'—' },
+  { id:'arcturus', kind:'Étoile', name:'Arcturus', mag:-0.05, alt:55, az:215, ra:14.2610, dec:19.18, r:3.1, color:'#f5c889', cons:'Bouvier',
+    info:'Géante orange, l\'étoile la plus brillante de l\'hémisphère nord céleste. Prolongez la queue de la Grande Ourse pour la trouver.', dist:'37 al', rise:'—', set:'—' },
+  { id:'capella', kind:'Étoile', name:'Capella', mag:0.08, alt:12, az:335, ra:5.2782, dec:45.998, r:3, color:'#f7e3b0', cons:'Cocher',
+    info:'Système de quatre étoiles dominé par deux géantes jaunes. Brille bas sur l\'horizon nord en été.', dist:'43 al', rise:'—', set:'—' },
+  { id:'altair', kind:'Étoile', name:'Altaïr', mag:0.77, alt:35, az:115, ra:19.8464, dec:8.868, r:2.8, color:'#e6edff', cons:'Aigle',
+    info:'Troisième sommet du Triangle d\'été avec Véga et Deneb. Rotation très rapide : 9 h seulement.', dist:'17 al', rise:'—', set:'—' },
+  { id:'betelgeuse', kind:'Étoile', name:'Bételgeuse', mag:0.5, alt:-20, az:320, ra:5.9195, dec:7.407, r:2.9, color:'#f0a070', cons:'Orion',
+    info:'Supergéante rouge en fin de vie, candidate à une supernova « proche ». Épaule d\'Orion, ciel d\'hiver.', dist:'640 al', rise:'—', set:'—' },
+  { id:'antares', kind:'Étoile', name:'Antarès', mag:1.06, alt:15, az:175, ra:16.4901, dec:-26.43, r:2.8, color:'#ef9270', cons:'Scorpion',
+    info:'« La rivale de Mars » : supergéante rouge au cœur du Scorpion, basse sur l\'horizon sud en été.', dist:'550 al', rise:'—', set:'—' },
+  { id:'aldebaran', kind:'Étoile', name:'Aldébaran', mag:0.86, alt:-10, az:330, ra:4.5987, dec:16.509, r:2.8, color:'#f3b585', cons:'Taureau',
+    info:'L\'œil rouge du Taureau, devant l\'amas des Hyades. Étoile du ciel d\'hiver.', dist:'65 al', rise:'—', set:'—' },
+  { id:'polaris', kind:'Étoile', name:'Polaire', mag:1.98, alt:49, az:0, ra:2.5303, dec:89.264, r:2.4, color:'#dbe6ff', cons:'Petite Ourse',
+    info:'L\'étoile du Nord : son altitude égale votre latitude. Toutes les étoiles semblent tourner autour d\'elle.', dist:'433 al', rise:'—', set:'—' },
+  { id:'m42', kind:'Nébuleuse', name:'M42 — Orion', mag:4.0, alt:-25, az:310, ra:5.5881, dec:-5.39, r:2.2, color:'#e8a8c0', cons:'Orion', deep:true,
+    info:'La grande nébuleuse d\'Orion, pouponnière d\'étoiles visible à l\'œil nu sous l\'épée d\'Orion. Ciel d\'hiver.', dist:'1 350 al', rise:'—', set:'—' },
+  { id:'m45', kind:'Amas', name:'M45 — Pléiades', mag:1.6, alt:-8, az:20, ra:3.7833, dec:24.117, r:2.6, color:'#b9d4f5', cons:'Taureau', deep:true,
+    info:'Les Sept Sœurs : amas ouvert spectaculaire aux jumelles, enveloppé de nébulosités bleutées.', dist:'444 al', rise:'—', set:'—' },
+  { id:'ngc869', kind:'Amas', name:'NGC 869/884 — Double amas', mag:4.3, alt:20, az:25, ra:2.3333, dec:57.13, r:2, color:'#cdd8f0', cons:'Persée', deep:true,
+    info:'Deux amas ouverts côte à côte entre Persée et Cassiopée. Superbe aux jumelles, circumpolaire.', dist:'7 500 al', rise:'—', set:'—' },
+  { id:'m44', kind:'Amas', name:'M44 — Crèche', mag:3.7, alt:5, az:290, ra:8.6733, dec:19.67, r:2, color:'#d8e2f5', cons:'Cancer', deep:true,
+    info:'Amas de la Ruche : nuage d\'étoiles visible à l\'œil nu sous un bon ciel, résolu aux jumelles.', dist:'577 al', rise:'—', set:'—' },
 ]
 
 // stars : [ra (heures), dec (degrés)] J2000 — positions projetées en direct
@@ -30,6 +56,12 @@ export const CONSTELLATIONS = [
   { name:'Lyre', // Véga, Sheliak, Sulafat
     stars:[[18.6156,38.78],[18.8347,33.36],[18.9824,32.69]],
     lines:[[0,1],[1,2],[2,0]] },
+  { name:'Grande Ourse', // Grand Chariot : Dubhe, Merak, Phecda, Megrez, Alioth, Mizar, Alkaid
+    stars:[[11.0621,61.75],[11.0307,56.38],[11.8972,53.69],[12.2571,57.03],[12.9005,55.96],[13.3988,54.93],[13.7923,49.31]],
+    lines:[[0,1],[1,2],[2,3],[3,0],[3,4],[4,5],[5,6]] },
+  { name:'Cassiopée', // le W : Caph, Schedar, Gamma Cas, Ruchbah, Segin
+    stars:[[0.1530,59.15],[0.6751,56.54],[0.9451,60.72],[1.4303,60.24],[1.9066,63.67]],
+    lines:[[0,1],[1,2],[2,3],[3,4]] },
 ]
 
 export const SUN_MOON = {
