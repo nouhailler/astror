@@ -8,12 +8,13 @@ function angleDiff(target, current) {
   return ((target - current + 540) % 360) - 180
 }
 
-function useCompass() {
+function useCompass(enabled = true) {
   const [orient, setOrient] = useState(null)
   const [supported, setSupported] = useState(null) // null=détection, true=ok, false=non dispo
   const [dbg, setDbg] = useState({ abs: 0, rel: 0, lastAlpha: '—', lastAbsolute: '—' })
 
   useEffect(() => {
+    if (!enabled) { setOrient(null); setSupported(null); return }
     let hasData = false
     let absCount = 0, relCount = 0
 
@@ -42,9 +43,20 @@ function useCompass() {
       window.removeEventListener('deviceorientation', process)
       clearTimeout(timeout)
     }
-  }, [])
+  }, [enabled])
 
   return { orient, supported, dbg }
+}
+
+// iOS 13+ exige une permission explicite pour DeviceOrientation
+async function ensureOrientationPermission() {
+  try {
+    if (typeof DeviceOrientationEvent !== 'undefined'
+        && typeof DeviceOrientationEvent.requestPermission === 'function') {
+      return (await DeviceOrientationEvent.requestPermission()) === 'granted'
+    }
+  } catch {}
+  return true
 }
 
 const RADAR_R = 110  // radius of the radar display in px
@@ -268,13 +280,58 @@ function IcClock({ size = 22 }) {
 
 function SkyDome({ filter, onPick }) {
   const stars = useStarfield(150)
+  const [rot, setRot] = useState(0)              // rotation manuelle (degrés)
+  const [compassOn, setCompassOn] = useState(false)
+  const { orient, supported } = useCompass(compassOn)
+  const domeRef = useRef(null)
+  const drag = useRef(null)
+  const moved = useRef(false)
+
+  // boussole indisponible après détection → on revient en mode manuel
+  useEffect(() => {
+    if (compassOn && supported === false) setCompassOn(false)
+  }, [compassOn, supported])
+
+  // le haut de la carte indique la direction visée
+  const ang = compassOn && orient ? -orient.heading : rot
+
+  const toggleCompass = async () => {
+    if (!compassOn && !(await ensureOrientationPermission())) return
+    setCompassOn(v => !v)
+  }
+
+  const center = () => {
+    const r = domeRef.current.getBoundingClientRect()
+    return { cx: r.left + r.width / 2, cy: r.top + r.height / 2 }
+  }
+  const onDown = (e) => {
+    if (compassOn) return
+    const { cx, cy } = center()
+    moved.current = false
+    drag.current = { cx, cy, a0: Math.atan2(e.clientY - cy, e.clientX - cx), r0: rot, x0: e.clientX, y0: e.clientY }
+  }
+  const onMove = (e) => {
+    if (!drag.current) return
+    if (Math.hypot(e.clientX - drag.current.x0, e.clientY - drag.current.y0) > 6) moved.current = true
+    if (!moved.current) return
+    const a = Math.atan2(e.clientY - drag.current.cy, e.clientX - drag.current.cx)
+    setRot(drag.current.r0 + (a - drag.current.a0) * 180 / Math.PI)
+  }
+  const onUp = () => { drag.current = null }
+  const pick = (o) => { if (!moved.current) onPick(o) }
+
+  const rotated = Math.round(((rot % 360) + 360) % 360) !== 0
   const visible = SKY_OBJECTS.filter(o => filter === 'all'
     || (filter === 'planet' && o.kind === 'Planète')
     || (filter === 'star' && o.kind === 'Étoile')
     || (filter === 'deep' && o.deep))
 
   return (
-    <div style={{ position: 'relative', width: '100%', aspectRatio: '1', margin: '4px 0 2px' }}>
+    <>
+    <div ref={domeRef} onPointerDown={onDown} onPointerMove={onMove} onPointerUp={onUp}
+      onPointerLeave={onUp} onPointerCancel={onUp}
+      style={{ position: 'relative', width: '100%', aspectRatio: '1', margin: '4px 0 2px',
+        touchAction: 'pan-y' }}>
       <div style={{ position: 'absolute', inset: 0, borderRadius: '50%',
         background: 'radial-gradient(circle at 50% 38%, #122044 0%, #0a132b 55%, #060c1c 100%)',
         border: '1px solid var(--line-2)',
@@ -282,44 +339,79 @@ function SkyDome({ filter, onPick }) {
       {[0.33, 0.66].map((f, i) => (
         <div key={i} style={{ position: 'absolute', borderRadius: '50%', border: '1px dashed rgba(150,180,235,.10)', inset: `${f * 50}%` }} />
       ))}
-      {[['N', '50%', '2%', 'translateX(-50%)'], ['S', '50%', '94%', 'translateX(-50%)'],
-        ['E', '94%', '50%', 'translateY(-50%)'], ['O', '2%', '50%', 'translateY(-50%)']].map(([l, lf, tp, tr]) => (
-        <span key={l} className="meta" style={{ position: 'absolute', left: lf, top: tp, transform: tr,
-          color: 'var(--gold)', fontSize: 11, fontWeight: 600 }}>{l}</span>
-      ))}
 
-      <svg viewBox="0 0 100 100" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', overflow: 'visible' }}>
-        {(filter === 'all' || filter === 'star') && CONSTELLATIONS.map((c, ci) =>
-          c.lines.map((ln, li) => (
-            <line key={ci + '-' + li}
-              x1={c.pts[ln[0]][0]} y1={c.pts[ln[0]][1]} x2={c.pts[ln[1]][0]} y2={c.pts[ln[1]][1]}
-              stroke="rgba(126,166,230,.30)" strokeWidth="0.3" />
-          ))
-        )}
-        {stars.map((s, i) => (
-          <circle key={i} cx={s.x} cy={s.y} r={s.s * 0.32} fill="#dce6ff" opacity={s.o}>
-            <animate attributeName="opacity" values={`${s.o};${s.o * 0.4};${s.o}`}
-              dur={`${3 + s.d}s`} repeatCount="indefinite" />
-          </circle>
+      {/* Couche rotative : cardinaux, constellations, étoiles, objets */}
+      <div style={{ position: 'absolute', inset: 0, transform: `rotate(${ang}deg)` }}>
+        {[['N', '50%', '2%', 'translateX(-50%)'], ['S', '50%', '94%', 'translateX(-50%)'],
+          ['E', '94%', '50%', 'translateY(-50%)'], ['O', '2%', '50%', 'translateY(-50%)']].map(([l, lf, tp, tr]) => (
+          <span key={l} className="meta" style={{ position: 'absolute', left: lf, top: tp, transform: tr,
+            color: 'var(--gold)', fontSize: 11, fontWeight: 600 }}>
+            <span style={{ display: 'inline-block', transform: `rotate(${-ang}deg)` }}>{l}</span>
+          </span>
         ))}
-      </svg>
 
-      {visible.map(o => (
-        <button key={o.id} onClick={() => onPick(o)} className="press"
-          style={{ position: 'absolute', left: o.x + '%', top: o.y + '%', transform: 'translate(-50%,-50%)',
-            background: 'none', border: 0, cursor: 'pointer', padding: 0, display: 'flex',
-            flexDirection: 'column', alignItems: 'center', gap: 3, zIndex: 5 }}>
-          <span style={{ width: o.r * 2.4, height: o.r * 2.4, borderRadius: '50%', background: o.color,
-            boxShadow: `0 0 ${o.r * 3}px ${o.color}, 0 0 4px ${o.color}` }} />
-          <span className="meta" style={{ fontSize: 8.5, color: 'var(--dim)', whiteSpace: 'nowrap',
-            textShadow: '0 1px 4px #000' }}>{o.name.split(' — ')[0]}</span>
-        </button>
-      ))}
+        <svg viewBox="0 0 100 100" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', overflow: 'visible' }}>
+          {(filter === 'all' || filter === 'star') && CONSTELLATIONS.map((c, ci) =>
+            c.lines.map((ln, li) => (
+              <line key={ci + '-' + li}
+                x1={c.pts[ln[0]][0]} y1={c.pts[ln[0]][1]} x2={c.pts[ln[1]][0]} y2={c.pts[ln[1]][1]}
+                stroke="rgba(126,166,230,.30)" strokeWidth="0.3" />
+            ))
+          )}
+          {stars.map((s, i) => (
+            <circle key={i} cx={s.x} cy={s.y} r={s.s * 0.32} fill="#dce6ff" opacity={s.o}>
+              <animate attributeName="opacity" values={`${s.o};${s.o * 0.4};${s.o}`}
+                dur={`${3 + s.d}s`} repeatCount="indefinite" />
+            </circle>
+          ))}
+        </svg>
+
+        {visible.map(o => (
+          <button key={o.id} onClick={() => pick(o)} className="press"
+            style={{ position: 'absolute', left: o.x + '%', top: o.y + '%',
+              transform: `translate(-50%,-50%) rotate(${-ang}deg)`,
+              background: 'none', border: 0, cursor: 'pointer', padding: 0, display: 'flex',
+              flexDirection: 'column', alignItems: 'center', gap: 3, zIndex: 5 }}>
+            <span style={{ width: o.r * 2.4, height: o.r * 2.4, borderRadius: '50%', background: o.color,
+              boxShadow: `0 0 ${o.r * 3}px ${o.color}, 0 0 4px ${o.color}` }} />
+            <span className="meta" style={{ fontSize: 8.5, color: 'var(--dim)', whiteSpace: 'nowrap',
+              textShadow: '0 1px 4px #000' }}>{o.name.split(' — ')[0]}</span>
+          </button>
+        ))}
+      </div>
 
       <span style={{ position: 'absolute', top: '20%', left: '78%', width: 60, height: 1,
         background: 'linear-gradient(90deg, transparent, #fff)', borderRadius: 2,
         animation: 'shoot 9s ease-in 2s infinite', pointerEvents: 'none' }} />
+
+      {/* Contrôles d'orientation */}
+      <button onClick={toggleCompass} aria-pressed={compassOn} aria-label="Aligner la carte avec la boussole"
+        className="press" style={{ position: 'absolute', top: 6, left: 6, zIndex: 6,
+          width: 36, height: 36, borderRadius: 999, cursor: 'pointer',
+          border: `1px solid ${compassOn ? 'var(--gold-line)' : 'var(--line-2)'}`,
+          background: compassOn ? 'var(--gold-soft)' : 'rgba(8,12,24,.55)',
+          color: compassOn ? 'var(--gold)' : 'var(--dim)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <IcCompass size={17} />
+      </button>
+      {!compassOn && rotated && (
+        <button onClick={() => setRot(0)} aria-label="Remettre le Nord en haut"
+          className="press" style={{ position: 'absolute', top: 6, right: 6, zIndex: 6,
+            width: 36, height: 36, borderRadius: 999, cursor: 'pointer',
+            border: '1px solid var(--line-2)', background: 'rgba(8,12,24,.55)', color: 'var(--gold)',
+            fontFamily: 'var(--mono)', fontSize: 13, fontWeight: 600,
+            display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          N
+        </button>
+      )}
     </div>
+    <p className="meta" style={{ textAlign: 'center', marginTop: 2 }}>
+      {compassOn
+        ? (orient ? 'Carte alignée sur la boussole · le haut indique votre direction'
+                  : 'Recherche de la boussole…')
+        : 'Touchez un astre · glissez pour orienter la carte'}
+    </p>
+    </>
   )
 }
 
@@ -400,9 +492,6 @@ export default function SkyScreen() {
 
       <div className="pad">
         <SkyDome filter={filter} onPick={setPick} />
-        <p className="meta" style={{ textAlign: 'center', marginTop: 2 }}>
-          Touchez un astre · planisphère orienté vers le zénith
-        </p>
       </div>
 
       <div className="pad">
