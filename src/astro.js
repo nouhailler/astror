@@ -492,6 +492,72 @@ export function getObsWindows(date = new Date(), lat = 48.8566, lng = 2.3522) {
   return windows
 }
 
+// ─── Positions live pour la carte du ciel ────────────────────────────────────
+
+const SKY_BODIES = {
+  jupiter: Astronomy.Body.Jupiter,
+  saturn:  Astronomy.Body.Saturn,
+  venus:   Astronomy.Body.Venus,
+  mars:    Astronomy.Body.Mars,
+}
+
+function fmtAU(au) {
+  return au.toFixed(2).replace('.', ',') + ' UA'
+}
+
+/**
+ * Enrichit les SKY_OBJECTS avec alt/az/mag/lever/coucher calculés en direct.
+ * Planètes via leur éphéméride ; objets fixes via ra/dec (J2000).
+ * En cas d'échec, les valeurs statiques de data.js servent de secours.
+ */
+export function getSkyPositions(objects, date = new Date(), lat = 48.8566, lng = 2.3522) {
+  const obs = new Astronomy.Observer(lat, lng, 0)
+  let starSlot = 1
+  return objects.map(o => {
+    try {
+      const body = SKY_BODIES[o.id]
+      if (body) {
+        const eq    = Astronomy.Equator(body, date, obs, true, true)
+        const hor   = Astronomy.Horizon(date, obs, eq.ra, eq.dec, 'normal')
+        const illum = Astronomy.Illumination(body, date)
+        const rise  = Astronomy.SearchRiseSet(body, obs, +1, date, 1)
+        const set   = Astronomy.SearchRiseSet(body, obs, -1, date, 1)
+        return { ...o, alt: Math.round(hor.altitude), az: Math.round(hor.azimuth),
+          mag: +illum.mag.toFixed(1), rise: fmtTime(rise), set: fmtTime(set),
+          dist: fmtAU(illum.geo_dist) }
+      }
+      if (o.ra != null && starSlot <= 8) {
+        const hor = Astronomy.Horizon(date, obs, o.ra, o.dec, 'normal')
+        const starBody = Astronomy.Body['Star' + starSlot++]
+        Astronomy.DefineStar(starBody, o.ra, o.dec, 1000)
+        let r = null, s = null
+        try { r = Astronomy.SearchRiseSet(starBody, obs, +1, date, 1) } catch {}
+        try { s = Astronomy.SearchRiseSet(starBody, obs, -1, date, 1) } catch {}
+        return { ...o, alt: Math.round(hor.altitude), az: Math.round(hor.azimuth),
+          rise: r ? fmtTime(r) : '—', set: s ? fmtTime(s) : '—' }
+      }
+      return o
+    } catch { return o }
+  })
+}
+
+/**
+ * Projette les figures de constellations : chaque sommet [ra, dec] → {alt, az}.
+ */
+export function getConstellationPoints(constellations, date = new Date(), lat = 48.8566, lng = 2.3522) {
+  const obs = new Astronomy.Observer(lat, lng, 0)
+  return constellations.map(c => ({
+    name: c.name,
+    lines: c.lines,
+    pts: c.stars.map(([ra, dec]) => {
+      try {
+        const hor = Astronomy.Horizon(date, obs, ra, dec, 'normal')
+        return { alt: hor.altitude, az: hor.azimuth }
+      } catch { return { alt: -90, az: 0 } }
+    }),
+  }))
+}
+
 export function getPlanetPositions(date = new Date(), lat = 48.8566, lng = 2.3522) {
   const obs = new Astronomy.Observer(lat, lng, 0)
   return PLANETS.map(({ body, name, id }) => {

@@ -3,6 +3,16 @@ import { IcPin, IcSearch, IcCompass, IcClose } from './icons'
 import { ScreenHeader, IconBtn, SettingsBtn, HeaderTools, ChipRow, SectionTitle, DataRow, Sheet, AiInfoPanel } from './ui'
 import { TipBanner } from './tips'
 import { SKY_OBJECTS, CONSTELLATIONS } from './data'
+import { getSkyPositions, getConstellationPoints } from './astro'
+import { onbLoad } from './onboarding'
+
+// Projection azimutale équidistante : zénith au centre, horizon au bord,
+// N en haut, E à droite (cohérent avec les cardinaux du dôme et le pointage)
+function project(alt, az) {
+  const rad = az * Math.PI / 180
+  const r = ((90 - alt) / 90) * 50
+  return { x: 50 + r * Math.sin(rad), y: 50 - r * Math.cos(rad) }
+}
 
 function angleDiff(target, current) {
   return ((target - current + 540) % 360) - 180
@@ -278,7 +288,7 @@ function IcClock({ size = 22 }) {
   )
 }
 
-function SkyDome({ filter, onPick }) {
+function SkyDome({ filter, objects, constellations, onPick }) {
   const stars = useStarfield(150)
   const [rot, setRot] = useState(0)              // rotation manuelle (degrés)
   const [compassOn, setCompassOn] = useState(false)
@@ -321,7 +331,7 @@ function SkyDome({ filter, onPick }) {
   const pick = (o) => { if (!moved.current) onPick(o) }
 
   const rotated = Math.round(((rot % 360) + 360) % 360) !== 0
-  const visible = SKY_OBJECTS.filter(o => filter === 'all'
+  const visible = objects.filter(o => o.alt > 0).filter(o => filter === 'all'
     || (filter === 'planet' && o.kind === 'Planète')
     || (filter === 'star' && o.kind === 'Étoile')
     || (filter === 'deep' && o.deep))
@@ -351,12 +361,16 @@ function SkyDome({ filter, onPick }) {
         ))}
 
         <svg viewBox="0 0 100 100" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', overflow: 'visible' }}>
-          {(filter === 'all' || filter === 'star') && CONSTELLATIONS.map((c, ci) =>
-            c.lines.map((ln, li) => (
-              <line key={ci + '-' + li}
-                x1={c.pts[ln[0]][0]} y1={c.pts[ln[0]][1]} x2={c.pts[ln[1]][0]} y2={c.pts[ln[1]][1]}
-                stroke="rgba(126,166,230,.30)" strokeWidth="0.3" />
-            ))
+          {(filter === 'all' || filter === 'star') && constellations.map((c, ci) =>
+            c.lines.map((ln, li) => {
+              const a = c.pts[ln[0]], b = c.pts[ln[1]]
+              if (a.alt <= 0 || b.alt <= 0) return null
+              const pa = project(a.alt, a.az), pb = project(b.alt, b.az)
+              return (
+                <line key={ci + '-' + li} x1={pa.x} y1={pa.y} x2={pb.x} y2={pb.y}
+                  stroke="rgba(126,166,230,.30)" strokeWidth="0.3" />
+              )
+            })
           )}
           {stars.map((s, i) => (
             <circle key={i} cx={s.x} cy={s.y} r={s.s * 0.32} fill="#dce6ff" opacity={s.o}>
@@ -366,9 +380,11 @@ function SkyDome({ filter, onPick }) {
           ))}
         </svg>
 
-        {visible.map(o => (
+        {visible.map(o => {
+          const p = project(o.alt, o.az)
+          return (
           <button key={o.id} onClick={() => pick(o)} className="press"
-            style={{ position: 'absolute', left: o.x + '%', top: o.y + '%',
+            style={{ position: 'absolute', left: p.x + '%', top: p.y + '%',
               transform: `translate(-50%,-50%) rotate(${-ang}deg)`,
               background: 'none', border: 0, cursor: 'pointer', padding: 0, display: 'flex',
               flexDirection: 'column', alignItems: 'center', gap: 3, zIndex: 5 }}>
@@ -377,7 +393,8 @@ function SkyDome({ filter, onPick }) {
             <span className="meta" style={{ fontSize: 8.5, color: 'var(--dim)', whiteSpace: 'nowrap',
               textShadow: '0 1px 4px #000' }}>{o.name.split(' — ')[0]}</span>
           </button>
-        ))}
+          )
+        })}
       </div>
 
       <span style={{ position: 'absolute', top: '20%', left: '78%', width: 60, height: 1,
@@ -465,11 +482,26 @@ export default function SkyScreen() {
   const [filter, setFilter] = useState('all')
   const [pick, setPick] = useState(null)
 
+  const loc = useMemo(() => {
+    const p = onbLoad()
+    return p.location?.lat != null ? p.location : { city: 'Paris', lat: 48.8566, lng: 2.3522 }
+  }, [])
+
+  // positions recalculées chaque minute
+  const [now, setNow] = useState(() => new Date())
+  useEffect(() => {
+    const id = setInterval(() => setNow(new Date()), 60000)
+    return () => clearInterval(id)
+  }, [])
+  const objects = useMemo(() => getSkyPositions(SKY_OBJECTS, now, loc.lat, loc.lng), [now, loc])
+  const constellations = useMemo(() => getConstellationPoints(CONSTELLATIONS, now, loc.lat, loc.lng), [now, loc])
+
   const chips = [
     { key: 'all', label: 'Tout' }, { key: 'planet', label: 'Planètes' },
     { key: 'star', label: 'Étoiles' }, { key: 'deep', label: 'Ciel profond' },
   ]
-  const list = SKY_OBJECTS.filter(o => o.alt > 0).sort((a, b) => a.mag - b.mag)
+  const list = objects.filter(o => o.alt > 0).sort((a, b) => a.mag - b.mag)
+  const latLabel = `${Math.abs(loc.lat).toFixed(2).replace('.', ',')}° ${loc.lat >= 0 ? 'N' : 'S'}`
 
   return (
     <div className="screen pad-b">
@@ -480,7 +512,7 @@ export default function SkyScreen() {
 
       <div className="pad" style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 8 }}>
         <span style={{ display: 'flex', alignItems: 'center', gap: 6, color: 'var(--dim)', fontSize: 12.5 }}>
-          <IcPin size={15} style={{ color: 'var(--gold)' }} /> Paris, FR · 48,85° N
+          <IcPin size={15} style={{ color: 'var(--gold)' }} /> {loc.city || 'Position'} · {latLabel}
         </span>
         <span style={{ width: 3, height: 3, borderRadius: 9, background: 'var(--faint)' }} />
         <span style={{ color: 'var(--dim)', fontSize: 12.5, display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -491,12 +523,17 @@ export default function SkyScreen() {
       <ChipRow items={chips} value={filter} onChange={setFilter} style={{ marginBottom: 4 }} />
 
       <div className="pad">
-        <SkyDome filter={filter} onPick={setPick} />
+        <SkyDome filter={filter} objects={objects} constellations={constellations} onPick={setPick} />
       </div>
 
       <div className="pad">
         <SectionTitle action="Magnitude ↑">Maintenant visible</SectionTitle>
         <div className="card-2" style={{ overflow: 'hidden' }}>
+          {list.length === 0 && (
+            <div className="body tight" style={{ padding: '16px 15px', fontSize: 13, color: 'var(--faint)' }}>
+              Aucun objet du catalogue au-dessus de l'horizon en ce moment.
+            </div>
+          )}
           {list.map((o, i) => (
             <button key={o.id} onClick={() => setPick(o)} className="press" style={{ width: '100%',
               display: 'flex', alignItems: 'center', gap: 13, padding: '12px 15px', background: 'none',

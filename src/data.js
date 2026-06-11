@@ -1,27 +1,35 @@
+// alt/az/mag/rise/set/dist : valeurs de secours, recalculées en direct par
+// getSkyPositions() (astro.js). ra en heures, dec en degrés (J2000) pour les
+// objets fixes ; les planètes sont calculées via astronomy-engine.
 export const SKY_OBJECTS = [
-  { id:'jupiter', kind:'Planète', name:'Jupiter', mag:-2.4, alt:52, az:148, x:62, y:34, r:5.2, color:'#e9c98a', cons:'Taureau',
+  { id:'jupiter', kind:'Planète', name:'Jupiter', mag:-2.4, alt:52, az:148, r:5.2, color:'#e9c98a', cons:'Taureau',
     info:'Géante gazeuse, la plus brillante ce soir. Les quatre lunes galiléennes sont visibles aux jumelles.', dist:'4,9 UA', rise:'18:42', set:'04:10' },
-  { id:'saturn', kind:'Planète', name:'Saturne', mag:0.7, alt:24, az:205, x:40, y:60, r:4, color:'#e7d6a6', cons:'Verseau',
+  { id:'saturn', kind:'Planète', name:'Saturne', mag:0.7, alt:24, az:205, r:4, color:'#e7d6a6', cons:'Verseau',
     info:'Anneaux inclinés à 9°. Un télescope de 60 mm suffit pour les distinguer.', dist:'9,6 UA', rise:'15:30', set:'00:55' },
-  { id:'venus', kind:'Planète', name:'Vénus', mag:-4.1, alt:11, az:255, x:24, y:74, r:4.6, color:'#fdf3d0', cons:'Poissons',
+  { id:'venus', kind:'Planète', name:'Vénus', mag:-4.1, alt:11, az:255, r:4.6, color:'#fdf3d0', cons:'Poissons',
     info:'Étoile du soir éclatante, bas sur l\'horizon ouest après le coucher du Soleil.', dist:'0,72 UA', rise:'09:10', set:'20:48' },
-  { id:'mars', kind:'Planète', name:'Mars', mag:0.9, alt:38, az:110, x:74, y:46, r:3.6, color:'#e0916f', cons:'Cancer',
+  { id:'mars', kind:'Planète', name:'Mars', mag:0.9, alt:38, az:110, r:3.6, color:'#e0916f', cons:'Cancer',
     info:'Teinte rouge orangée caractéristique. Opposition prochaine en janvier 2027.', dist:'1,4 UA', rise:'21:05', set:'07:30' },
-  { id:'vega', kind:'Étoile', name:'Véga', mag:0.0, alt:78, az:300, x:48, y:18, r:3, color:'#cfe0ff', cons:'Lyre',
+  { id:'vega', kind:'Étoile', name:'Véga', mag:0.0, alt:78, az:300, ra:18.6156, dec:38.78, r:3, color:'#cfe0ff', cons:'Lyre',
     info:'Étoile la plus brillante de la Lyre, sommet du Triangle d\'été. À 25 années-lumière.', dist:'25 al', rise:'—', set:'—' },
-  { id:'deneb', kind:'Étoile', name:'Deneb', mag:1.25, alt:71, az:330, x:55, y:24, r:2.6, color:'#dbe6ff', cons:'Cygne',
+  { id:'deneb', kind:'Étoile', name:'Deneb', mag:1.25, alt:71, az:330, ra:20.6905, dec:45.28, r:2.6, color:'#dbe6ff', cons:'Cygne',
     info:'Supergéante bleue, l\'une des étoiles les plus lumineuses connues (≈ 200 000 L☉).', dist:'2 600 al', rise:'—', set:'—' },
-  { id:'m31', kind:'Galaxie', name:'M31 — Andromède', mag:3.4, alt:44, az:48, x:80, y:30, r:2.4, color:'#b9c6e8', cons:'Andromède', deep:true,
+  { id:'m31', kind:'Galaxie', name:'M31 — Andromède', mag:3.4, alt:44, az:48, ra:0.7123, dec:41.27, r:2.4, color:'#b9c6e8', cons:'Andromède', deep:true,
     info:'Galaxie spirale, l\'objet le plus lointain visible à l\'œil nu (2,5 M al). Idéale aux jumelles.', dist:'2,5 M al', rise:'—', set:'—' },
-  { id:'m13', kind:'Amas', name:'M13 — Hercule', mag:5.8, alt:64, az:285, x:44, y:30, r:2, color:'#cdbfe8', cons:'Hercule', deep:true,
+  { id:'m13', kind:'Amas', name:'M13 — Hercule', mag:5.8, alt:64, az:285, ra:16.6947, dec:36.46, r:2, color:'#cdbfe8', cons:'Hercule', deep:true,
     info:'Amas globulaire de ~300 000 étoiles. Spectaculaire dans un 200 mm.', dist:'22 000 al', rise:'—', set:'—' },
-  { id:'m57', kind:'Nébuleuse', name:'M57 — Anneau', mag:8.8, alt:75, az:305, x:50, y:21, r:1.7, color:'#9fd6c2', cons:'Lyre', deep:true,
+  { id:'m57', kind:'Nébuleuse', name:'M57 — Anneau', mag:8.8, alt:75, az:305, ra:18.8931, dec:33.03, r:1.7, color:'#9fd6c2', cons:'Lyre', deep:true,
     info:'Nébuleuse planétaire en anneau. Nécessite un télescope ; visible entre Sheliak et Sulafat.', dist:'2 300 al', rise:'—', set:'—' },
 ]
 
+// stars : [ra (heures), dec (degrés)] J2000 — positions projetées en direct
 export const CONSTELLATIONS = [
-  { name:'Cygne', pts:[[55,24],[52,33],[49,42],[46,30],[58,30],[48,52]], lines:[[0,1],[1,2],[3,1],[1,4],[2,5]] },
-  { name:'Lyre', pts:[[48,18],[50,21],[46,24]], lines:[[0,1],[1,2],[2,0]] },
+  { name:'Cygne', // Croix du Nord : Deneb, Sadr, Albireo + bras Delta/Epsilon
+    stars:[[20.6905,45.28],[20.3705,40.26],[19.5121,27.96],[19.7496,45.13],[20.7702,33.97]],
+    lines:[[0,1],[1,2],[3,1],[1,4]] },
+  { name:'Lyre', // Véga, Sheliak, Sulafat
+    stars:[[18.6156,38.78],[18.8347,33.36],[18.9824,32.69]],
+    lines:[[0,1],[1,2],[2,0]] },
 ]
 
 export const SUN_MOON = {

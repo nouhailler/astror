@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest'
-import { getMoonData, getSunData, getPlanetPositions } from '../astro'
+import { getMoonData, getSunData, getPlanetPositions, getSkyPositions, getConstellationPoints } from '../astro'
+import { SKY_OBJECTS, CONSTELLATIONS } from '../data'
 
 describe('getMoonData', () => {
   const paris = [48.8566, 2.3522]
@@ -73,6 +74,57 @@ describe('getPlanetPositions', () => {
       expect(p.name).toBeTruthy()
       expect(p.rise).toMatch(/\d{2}:\d{2}|--:--/)
       expect(p.set).toMatch(/\d{2}:\d{2}|--:--/)
+    })
+  })
+})
+
+describe('getSkyPositions', () => {
+  const paris = [48.8566, 2.3522]
+  const date = new Date('2026-06-09T22:00:00Z')
+
+  it('returns live alt/az for every object', () => {
+    const objs = getSkyPositions(SKY_OBJECTS, date, ...paris)
+    expect(objs).toHaveLength(SKY_OBJECTS.length)
+    objs.forEach(o => {
+      expect(o.alt).toBeGreaterThanOrEqual(-90)
+      expect(o.alt).toBeLessThanOrEqual(90)
+      expect(o.az).toBeGreaterThanOrEqual(0)
+      expect(o.az).toBeLessThan(361)
+    })
+  })
+
+  it('puts Vega high in the sky on a June night in Paris', () => {
+    const vega = getSkyPositions(SKY_OBJECTS, date, ...paris).find(o => o.id === 'vega')
+    expect(vega.alt).toBeGreaterThan(40)
+  })
+
+  it('marks Deneb circumpolar from Paris (no rise/set)', () => {
+    const deneb = getSkyPositions(SKY_OBJECTS, date, ...paris).find(o => o.id === 'deneb')
+    expect(deneb.rise).toBe('—')
+    expect(deneb.set).toBe('—')
+  })
+
+  it('computes a live magnitude for planets', () => {
+    const jup = getSkyPositions(SKY_OBJECTS, date, ...paris).find(o => o.id === 'jupiter')
+    expect(jup.mag).toBeLessThan(0) // Jupiter toujours négative
+    expect(jup.dist).toMatch(/UA$/)
+  })
+})
+
+describe('getConstellationPoints', () => {
+  const paris = [48.8566, 2.3522]
+  const date = new Date('2026-06-09T22:00:00Z')
+
+  it('projects every vertex to alt/az and keeps the line indices', () => {
+    const cons = getConstellationPoints(CONSTELLATIONS, date, ...paris)
+    expect(cons).toHaveLength(CONSTELLATIONS.length)
+    cons.forEach((c, i) => {
+      expect(c.pts).toHaveLength(CONSTELLATIONS[i].stars.length)
+      expect(c.lines).toEqual(CONSTELLATIONS[i].lines)
+      c.pts.forEach(p => {
+        expect(p.alt).toBeGreaterThanOrEqual(-90)
+        expect(p.alt).toBeLessThanOrEqual(90)
+      })
     })
   })
 })
