@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { IcEye, IcMoon, IcPlanet, IcCal, IcCamera, IcSat, IcBook, IcUsers, IcSpark, IcOrbit } from './icons'
 import { ScreenHeader } from './ui'
+import { TipBanner } from './tips'
 
 import ObservePage from './tool-observe'
 import MoonPage from './tool-moon'
@@ -31,6 +32,7 @@ function ToolsHub({ onOpen }) {
     <div className="screen">
       <ScreenHeader title="Outils" />
       <div className="screen-scroll">
+        <TipBanner tipKey="tools" />
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, padding: '14px 16px calc(16px + var(--sab))' }}>
           {TOOLS.map(t => (
             <button key={t.key} onClick={() => onOpen(t.key)} className="press" style={{ textAlign: 'left', display: 'flex', flexDirection: 'column',

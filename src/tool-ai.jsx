@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { IcSpark, IcSend, IcArrowLeft, IcSliders } from './icons'
 import { onbLoad } from './onboarding'
+import { TipBanner } from './tips'
 import { callAI } from './claudeApi'
 
 const AI_CATEGORIES = [
@@ -193,6 +194,8 @@ export default function AiPage({ onBack }) {
           <IcSliders size={17} />
         </button>
       </div>
+
+      {msgs.length <= 1 && <TipBanner tipKey="tool_ai" style={{ paddingTop: 10 }} />}
 
       {/* Panel suggestions — hors de la zone de scroll, toujours visible en haut */}
       {msgs.length <= 1 && (

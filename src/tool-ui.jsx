@@ -1,4 +1,5 @@
 import { IcArrowLeft, IcSliders, IcPlay } from './icons'
+import { TipBanner } from './tips'
 
 const iconBtnStyle = {
   width: 38, height: 38, borderRadius: 999, border: '1px solid var(--line-2)',
@@ -23,6 +24,7 @@ export function ToolPage({ title, onBack, demoKey, children }) {
           <IcSliders size={17} />
         </button>
       </div>
+      {demoKey && <TipBanner tipKey={demoKey} style={{ paddingTop: 8 }} />}
       <div style={{ padding: '6px 0 0' }}>{children}</div>
     </div>
   )

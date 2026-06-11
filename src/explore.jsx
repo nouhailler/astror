@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import { IcOrbit, IcChevron, IcArrowLeft, IcWave, IcSpark, IcRocket, IcClose } from './icons'
 import { ScreenHeader, SettingsBtn, DataRow, Sheet, AiInfoPanel } from './ui'
+import { TipBanner } from './tips'
 import { PLANETS, ANOMALIES, THEORIES } from './data'
 import { getPlanetPositions } from './astro'
 import { fetchJWSTImages, fetchNASAImages } from './api'
@@ -1582,6 +1583,7 @@ export default function ExploreScreen() {
   return (
     <div className="screen pad-b">
       <ScreenHeader eyebrow="Explorer le cosmos" title="Explorer" right={<SettingsBtn />} />
+      <TipBanner tipKey="explore" />
       <Segmented value={seg} onChange={setSeg} />
       <div style={{ marginTop: 6 }}>
         {seg === 'solar'    && <SolarView onPick={setPlanet} onSun={() => setSunOpen(true)} onMoons={setMoonsFor} planetPositions={planetPositions} />}

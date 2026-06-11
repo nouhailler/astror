@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { IcRocket, IcEye, IcPlus, IcTrash, IcChevron, IcCheck, IcSearch, IcBook } from './icons'
 import { ScreenHeader, SettingsBtn, HeaderTools, Sheet } from './ui'
+import { TipBanner } from './tips'
 import { CONFERENCES, PEOPLE, BOOKS, PHOTO_SITES } from './data'
 import { fetchSpaceNews, useLiveData, searchBooks, fetchBookCover, fetchConfImage, fetchSitePhotos } from './api'
 
@@ -874,6 +875,7 @@ export default function FeedScreen() {
           <SettingsBtn />
         </HeaderTools>
       } />
+      <TipBanner tipKey="feed" />
       <div style={{ display: 'flex', gap: 7, overflowX: 'auto', padding: '2px 18px 4px', scrollbarWidth: 'none' }}>
         {FEED_SEG.map(s => (
           <button key={s.key} className={'chip' + (seg === s.key ? ' on' : '')} onClick={() => setSeg(s.key)}>{s.label}</button>

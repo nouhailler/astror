@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect, useRef } from 'react'
 import { IcPin, IcSearch, IcCompass, IcClose } from './icons'
 import { ScreenHeader, IconBtn, SettingsBtn, HeaderTools, ChipRow, SectionTitle, DataRow, Sheet, AiInfoPanel } from './ui'
+import { TipBanner } from './tips'
 import { SKY_OBJECTS, CONSTELLATIONS } from './data'
 
 function angleDiff(target, current) {
@@ -382,6 +383,8 @@ export default function SkyScreen() {
     <div className="screen pad-b">
       <ScreenHeader eyebrow="Ciel en direct" title="Ce soir"
         right={<HeaderTools><IconBtn><IcSearch size={19} /></IconBtn><SettingsBtn /></HeaderTools>} />
+
+      <TipBanner tipKey="sky" />
 
       <div className="pad" style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 8 }}>
         <span style={{ display: 'flex', alignItems: 'center', gap: 6, color: 'var(--dim)', fontSize: 12.5 }}>

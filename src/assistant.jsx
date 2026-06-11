@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { IcSpark, IcSend } from './icons'
 import { SettingsBtn } from './ui'
+import { TipBanner } from './tips'
 import { callAI } from './claudeApi'
 
 const PRIME = "Tu es Astror, un assistant expert en astronomie, astrophysique et cosmologie, intégré à une application pour astronomes amateurs confirmés. Réponds toujours en français, de façon précise, rigoureuse et concise (4 à 6 phrases maximum). Emploie des données chiffrées et des termes techniques quand c'est pertinent, sans jargon inutile. Si la question sort de l'astronomie, ramène poliment au sujet."
@@ -195,6 +196,8 @@ export default function AssistantScreen() {
         <SettingsBtn />
       </div>
       <hr className="hair" />
+
+      {msgs.length <= 1 && <TipBanner tipKey="ai" style={{ paddingTop: 10 }} />}
 
       {/* Panel suggestions — hors de la zone de scroll, toujours visible en haut */}
       {msgs.length <= 1 && (

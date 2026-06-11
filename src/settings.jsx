@@ -1,6 +1,7 @@
 import { useState } from 'react'
-import { IcPin, IcStar, IcSpark, IcChevron, IcChevDown, IcCheck } from './icons'
+import { IcPin, IcStar, IcSpark, IcChevron, IcChevDown, IcCheck, IcBulb } from './icons'
 import { Sheet, loadAiCache, saveAiCache, clearAiCache } from './ui'
+import { resetTips } from './tips'
 import {
   ONB_LEVELS, ONB_LOCATIONS, ONB_LOCATION_COORDS, ONB_INTERESTS, ONB_GEAR, ONB_ALERTS, DEFAULT_PROFILE
 } from './onboarding'
@@ -14,6 +15,31 @@ import { getGBooksKey, saveGBooksKey, getCommunitySheetUrl, saveCommunitySheetUr
 function SettingsSection({ label }) {
   return (
     <div className="eyebrow dim" style={{ color: 'var(--faint)', marginBottom: 11, letterSpacing: '.16em' }}>{label}</div>
+  )
+}
+
+function TipsResetButton() {
+  const [done, setDone] = useState(false)
+  const reset = () => { resetTips(); setDone(true); setTimeout(() => setDone(false), 2500) }
+  return (
+    <button onClick={reset} className="press" style={{ width: '100%', textAlign: 'left', display: 'flex',
+      alignItems: 'center', gap: 14, padding: '13px 16px', borderRadius: 16, cursor: 'pointer',
+      marginTop: -12, marginBottom: 26, background: 'rgba(255,255,255,0.02)', border: '1px solid var(--line)' }}>
+      <span style={{ width: 42, height: 42, borderRadius: 12, flexShrink: 0, display: 'flex',
+        alignItems: 'center', justifyContent: 'center', color: 'var(--gold)',
+        background: 'var(--gold-soft)', border: '1px solid var(--gold-line)' }}>
+        {done ? <IcCheck size={19} /> : <IcBulb size={20} />}
+      </span>
+      <span style={{ flex: 1 }}>
+        <span className="h-card" style={{ display: 'block', fontSize: 15 }}>
+          {done ? 'Astuces réactivées' : 'Réafficher les astuces'}
+        </span>
+        <span className="body tight" style={{ fontSize: 12.5 }}>
+          {done ? 'Elles réapparaîtront sur chaque écran' : 'Revoir les bandeaux « Astuce » masqués'}
+        </span>
+      </span>
+      {!done && <IcChevron size={18} className="arrow" />}
+    </button>
   )
 }
 
@@ -384,6 +410,8 @@ export default function SettingsSheet({ open, onClose, profile, onChange, onRepl
         </span>
         <IcChevron size={18} className="arrow" />
       </button>
+
+      <TipsResetButton />
 
       <SettingsSection label="Niveau d'expérience" />
       <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 24 }}>

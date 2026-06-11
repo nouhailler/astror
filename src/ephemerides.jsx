@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react'
 import { IcRocket, IcMoon, IcStar, IcBell } from './icons'
 import { ScreenHeader, IconBtn, SettingsBtn, HeaderTools, SectionTitle, DataRow, Stat, Sheet, useCountdown, AiInfoPanel } from './ui'
+import { TipBanner } from './tips'
 import { ALERTS, EVENTS } from './data'
 import { getMoonData, getSunData } from './astro'
 import { fetchWeather, useLiveData } from './api'
@@ -119,6 +120,8 @@ export default function EphScreen() {
     <div className="screen pad-b">
       <ScreenHeader eyebrow={dateLabel} title="Éphémérides"
         right={<HeaderTools><IconBtn badge onClick={() => setManageOpen(true)}><IcBell size={19} /></IconBtn><SettingsBtn /></HeaderTools>} />
+
+      <TipBanner tipKey="eph" />
 
       <div className="pad">
         <div className="card enter" style={{ padding: 18, display: 'flex', gap: 18, alignItems: 'center' }}>
