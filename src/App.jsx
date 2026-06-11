@@ -1,15 +1,28 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, lazy, Suspense } from 'react'
 import { IcSky, IcMoon, IcGlobe, IcBell, IcWrench, IcSpark } from './icons'
 import { TopBar, HelpSheet, DemoSheet } from './help'
 import SettingsSheet from './settings'
 import Onboarding, { onbWasSeen, onbMarkSeen, onbLoad, onbSave } from './onboarding'
-import SkyScreen from './sky'
-import EphScreen from './ephemerides'
-import ExploreScreen from './explore'
-import FeedScreen from './feed'
-import OutilsScreen from './tools'
-import AssistantScreen from './assistant'
+import SkyScreen from './sky' // onglet par défaut : chargé d'emblée
 import './app.css'
+
+// Autres onglets chargés à la demande (code-splitting)
+const EphScreen       = lazy(() => import('./ephemerides'))
+const ExploreScreen   = lazy(() => import('./explore'))
+const FeedScreen      = lazy(() => import('./feed'))
+const OutilsScreen    = lazy(() => import('./tools'))
+const AssistantScreen = lazy(() => import('./assistant'))
+
+function ScreenLoader() {
+  return (
+    <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+      {[0, 1, 2].map(i => (
+        <span key={i} style={{ width: 7, height: 7, borderRadius: '50%', background: 'var(--gold)',
+          animation: 'pulse 1.2s ease-in-out infinite', animationDelay: `${i * 0.18}s` }} />
+      ))}
+    </div>
+  )
+}
 
 const TABS = [
   { key: 'sky', label: 'Ciel', Ic: IcSky },
@@ -69,12 +82,14 @@ export default function App() {
       <div className="safe-top" />
       <TopBar onHelp={() => setHelpKey(HELP_KEYS[tab])} onDemo={() => setDemoKey(HELP_KEYS[tab])} onHome={() => setTab('sky')} />
       <div className="screen-area">
-        {tab === 'sky' && <SkyScreen />}
-        {tab === 'eph' && <EphScreen />}
-        {tab === 'explore' && <ExploreScreen />}
-        {tab === 'feed' && <FeedScreen />}
-        {tab === 'tools' && <OutilsScreen deepLink={toolDeepLink} onDeepLinkConsumed={() => setToolDeepLink(null)} />}
-        {tab === 'ai' && <AssistantScreen />}
+        <Suspense fallback={<ScreenLoader />}>
+          {tab === 'sky' && <SkyScreen />}
+          {tab === 'eph' && <EphScreen />}
+          {tab === 'explore' && <ExploreScreen />}
+          {tab === 'feed' && <FeedScreen />}
+          {tab === 'tools' && <OutilsScreen deepLink={toolDeepLink} onDeepLinkConsumed={() => setToolDeepLink(null)} />}
+          {tab === 'ai' && <AssistantScreen />}
+        </Suspense>
       </div>
       <TabBar tab={tab} onChange={setTab} />
 

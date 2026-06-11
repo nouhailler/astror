@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { IcPin, IcStar, IcSpark, IcChevron, IcChevDown, IcCheck, IcBulb } from './icons'
 import { Sheet, loadAiCache, saveAiCache, clearAiCache } from './ui'
 import { resetTips } from './tips'
@@ -40,6 +40,75 @@ function TipsResetButton() {
       </span>
       {!done && <IcChevron size={18} className="arrow" />}
     </button>
+  )
+}
+
+function DataBackupSection() {
+  const [msg, setMsg] = useState(null)
+  const fileRef = useRef(null)
+
+  const doExport = () => {
+    const data = {}
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i)
+      if (k && k.startsWith('astror_')) data[k] = localStorage.getItem(k)
+    }
+    const payload = { app: 'astror', version: 1, exportedAt: new Date().toISOString(), data }
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `astror-sauvegarde-${new Date().toISOString().slice(0, 10)}.json`
+    a.click()
+    URL.revokeObjectURL(url)
+    setMsg('Sauvegarde téléchargée ✓')
+    setTimeout(() => setMsg(null), 3000)
+  }
+
+  const doImport = (e) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = () => {
+      try {
+        const parsed = JSON.parse(reader.result)
+        if (parsed?.app !== 'astror' || !parsed.data || typeof parsed.data !== 'object') throw new Error('format')
+        let n = 0
+        for (const [k, v] of Object.entries(parsed.data)) {
+          if (k.startsWith('astror_') && typeof v === 'string') { localStorage.setItem(k, v); n++ }
+        }
+        setMsg(`${n} éléments restaurés — rechargement…`)
+        setTimeout(() => window.location.reload(), 1200)
+      } catch {
+        setMsg('Fichier invalide — choisissez une sauvegarde Astror (.json)')
+        setTimeout(() => setMsg(null), 4000)
+      }
+    }
+    reader.readAsText(file)
+    e.target.value = ''
+  }
+
+  return (
+    <>
+      <SettingsSection label="Sauvegarde des données" />
+      <p className="body tight" style={{ fontSize: 12.5, margin: '0 0 12px' }}>
+        Journal d'observation, profil, veille, clés API et préférences sont stockés
+        uniquement sur cet appareil. Exportez-les régulièrement pour ne rien perdre.
+      </p>
+      <div style={{ display: 'flex', gap: 8, marginBottom: msg ? 10 : 26 }}>
+        <button className="chip" style={{ height: 40, flex: 1 }} onClick={doExport}>
+          ↓ Exporter mes données
+        </button>
+        <button className="chip" style={{ height: 40, flex: 1 }} onClick={() => fileRef.current?.click()}>
+          ↑ Importer
+        </button>
+        <input ref={fileRef} type="file" accept="application/json,.json" onChange={doImport}
+          style={{ display: 'none' }} aria-label="Importer une sauvegarde Astror" />
+      </div>
+      {msg && (
+        <div className="meta" style={{ color: 'var(--gold)', marginBottom: 26 }}>{msg}</div>
+      )}
+    </>
   )
 }
 
@@ -475,6 +544,8 @@ export default function SettingsSheet({ open, onClose, profile, onChange, onRepl
       <GBooksKeySection />
 
       <CommunitySheetSection />
+
+      <DataBackupSection />
 
       <div className="meta" style={{ textAlign: 'center', color: 'var(--faint)', padding: '4px 0 2px' }}>
         Astror · version 1.0 — préférences enregistrées sur cet appareil

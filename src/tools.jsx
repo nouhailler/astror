@@ -1,18 +1,19 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, lazy, Suspense } from 'react'
 import { IcEye, IcMoon, IcPlanet, IcCal, IcCamera, IcSat, IcBook, IcUsers, IcSpark, IcOrbit } from './icons'
 import { ScreenHeader } from './ui'
 import { TipBanner } from './tips'
 
-import ObservePage from './tool-observe'
-import MoonPage from './tool-moon'
-import PlanetsPage from './tool-planets'
-import EventsPage from './tool-events'
-import AstrophotoPage from './tool-astrophoto'
-import SatellitesPage from './tool-satellites'
-import EducationPage from './tool-education'
-import CommunityPage from './tool-community'
-import AiPage from './tool-ai'
-import ExtrasPage from './tool-extras'
+// Chaque outil est chargé à la demande (code-splitting)
+const ObservePage    = lazy(() => import('./tool-observe'))
+const MoonPage       = lazy(() => import('./tool-moon'))
+const PlanetsPage    = lazy(() => import('./tool-planets'))
+const EventsPage     = lazy(() => import('./tool-events'))
+const AstrophotoPage = lazy(() => import('./tool-astrophoto'))
+const SatellitesPage = lazy(() => import('./tool-satellites'))
+const EducationPage  = lazy(() => import('./tool-education'))
+const CommunityPage  = lazy(() => import('./tool-community'))
+const AiPage         = lazy(() => import('./tool-ai'))
+const ExtrasPage     = lazy(() => import('./tool-extras'))
 
 const TOOLS = [
   { key: 'observe', label: 'Observer', sub: 'Journal & cataogue', Ic: IcEye, Page: ObservePage },
@@ -63,7 +64,18 @@ export default function OutilsScreen({ deepLink, onDeepLinkConsumed }) {
 
   if (tool) {
     const { Page } = tool
-    return <Page onBack={() => setOpen(null)} />
+    return (
+      <Suspense fallback={
+        <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+          {[0, 1, 2].map(i => (
+            <span key={i} style={{ width: 7, height: 7, borderRadius: '50%', background: 'var(--gold)',
+              animation: 'pulse 1.2s ease-in-out infinite', animationDelay: `${i * 0.18}s` }} />
+          ))}
+        </div>
+      }>
+        <Page onBack={() => setOpen(null)} />
+      </Suspense>
+    )
   }
 
   return <ToolsHub onOpen={setOpen} />

@@ -7,49 +7,49 @@ Application mobile PWA pour astronomes amateurs, entièrement en français.
 <table>
   <tr>
     <td align="center">
-      <img src="public/screenshots/01-ciel.png" width="185"/><br/>
+      <img src="docs/screenshots/01-ciel.png" width="185"/><br/>
       <sub><b>Carte du Ciel</b><br/>Planisphère temps réel, boussole AR</sub>
     </td>
     <td align="center">
-      <img src="public/screenshots/02-ephemerides.png" width="185"/><br/>
+      <img src="docs/screenshots/02-ephemerides.png" width="185"/><br/>
       <sub><b>Éphémérides</b><br/>Lune, Soleil, alertes, événements</sub>
     </td>
     <td align="center">
-      <img src="public/screenshots/03-explorer-solaire.png" width="185"/><br/>
+      <img src="docs/screenshots/03-explorer-solaire.png" width="185"/><br/>
       <sub><b>Système solaire</b><br/>8 planètes avec visibilité live</sub>
     </td>
   </tr>
   <tr>
     <td align="center">
-      <img src="public/screenshots/04-explorer-conquete.png" width="185"/><br/>
+      <img src="docs/screenshots/04-explorer-conquete.png" width="185"/><br/>
       <sub><b>Conquête spatiale</b><br/>Article complet en 10 chapitres</sub>
     </td>
     <td align="center">
-      <img src="public/screenshots/10-annexes-chronologie.png" width="185"/><br/>
+      <img src="docs/screenshots/10-annexes-chronologie.png" width="185"/><br/>
       <sub><b>Annexes — Chronologie</b><br/>34 dates clés cliquables</sub>
     </td>
     <td align="center">
-      <img src="public/screenshots/11-wiki-detail.png" width="185"/><br/>
+      <img src="docs/screenshots/11-wiki-detail.png" width="185"/><br/>
       <sub><b>Fiche Wikipédia</b><br/>Photo + résumé + panel IA</sub>
     </td>
   </tr>
   <tr>
     <td align="center">
-      <img src="public/screenshots/05-explorer-jwst.png" width="185"/><br/>
+      <img src="docs/screenshots/05-explorer-jwst.png" width="185"/><br/>
       <sub><b>James Webb</b><br/>Dernières images Wikimedia</sub>
     </td>
     <td align="center">
-      <img src="public/screenshots/06-veille.png" width="185"/><br/>
+      <img src="docs/screenshots/06-veille.png" width="185"/><br/>
       <sub><b>Veille spatiale</b><br/>Actualités, conférences, personnalités</sub>
     </td>
     <td align="center">
-      <img src="public/screenshots/07-outils.png" width="185"/><br/>
+      <img src="docs/screenshots/07-outils.png" width="185"/><br/>
       <sub><b>Outils</b><br/>9 modules spécialisés</sub>
     </td>
   </tr>
   <tr>
     <td align="center">
-      <img src="public/screenshots/08-assistant.png" width="185"/><br/>
+      <img src="docs/screenshots/08-assistant.png" width="185"/><br/>
       <sub><b>Assistant IA</b><br/>Chat contextuel OpenRouter</sub>
     </td>
     <td></td>
