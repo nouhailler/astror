@@ -64,31 +64,6 @@ export const CONSTELLATIONS = [
     lines:[[0,1],[1,2],[2,3],[3,4]] },
 ]
 
-export const SUN_MOON = {
-  sunrise:'05:51', sunset:'21:54', dawnAstro:'03:42', duskAstro:'00:05',
-  moonPhase:'Gibbeuse croissante', moonIllum:73, moonAge:9.4, moonrise:'15:22', moonset:'02:48',
-  nightLen:'3 h 37', lunarDist:'389 400 km',
-}
-
-export const ALERTS = [
-  { id:1, icon:'iss', title:'Passage de l\'ISS', when:'Ce soir · 22:41 → 22:47', detail:'Mag −3,8 · culmine à 78° · trajectoire SO → NE. Visible à l\'œil nu pendant 6 minutes.', live:true },
-  { id:2, icon:'conj', title:'Conjonction Lune – Saturne', when:'Demain · 23:10', detail:'Séparation de 1,4°. Belle composition aux jumelles, bas sur l\'horizon sud-est.' },
-  { id:3, icon:'iri', title:'Station chinoise Tiangong', when:'8 juin · 04:12', detail:'Mag −1,9 · passage rapide à 41° d\'élévation, direction SO.' },
-]
-
-export const EVENTS = [
-  { id:'a', date:'2026-08-12', label:'Perséides — maximum', kind:'Pluie de météores', zhr:'~100/h', detail:'L\'une des plus actives de l\'année. Radiant dans Persée, conditions favorables (Lune à 18 %).' },
-  { id:'b', date:'2026-09-07', label:'Éclipse totale de Lune', kind:'Éclipse', zhr:'82 min', detail:'Totalité visible depuis l\'Europe, l\'Afrique et l\'Asie. Lune de sang à 03:11 TU.' },
-  { id:'c', date:'2026-08-02', label:'Éclipse totale de Soleil', kind:'Éclipse', zhr:'2 min 18 s', detail:'Bande de totalité traversant l\'Espagne. Partielle depuis toute la France.' },
-  { id:'d', date:'2026-12-14', label:'Géminides — maximum', kind:'Pluie de météores', zhr:'~120/h', detail:'La plus riche pluie annuelle. Météores lents et brillants issus de (3200) Phaéthon.' },
-  { id:'e', date:'2027-01-19', label:'Opposition de Mars', kind:'Planète', zhr:'14,0″', detail:'Mars au plus proche : diamètre apparent maximal, idéal pour l\'imagerie planétaire.' },
-]
-
-export const CONDITIONS = {
-  seeing:'Bon', seeingVal:3, transparency:'Excellente', transVal:4,
-  bortle:4, clouds:8, humidity:62, temp:14, moonInterf:'Modérée',
-}
-
 export const PLANETS = [
   { id:'mercure', name:'Mercure', sub:'Planète tellurique', color:'#b8a48a', glow:'#cdb79c',
     img:'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Mercury_in_true_color.jpg/480px-Mercury_in_true_color.jpg',

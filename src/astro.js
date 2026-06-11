@@ -53,7 +53,9 @@ export function getSunData(date = new Date(), lat = 48.8566, lng = 2.3522) {
 
   let nightLen = '--h--'
   if (dawnAstro && duskAstro) {
-    nightLen = fmtDur(dawnAstro.date.getTime() + 86400000 - duskAstro.date.getTime())
+    let ms = dawnAstro.date.getTime() - duskAstro.date.getTime()
+    if (ms < 0) ms += 86400000
+    nightLen = fmtDur(ms)
   }
 
   return {
@@ -567,6 +569,70 @@ export function getSkyPositions(objects, date = new Date(), lat = 48.8566, lng =
       return o
     } catch { return o }
   })
+}
+
+function sunAltitude(date, obs) {
+  const eq = Astronomy.Equator(Astronomy.Body.Sun, date, obs, true, true)
+  return Astronomy.Horizon(date, obs, eq.ra, eq.dec, 'normal').altitude
+}
+
+/** Vrai si le ciel est sombre (Soleil sous −6°) à cet instant et ce lieu. */
+export function isDarkAt(date, lat = 48.8566, lng = 2.3522) {
+  try { return sunAltitude(date, new Astronomy.Observer(lat, lng, 0)) < -6 } catch { return true }
+}
+
+/**
+ * Conjonctions Lune – planète des prochains jours : minimum de séparation
+ * angulaire (échantillonnage 1 h, raffinement 5 min), retenu si < 6°.
+ */
+export function getMoonConjunctions(date = new Date(), lat = 48.8566, lng = 2.3522, days = 10) {
+  const obs = new Astronomy.Observer(lat, lng, 0)
+  const bodies = [
+    [Astronomy.Body.Venus, 'Vénus'], [Astronomy.Body.Mars, 'Mars'],
+    [Astronomy.Body.Jupiter, 'Jupiter'], [Astronomy.Body.Saturn, 'Saturne'],
+  ]
+  const sepAt = (body, t) => Astronomy.AngleBetween(
+    Astronomy.GeoVector(Astronomy.Body.Moon, t, true),
+    Astronomy.GeoVector(body, t, true))
+
+  const out = []
+  for (const [body, name] of bodies) {
+    try {
+      let best = null, bestH = 0
+      for (let h = 0; h <= days * 24; h++) {
+        const t = new Date(date.getTime() + h * 3600000)
+        const sep = sepAt(body, t)
+        if (!best || sep < best.sep) { best = { t, sep }; bestH = h }
+      }
+      // minimum en bord de fenêtre → la vraie conjonction est hors fenêtre
+      if (!best || best.sep > 6 || bestH === 0 || bestH === days * 24) continue
+      for (let m = -55; m <= 55; m += 5) {
+        const t = new Date(best.t.getTime() + m * 60000)
+        const sep = sepAt(body, t)
+        if (sep < best.sep) best = { t, sep }
+      }
+      const eq  = Astronomy.Equator(Astronomy.Body.Moon, best.t, obs, true, true)
+      const hor = Astronomy.Horizon(best.t, obs, eq.ra, eq.dec, 'normal')
+      const sepLabel = best.sep.toFixed(1).replace('.', ',')
+      const dark = sunAltitude(best.t, obs) < -6
+      let detail
+      if (dark && hor.altitude > 0) {
+        detail = `Séparation de ${sepLabel}°. Direction ${azToDir(hor.azimuth)}, à ${Math.round(hor.altitude)}° de hauteur — belle composition aux jumelles.`
+      } else if (!dark) {
+        detail = `Séparation de ${sepLabel}° au maximum (en plein jour). La Lune reste voisine de ${name} — cherchez-les ensemble la nuit la plus proche.`
+      } else {
+        detail = `Séparation de ${sepLabel}° au maximum (sous l'horizon à cet instant). Observez le rapprochement en début ou fin de nuit.`
+      }
+      out.push({
+        id: `conj_${name}_${best.t.toISOString().slice(0, 10)}`,
+        icon: 'conj',
+        title: `Conjonction Lune – ${name}`,
+        date: best.t,
+        detail,
+      })
+    } catch {}
+  }
+  return out.sort((a, b) => a.date - b.date)
 }
 
 /**

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { getMoonData, getSunData, getPlanetPositions, getSkyPositions, getConstellationPoints } from '../astro'
+import { getMoonData, getSunData, getPlanetPositions, getSkyPositions, getConstellationPoints, getMoonConjunctions } from '../astro'
 import { SKY_OBJECTS, CONSTELLATIONS } from '../data'
 
 describe('getMoonData', () => {
@@ -136,6 +136,24 @@ describe('getSkyPositions', () => {
     const sirius = fixed.find(o => o.id === 'sirius')
     expect(sirius.rise).toMatch(/\d{2}:\d{2}/)
     expect(sirius.set).toMatch(/\d{2}:\d{2}/)
+  })
+})
+
+describe('getMoonConjunctions', () => {
+  const paris = [48.8566, 2.3522]
+  const date = new Date('2026-06-09T22:00:00Z')
+
+  it('finds Moon-planet conjunctions over a lunar month, sorted by date', () => {
+    const conj = getMoonConjunctions(date, ...paris, 27)
+    expect(conj.length).toBeGreaterThanOrEqual(2)
+    conj.forEach(c => {
+      expect(c.icon).toBe('conj')
+      expect(c.title).toMatch(/^Conjonction Lune – /)
+      expect(c.date.getTime()).toBeGreaterThan(date.getTime())
+      expect(c.detail).toMatch(/Séparation de \d+,\d°/)
+    })
+    const times = conj.map(c => c.date.getTime())
+    expect([...times].sort((a, b) => a - b)).toEqual(times)
   })
 })
 

@@ -188,11 +188,34 @@ function computePasses(tle1, tle2, lat, lng, minElDeg = 10) {
   return passes
 }
 
-export async function fetchISSPasses(lat = 48.8566, lng = 2.3522) {
-  const res = await fetch('https://api.wheretheiss.at/v1/satellites/25544/tles')
+async function fetchTleCelestrak(catnr) {
+  const res = await fetch(`https://celestrak.org/NORAD/elements/gp.php?CATNR=${catnr}&FORMAT=TLE`)
   if (!res.ok) throw new Error('TLE fetch failed')
-  const { line1, line2 } = await res.json()
-  return computePasses(line1, line2, lat, lng)
+  const lines = (await res.text()).trim().split('\n').map(l => l.trim())
+  const i1 = lines.findIndex(l => l.startsWith('1 '))
+  if (i1 < 0 || !lines[i1 + 1]?.startsWith('2 ')) throw new Error('TLE parse failed')
+  return [lines[i1], lines[i1 + 1]]
+}
+
+export async function fetchISSPasses(lat = 48.8566, lng = 2.3522) {
+  const ctrl = new AbortController()
+  const timer = setTimeout(() => ctrl.abort(), 5000)
+  try {
+    const res = await fetch('https://api.wheretheiss.at/v1/satellites/25544/tles', { signal: ctrl.signal })
+    if (res.ok) {
+      const { line1, line2 } = await res.json()
+      return computePasses(line1, line2, lat, lng)
+    }
+  } catch {} // wheretheiss indisponible ou trop lent → secours Celestrak
+  finally { clearTimeout(timer) }
+  const [l1, l2] = await fetchTleCelestrak(25544)
+  return computePasses(l1, l2, lat, lng)
+}
+
+// Tiangong (NORAD 48274)
+export async function fetchTiangongPasses(lat = 48.8566, lng = 2.3522) {
+  const [l1, l2] = await fetchTleCelestrak(48274)
+  return computePasses(l1, l2, lat, lng)
 }
 
 export function useLiveData(fetcher, intervalMs = 0) {

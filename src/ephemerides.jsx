@@ -2,9 +2,8 @@ import { useState, useMemo } from 'react'
 import { IcRocket, IcMoon, IcStar, IcBell } from './icons'
 import { ScreenHeader, IconBtn, SettingsBtn, HeaderTools, SectionTitle, DataRow, Stat, Sheet, useCountdown, AiInfoPanel } from './ui'
 import { TipBanner } from './tips'
-import { ALERTS, EVENTS } from './data'
-import { getMoonData, getSunData } from './astro'
-import { fetchWeather, useLiveData } from './api'
+import { getMoonData, getSunData, getMoonConjunctions, getUpcomingAstroEvents, isDarkAt } from './astro'
+import { fetchWeather, fetchISSPasses, fetchTiangongPasses, useLiveData } from './api'
 import { onbLoad } from './onboarding'
 import { requestPermission, getPermission, loadNotifPrefs, saveNotifPrefs } from './notifications'
 
@@ -35,6 +34,17 @@ function Moon({ illum = 73, size = 116 }) {
 
 const ALERT_ICON = {
   iss: <IcRocket size={18} />, conj: <IcMoon size={18} />, iri: <IcStar size={18} />,
+}
+
+const EVENT_KIND = { eclipse: 'Éclipse', meteor: 'Pluie de météores', special: 'Spécial' }
+
+function fmtWhen(d) {
+  const now = new Date()
+  const sameDay = (a, b) => a.toDateString() === b.toDateString()
+  const time = d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
+  if (sameDay(d, now)) return (d.getHours() >= 18 ? 'Ce soir' : "Aujourd'hui") + ' · ' + time
+  if (sameDay(d, new Date(now.getTime() + 86400000))) return 'Demain · ' + time
+  return d.toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric', month: 'short' }) + ' · ' + time
 }
 
 function CondBar({ label, value, level, max = 5 }) {
@@ -95,6 +105,41 @@ export default function EphScreen() {
   const sun  = useMemo(() => getSunData(now, lat, lng), [lat, lng, now])
 
   const { data: weather, loading: wLoading } = useLiveData(() => fetchWeather(lat, lng))
+  const { data: issPasses, loading: issLoading } = useLiveData(() => fetchISSPasses(lat, lng))
+  const { data: tgPasses } = useLiveData(() => fetchTiangongPasses(lat, lng))
+  const conjunctions = useMemo(() => getMoonConjunctions(now, lat, lng), [now, lat, lng])
+  const events = useMemo(() => getUpcomingAstroEvents(18).slice(0, 6).map(e => ({
+    id: e.id, date: e.isoDate, label: e.title, kind: EVENT_KIND[e.cat] || 'Événement',
+    zhr: e.tag, detail: e.detail,
+  })), [])
+
+  // Alertes réelles : prochain passage ISS, conjonctions Lune-planète, Tiangong.
+  // Seuls les passages de nuit (Soleil < −6°) sont observables.
+  const nightPass = (passes) => passes?.find(p => isDarkAt(new Date(p.isoTime), lat, lng))
+  const alerts = useMemo(() => {
+    const list = []
+    const iss = nightPass(issPasses)
+    if (iss) list.push({
+      id: `iss_${iss.isoTime}`, icon: 'iss', title: "Passage de l'ISS", live: true,
+      date: new Date(iss.isoTime),
+      detail: `Culmine à ${iss.alt} · trajectoire ${iss.dir} · durée ${iss.dur}. `
+        + (iss.bright ? "Passage haut et brillant, visible à l'œil nu." : "Visible à l'œil nu si le ciel est dégagé."),
+    })
+    else if (issPasses) list.push({
+      id: 'iss_none', icon: 'iss', title: "Passage de l'ISS",
+      date: new Date(8640000000000000), when: 'Aucun passage visible sous 24 h',
+      detail: "Tous les passages des prochaines 24 h ont lieu de jour. La fenêtre de visibilité revient par cycles de quelques semaines — activez la notification pour être prévenu.",
+    })
+    conjunctions.slice(0, 2).forEach(c => list.push(c))
+    const tg = nightPass(tgPasses)
+    if (tg) list.push({
+      id: `tg_${tg.isoTime}`, icon: 'iri', title: 'Station chinoise Tiangong',
+      date: new Date(tg.isoTime),
+      detail: `Culmine à ${tg.alt} · trajectoire ${tg.dir} · durée ${tg.dur}. Moins brillante que l'ISS mais visible à l'œil nu.`,
+    })
+    return list.map(a => ({ ...a, when: a.when || fmtWhen(a.date) })).sort((a, b) => a.date - b.date)
+  }, [issPasses, tgPasses, conjunctions])
+
   const [evt, setEvt] = useState(null)
   const [alertSheet, setAlertSheet] = useState(null)
   const [manageOpen, setManageOpen] = useState(false)
@@ -162,7 +207,12 @@ export default function EphScreen() {
       <div className="pad">
         <SectionTitle action="Gérer" onAction={() => setManageOpen(true)}>Alertes</SectionTitle>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          {ALERTS.map(a => (
+          {alerts.length === 0 && (
+            <div className="card" style={{ padding: 16, textAlign: 'center', color: 'var(--faint)', fontSize: 13 }}>
+              {issLoading ? 'Calcul des prochains passages…' : 'Aucune alerte dans les prochains jours.'}
+            </div>
+          )}
+          {alerts.map(a => (
             <button key={a.id} onClick={() => setAlertSheet(a)} className="card press"
               style={{ width: '100%', textAlign: 'left', cursor: 'pointer', padding: 14, display: 'flex', gap: 13 }}>
               <span style={{ width: 38, height: 38, borderRadius: 11, flexShrink: 0, display: 'flex',
@@ -187,15 +237,14 @@ export default function EphScreen() {
       <div className="pad">
         <SectionTitle action="Tout voir" onAction={() => window.openAstrorTool?.('events')}>Calendrier céleste</SectionTitle>
         <AiInfoPanel cacheKey="ephem_calendar" buildPrompt={() => {
-          const sorted = [...EVENTS].sort((a, b) => new Date(a.date) - new Date(b.date))
-          const lines = sorted.map(e => {
+          const lines = events.map(e => {
             const d = new Date(e.date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
             return `- ${e.label} (${d}, ${e.kind}) : ${e.detail}`
           }).join('\n')
           return `Voici les prochains événements du calendrier astronomique :\n${lines}\n\nEn 4 à 5 phrases, explique quels sont les plus spectaculaires, lesquels nécessitent un équipement particulier, et donne une astuce pratique pour préparer l'observation du prochain événement.`
         }} />
         <div className="card-2" style={{ overflow: 'hidden' }}>
-          {[...EVENTS].sort((a, b) => new Date(a.date) - new Date(b.date)).map(e => (
+          {events.map(e => (
             <EventRow key={e.id} e={e} onClick={() => setEvt(e)} />
           ))}
         </div>
