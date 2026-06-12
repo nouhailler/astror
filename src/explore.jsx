@@ -1,9 +1,10 @@
 import { useState, useEffect, useMemo, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import { IcOrbit, IcChevron, IcArrowLeft, IcWave, IcSpark, IcRocket, IcClose } from './icons'
-import { ScreenHeader, SettingsBtn, DataRow, Sheet, AiInfoPanel } from './ui'
+import { ScreenHeader, SettingsBtn, DataRow, Sheet, AiInfoPanel, SectionTitle } from './ui'
 import { TipBanner } from './tips'
 import { PLANETS, ANOMALIES, THEORIES } from './data'
+import { CONSTELLATIONS_88 } from './constellations'
 import { getPlanetPositions } from './astro'
 import { fetchJWSTImages, fetchNASAImages } from './api'
 import { onbLoad } from './onboarding'
@@ -663,6 +664,120 @@ function WikiLink({ url }) {
   )
 }
 
+// ─── Les 88 constellations ────────────────────────────────────────────────────
+
+const norm = (s) => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+
+const CONS_FILTERS = [
+  { key: 'all', label: 'Toutes' },
+  { key: 'zodiac', label: 'Zodiaque' },
+  { key: 'N', label: 'Boréales' },
+  { key: 'S', label: 'Australes' },
+]
+
+function ConstellationSheet({ c, onClose, onWiki }) {
+  return (
+    <Sheet open={!!c} onClose={onClose}>
+      {c && (
+        <div>
+          <div style={{ display: 'flex', gap: 8, marginBottom: 12, flexWrap: 'wrap' }}>
+            {c.zodiac && <span className="tag">Zodiaque</span>}
+            <span className="tag neutral">{c.hemi === 'N' ? 'Boréale' : c.hemi === 'S' ? 'Australe' : 'Équatoriale'}</span>
+            <span className="tag neutral">{c.season}</span>
+          </div>
+          <div className="h-sec" style={{ fontSize: 25, marginBottom: 3 }}>{c.fr}</div>
+          <div className="meta" style={{ color: 'var(--gold)', fontStyle: 'italic', marginBottom: 16 }}>{c.la}</div>
+
+          <p className="body serif-body" style={{ fontSize: 14.5, lineHeight: 1.65, margin: '0 0 16px' }}>{c.hist}</p>
+
+          <AiInfoPanel cacheKey={`cons88_${c.id}`} style={{ marginBottom: 18 }}
+            buildPrompt={`Constellation : ${c.fr} (${c.la}). Étoile la plus brillante : ${c.star}. ${c.hist}
+
+En 5 phrases, approfondis l'histoire et la mythologie de cette constellation, puis explique concrètement comment la repérer dans le ciel (repères voisins, meilleure période) et cite un objet céleste intéressant à y observer avec un instrument amateur.`} />
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 24px' }}>
+            <DataRow k="Étoile principale" v={c.star} accent />
+            <DataRow k="Meilleure saison" v={c.season} />
+            <DataRow k="Hémisphère" v={c.hemi === 'N' ? 'Boréal' : c.hemi === 'S' ? 'Austral' : 'Équatorial'} />
+            <DataRow k="Superficie" v={`${c.area} deg² · ${c.rank}ᵉ/88`} />
+          </div>
+
+          <button onClick={() => onWiki(c)} className="press"
+            style={{ width: '100%', marginTop: 20, height: 48, borderRadius: 14, cursor: 'pointer',
+              border: '1px solid var(--gold-line)', background: 'var(--gold-soft)', color: 'var(--gold)',
+              fontFamily: 'var(--sans)', fontWeight: 600, fontSize: 14,
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+            Fiche Wikipédia
+          </button>
+        </div>
+      )}
+    </Sheet>
+  )
+}
+
+function ConstellationsSection() {
+  const [query, setQuery] = useState('')
+  const [filter, setFilter] = useState('all')
+  const [selected, setSelected] = useState(null)
+  const [wikiFor, setWikiFor] = useState(null)
+
+  const list = useMemo(() => {
+    let l = CONSTELLATIONS_88
+    if (filter === 'zodiac') l = l.filter(c => c.zodiac)
+    else if (filter === 'N') l = l.filter(c => c.hemi === 'N')
+    else if (filter === 'S') l = l.filter(c => c.hemi === 'S')
+    const q = norm(query.trim())
+    if (q) l = l.filter(c => norm(c.fr).includes(q) || norm(c.la).includes(q) || norm(c.star).includes(q))
+    return [...l].sort((a, b) => a.fr.localeCompare(b.fr, 'fr'))
+  }, [query, filter])
+
+  return (
+    <div className="pad" style={{ paddingBottom: 8 }}>
+      <SectionTitle action={`${list.length}/88`}>Les 88 constellations</SectionTitle>
+      <p className="body tight" style={{ fontSize: 12.5, margin: '-4px 0 12px' }}>
+        Le ciel entier, officiellement découpé par l'Union astronomique internationale en 1922.
+        Touchez une constellation pour son histoire.
+      </p>
+
+      <input value={query} onChange={e => setQuery(e.target.value)} placeholder="Rechercher (nom, latin, étoile)…"
+        aria-label="Rechercher une constellation"
+        style={{ width: '100%', height: 42, borderRadius: 12, padding: '0 14px', marginBottom: 10,
+          background: 'var(--surface-1)', border: '1px solid var(--line-2)', outline: 'none',
+          color: 'var(--text)', fontFamily: 'var(--sans)', fontSize: 13.5 }} />
+
+      <div style={{ display: 'flex', gap: 7, marginBottom: 14, overflowX: 'auto', scrollbarWidth: 'none' }}>
+        {CONS_FILTERS.map(f => (
+          <button key={f.key} className={'chip' + (filter === f.key ? ' on' : '')}
+            onClick={() => setFilter(f.key)}>{f.label}</button>
+        ))}
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 9 }}>
+        {list.map(c => (
+          <button key={c.id} onClick={() => setSelected(c)} className="press"
+            style={{ textAlign: 'left', padding: '11px 13px', borderRadius: 13, cursor: 'pointer',
+              background: 'linear-gradient(180deg,var(--surface-2),var(--surface-1))',
+              border: '1px solid var(--line)' }}>
+            <span className="h-card" style={{ display: 'block', fontSize: 13.5 }}>{c.fr}</span>
+            <span className="meta" style={{ display: 'block', marginTop: 2, fontStyle: 'italic' }}>{c.la}</span>
+            <span className="meta" style={{ display: 'block', marginTop: 4, color: 'var(--gold)' }}>★ {c.star}</span>
+          </button>
+        ))}
+      </div>
+      {list.length === 0 && (
+        <div style={{ textAlign: 'center', color: 'var(--faint)', fontSize: 13, padding: '18px 0' }}>
+          Aucune constellation ne correspond à cette recherche.
+        </div>
+      )}
+
+      <ConstellationSheet c={selected} onClose={() => setSelected(null)}
+        onWiki={(c) => setWikiFor(c)} />
+      <WikiSummarySheet open={!!wikiFor} wikiPage={wikiFor?.wiki} label={wikiFor?.fr}
+        onClose={() => setWikiFor(null)} />
+    </div>
+  )
+}
+
 function SolarView({ onPick, onSun, onMoons, planetPositions }) {
   return (
     <div className="enter">
@@ -695,6 +810,8 @@ function SolarView({ onPick, onSun, onMoons, planetPositions }) {
           </div>
         </button>
       </div>
+
+      <ConstellationsSection />
     </div>
   )
 }

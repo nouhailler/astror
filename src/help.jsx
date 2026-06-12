@@ -27,7 +27,7 @@ export const HELP_CONTENT = {
   explore: { title: 'Explorer', icon: IcOrbit,
     intro: "Un voyage guidé dans le cosmos : les planètes en direct, les images du James Webb, un grand article sur la conquête spatiale avec annexes interactives, et les grandes questions ouvertes de l'astrophysique.",
     points: [
-      "Système solaire : fiche de chaque planète (diamètre, distance, composition, lunes avec photos NASA) avec badge « Visible ce soir » calculé en direct et panel IA",
+      "Système solaire : fiche de chaque planète (diamètre, distance, composition, lunes avec photos NASA) avec badge « Visible ce soir » calculé en direct et panel IA — suivi des 88 constellations avec histoire, mythologie, recherche et fiche Wikipédia",
       "Conquête spatiale : article complet « De Spoutnik à Mars » en 10 chapitres — touchez Chronologie, Glossaire ou Missions pour ouvrir une fiche Wikipédia avec photo, résumé et panel IA",
       "James Webb, Anomalies cosmiques et grandes Théories (matière noire, trous noirs, inflation…) — chaque entrée enrichie par un panel IA et un lien Wikipédia",
     ] },

@@ -20,6 +20,7 @@ export const TIPS = {
   ],
   explore: [
     "Naviguez entre Système solaire, James Webb, Conquête, Anomalies et Théories avec les onglets sous le titre.",
+    "Sous le Soleil, explorez les 88 constellations officielles : chacune raconte son histoire, sa mythologie et son étoile principale.",
     "Dans la Conquête spatiale, touchez une date, un terme ou une mission des Annexes pour ouvrir sa fiche Wikipédia.",
     "Le badge « Visible ce soir » des planètes est calculé en direct pour votre position GPS.",
   ],
