@@ -273,3 +273,12 @@ export const CONSTELLATIONS_88 = [
 // Rang par superficie (1 = la plus grande), calculé une fois au chargement
 const byArea = [...CONSTELLATIONS_88].sort((a, b) => b.area - a.area)
 CONSTELLATIONS_88.forEach(c => { c.rank = byArea.indexOf(c) + 1 })
+
+// Retrouve une fiche par nom français exact, ou par préfixe pour les noms
+// abrégés du catalogue (« Écu » → « Écu de Sobieski »)
+export function findConstellation(name) {
+  if (!name || name === '—') return null
+  return CONSTELLATIONS_88.find(c => c.fr === name)
+    || CONSTELLATIONS_88.find(c => c.fr.startsWith(name + ' '))
+    || null
+}

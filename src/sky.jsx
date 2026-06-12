@@ -3,6 +3,8 @@ import { IcPin, IcSearch, IcCompass, IcClose } from './icons'
 import { ScreenHeader, IconBtn, SettingsBtn, HeaderTools, ChipRow, SectionTitle, DataRow, Sheet, AiInfoPanel } from './ui'
 import { TipBanner } from './tips'
 import { SKY_OBJECTS, CONSTELLATIONS } from './data'
+import { CONSTELLATIONS_88, findConstellation } from './constellations'
+import ConstellationSheet from './constellation-sheet'
 import { getSkyPositions, getConstellationPoints } from './astro'
 import { onbLoad } from './onboarding'
 
@@ -288,7 +290,7 @@ function IcClock({ size = 22 }) {
   )
 }
 
-function SkyDome({ filter, objects, constellations, onPick }) {
+function SkyDome({ filter, objects, constellations, onPick, onPickCons }) {
   const stars = useStarfield(150)
   const [rot, setRot] = useState(0)              // rotation manuelle (degrés)
   const [compassOn, setCompassOn] = useState(false)
@@ -380,6 +382,26 @@ function SkyDome({ filter, objects, constellations, onPick }) {
           ))}
         </svg>
 
+        {/* Étiquettes des constellations levées : tap → fiche (histoire, mythologie) */}
+        {(filter === 'all' || filter === 'star') && constellations.map(c => {
+          const up = c.pts.filter(p => p.alt > 0)
+          if (up.length < 2) return null
+          const proj = up.map(p => project(p.alt, p.az))
+          const cx = proj.reduce((s, p) => s + p.x, 0) / proj.length
+          const cy = proj.reduce((s, p) => s + p.y, 0) / proj.length
+          return (
+            <button key={c.name} onClick={() => { if (!moved.current) onPickCons(c) }}
+              className="press" aria-label={`Constellation ${c.name} : ouvrir la fiche`}
+              style={{ position: 'absolute', left: cx + '%', top: cy + '%',
+                transform: `translate(-50%,-50%) rotate(${-ang}deg)`,
+                background: 'none', border: 0, cursor: 'pointer', padding: 6, zIndex: 4 }}>
+              <span style={{ fontSize: 8.5, fontStyle: 'italic', letterSpacing: '.14em',
+                fontFamily: 'var(--serif)', color: 'rgba(126,166,230,.85)',
+                whiteSpace: 'nowrap', textShadow: '0 1px 4px #000' }}>{c.name}</span>
+            </button>
+          )
+        })}
+
         {visible.map(o => {
           const p = project(o.alt, o.az)
           return (
@@ -432,8 +454,9 @@ function SkyDome({ filter, objects, constellations, onPick }) {
   )
 }
 
-function SkySheet({ o, onClose }) {
+function SkySheet({ o, onClose, onCons }) {
   const [pointing, setPointing] = useState(false)
+  const consFiche = o ? findConstellation(o.cons) : null
   return (
     <>
       <Sheet open={!!o} onClose={onClose}>
@@ -457,7 +480,15 @@ ${o.info}
 En 4 phrases, que peut-on observer de ${o.name} ce soir avec un télescope amateur ? Quel grossissement utiliser, et quel est le détail le plus intéressant à chercher ?`} />
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 24px' }}>
               <DataRow k="Magnitude" v={`${o.mag > 0 ? '+' : ''}${o.mag.toFixed(1)}`} accent />
-              <DataRow k="Constellation" v={o.cons} />
+              <DataRow k="Constellation" v={consFiche ? (
+                <button onClick={() => onCons(consFiche)} className="press"
+                  aria-label={`Ouvrir la fiche de la constellation ${consFiche.fr}`}
+                  style={{ background: 'none', border: 0, padding: 0, cursor: 'pointer',
+                    font: 'inherit', color: 'var(--gold)',
+                    borderBottom: '1px dotted var(--gold-line)' }}>
+                  {o.cons} →
+                </button>
+              ) : o.cons} />
               <DataRow k="Altitude" v={`${o.alt}°`} />
               <DataRow k="Azimut" v={`${o.az}°`} />
               <DataRow k="Distance" v={o.dist} />
@@ -481,6 +512,7 @@ En 4 phrases, que peut-on observer de ${o.name} ce soir avec un télescope amate
 export default function SkyScreen() {
   const [filter, setFilter] = useState('all')
   const [pick, setPick] = useState(null)
+  const [pickCons, setPickCons] = useState(null) // entrée CONSTELLATIONS_88
 
   const loc = useMemo(() => {
     const p = onbLoad()
@@ -527,7 +559,8 @@ export default function SkyScreen() {
       <ChipRow items={chips} value={filter} onChange={setFilter} style={{ marginBottom: 4 }} />
 
       <div className="pad">
-        <SkyDome filter={filter} objects={objects} constellations={constellations} onPick={setPick} />
+        <SkyDome filter={filter} objects={objects} constellations={constellations} onPick={setPick}
+          onPickCons={(c) => setPickCons(CONSTELLATIONS_88.find(x => x.id === c.id) || null)} />
 
         {/* Curseur temporel : de maintenant à +12 h */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 11, marginTop: 10 }}>
@@ -584,7 +617,8 @@ export default function SkyScreen() {
         </div>
       </div>
 
-      <SkySheet o={pick} onClose={() => setPick(null)} />
+      <SkySheet o={pick} onClose={() => setPick(null)} onCons={setPickCons} />
+      <ConstellationSheet c={pickCons} onClose={() => setPickCons(null)} />
     </div>
   )
 }

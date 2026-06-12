@@ -641,6 +641,7 @@ export function getMoonConjunctions(date = new Date(), lat = 48.8566, lng = 2.35
 export function getConstellationPoints(constellations, date = new Date(), lat = 48.8566, lng = 2.3522) {
   const obs = new Astronomy.Observer(lat, lng, 0)
   return constellations.map(c => ({
+    id: c.id,
     name: c.name,
     lines: c.lines,
     pts: c.stars.map(([ra, dec]) => {

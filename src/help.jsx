@@ -12,6 +12,7 @@ export const HELP_CONTENT = {
     intro: "La carte du ciel en temps réel, calculée pour votre position GPS et l'heure actuelle. Touchez un astre pour ses informations complètes, ou activez le mode boussole pour le retrouver dans le ciel.",
     points: [
       "Touchez un astre pour ses détails : type, magnitude, altitude, azimut, distance et fiche enrichie avec panel IA contextuel",
+      "Touchez le nom d'une constellation sur la carte — ou dans la fiche d'un astre — pour ouvrir son histoire, sa mythologie et sa fiche Wikipédia",
       "Mode boussole : pointez votre téléphone vers le ciel, une flèche directionnelle et un radar vous guident avec précision vers l'objet choisi",
       "Filtres par catégorie (planètes, étoiles, ciel profond) et liste « Visibles ce soir » triée par éclat — mise à jour en direct",
     ] },

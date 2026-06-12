@@ -1,10 +1,10 @@
 import { useState, useEffect, useMemo, useRef } from 'react'
-import { createPortal } from 'react-dom'
 import { IcOrbit, IcChevron, IcArrowLeft, IcWave, IcSpark, IcRocket, IcClose } from './icons'
-import { ScreenHeader, SettingsBtn, DataRow, Sheet, AiInfoPanel, SectionTitle } from './ui'
+import { ScreenHeader, SettingsBtn, DataRow, Sheet, AiInfoPanel, SectionTitle, WikiSummarySheet } from './ui'
 import { TipBanner } from './tips'
 import { PLANETS, ANOMALIES, THEORIES } from './data'
 import { CONSTELLATIONS_88 } from './constellations'
+import ConstellationSheet from './constellation-sheet'
 import { getPlanetPositions } from './astro'
 import { fetchJWSTImages, fetchNASAImages } from './api'
 import { onbLoad } from './onboarding'
@@ -675,51 +675,10 @@ const CONS_FILTERS = [
   { key: 'S', label: 'Australes' },
 ]
 
-function ConstellationSheet({ c, onClose, onWiki }) {
-  return (
-    <Sheet open={!!c} onClose={onClose}>
-      {c && (
-        <div>
-          <div style={{ display: 'flex', gap: 8, marginBottom: 12, flexWrap: 'wrap' }}>
-            {c.zodiac && <span className="tag">Zodiaque</span>}
-            <span className="tag neutral">{c.hemi === 'N' ? 'Boréale' : c.hemi === 'S' ? 'Australe' : 'Équatoriale'}</span>
-            <span className="tag neutral">{c.season}</span>
-          </div>
-          <div className="h-sec" style={{ fontSize: 25, marginBottom: 3 }}>{c.fr}</div>
-          <div className="meta" style={{ color: 'var(--gold)', fontStyle: 'italic', marginBottom: 16 }}>{c.la}</div>
-
-          <p className="body serif-body" style={{ fontSize: 14.5, lineHeight: 1.65, margin: '0 0 16px' }}>{c.hist}</p>
-
-          <AiInfoPanel cacheKey={`cons88_${c.id}`} style={{ marginBottom: 18 }}
-            buildPrompt={`Constellation : ${c.fr} (${c.la}). Étoile la plus brillante : ${c.star}. ${c.hist}
-
-En 5 phrases, approfondis l'histoire et la mythologie de cette constellation, puis explique concrètement comment la repérer dans le ciel (repères voisins, meilleure période) et cite un objet céleste intéressant à y observer avec un instrument amateur.`} />
-
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 24px' }}>
-            <DataRow k="Étoile principale" v={c.star} accent />
-            <DataRow k="Meilleure saison" v={c.season} />
-            <DataRow k="Hémisphère" v={c.hemi === 'N' ? 'Boréal' : c.hemi === 'S' ? 'Austral' : 'Équatorial'} />
-            <DataRow k="Superficie" v={`${c.area} deg² · ${c.rank}ᵉ/88`} />
-          </div>
-
-          <button onClick={() => onWiki(c)} className="press"
-            style={{ width: '100%', marginTop: 20, height: 48, borderRadius: 14, cursor: 'pointer',
-              border: '1px solid var(--gold-line)', background: 'var(--gold-soft)', color: 'var(--gold)',
-              fontFamily: 'var(--sans)', fontWeight: 600, fontSize: 14,
-              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-            Fiche Wikipédia
-          </button>
-        </div>
-      )}
-    </Sheet>
-  )
-}
-
 function ConstellationsSection() {
   const [query, setQuery] = useState('')
   const [filter, setFilter] = useState('all')
   const [selected, setSelected] = useState(null)
-  const [wikiFor, setWikiFor] = useState(null)
 
   const list = useMemo(() => {
     let l = CONSTELLATIONS_88
@@ -770,10 +729,7 @@ function ConstellationsSection() {
         </div>
       )}
 
-      <ConstellationSheet c={selected} onClose={() => setSelected(null)}
-        onWiki={(c) => setWikiFor(c)} />
-      <WikiSummarySheet open={!!wikiFor} wikiPage={wikiFor?.wiki} label={wikiFor?.fr}
-        onClose={() => setWikiFor(null)} />
+      <ConstellationSheet c={selected} onClose={() => setSelected(null)} />
     </div>
   )
 }
@@ -1334,106 +1290,6 @@ function ConquestSection({ section }) {
       </p>
       <AiInfoPanel cacheKey={`cq_${section.aiKey}`} buildPrompt={section.aiPrompt} />
     </div>
-  )
-}
-
-function WikiSummarySheet({ wikiPage, label, open, onClose }) {
-  const [data, setData] = useState(null)
-  const [loading, setLoading] = useState(false)
-  const fetched = useRef(false)
-
-  useEffect(() => {
-    if (!open) { fetched.current = false; setData(null); return }
-    if (!wikiPage || fetched.current) return
-    fetched.current = true
-    setLoading(true)
-    fetch(`https://fr.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(wikiPage)}`)
-      .then(r => r.ok ? r.json() : Promise.reject())
-      .then(d => { setData(d); setLoading(false) })
-      .catch(() => {
-        fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(wikiPage)}`)
-          .then(r => r.ok ? r.json() : Promise.reject())
-          .then(d => { setData(d); setLoading(false) })
-          .catch(() => setLoading(false))
-      })
-  }, [open, wikiPage])
-
-  useEffect(() => {
-    if (!open) return
-    const onKey = (e) => e.key === 'Escape' && onClose()
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [open, onClose])
-
-  if (!open) return null
-  const root = document.getElementById('root')
-  if (!root) return null
-
-  return createPortal(
-    <>
-      <div className="sheet-backdrop" onClick={onClose} aria-hidden="true" />
-      <div className="sheet" role="dialog" aria-modal="true" aria-label={label || wikiPage}>
-        <div className="sheet-grip" />
-        <button onClick={onClose} aria-label="Fermer"
-          style={{ position:'absolute', top:14, right:16, width:32, height:32, borderRadius:999,
-            border:'1px solid var(--line-2)', background:'rgba(255,255,255,.03)', color:'var(--dim)',
-            display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer' }}>
-          <IcClose size={16} />
-        </button>
-        <div className="sheet-scroll">
-          <div style={{ padding:'0 0 24px' }}>
-            {loading && (
-              <div style={{ display:'flex', justifyContent:'center', padding:'36px 0' }}>
-                <div style={{ display:'flex', gap:6 }}>
-                  {[0,1,2].map(i => (
-                    <span key={i} style={{ width:6, height:6, borderRadius:'50%', background:'var(--faint)',
-                      animation:'pulse 1.2s ease-in-out infinite', animationDelay:`${i*0.18}s` }} />
-                  ))}
-                </div>
-              </div>
-            )}
-            {data && (
-              <>
-                {data.thumbnail?.source && (
-                  <img src={data.thumbnail.source} alt={data.title}
-                    style={{ width:'100%', maxHeight:220, objectFit:'cover', borderRadius:14, marginBottom:16, display:'block' }} />
-                )}
-                <div style={{ fontSize:18, fontWeight:700, fontFamily:'var(--sans)', color:'var(--text)', marginBottom:5 }}>
-                  {data.title}
-                </div>
-                {data.description && (
-                  <div style={{ fontSize:12, fontFamily:'var(--mono)', color:'var(--gold)', marginBottom:13, letterSpacing:'.03em' }}>
-                    {data.description}
-                  </div>
-                )}
-                {data.extract && (
-                  <p className="body serif-body" style={{ fontSize:13.5, lineHeight:1.72, color:'var(--dim)', margin:'0 0 18px' }}>
-                    {data.extract}
-                  </p>
-                )}
-                <AiInfoPanel
-                  cacheKey={`wiki_${wikiPage}`}
-                  buildPrompt={`Donne-moi 3 faits fascinants et peu connus sur : ${data.title}. ${data.description ? 'Contexte : ' + data.description : ''}`}
-                />
-                {data.content_urls?.desktop?.page && (
-                  <a href={data.content_urls.desktop.page} target="_blank" rel="noopener noreferrer"
-                    style={{ display:'inline-block', marginTop:16, fontSize:12, fontFamily:'var(--mono)',
-                      color:'var(--gold)', textDecoration:'none', borderBottom:'1px solid var(--gold)', paddingBottom:2 }}>
-                    Lire l&apos;article complet sur Wikipédia →
-                  </a>
-                )}
-              </>
-            )}
-            {!loading && !data && (
-              <div style={{ textAlign:'center', padding:'36px 0', color:'var(--faint)', fontSize:13 }}>
-                Article non disponible
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-    </>,
-    root
   )
 }
 

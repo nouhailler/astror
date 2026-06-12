@@ -49,17 +49,18 @@ export const SKY_OBJECTS = [
 ]
 
 // stars : [ra (heures), dec (degrés)] J2000 — positions projetées en direct
+// id : identifiant UAI à 3 lettres → fiche correspondante dans CONSTELLATIONS_88
 export const CONSTELLATIONS = [
-  { name:'Cygne', // Croix du Nord : Deneb, Sadr, Albireo + bras Delta/Epsilon
+  { id:'cyg', name:'Cygne', // Croix du Nord : Deneb, Sadr, Albireo + bras Delta/Epsilon
     stars:[[20.6905,45.28],[20.3705,40.26],[19.5121,27.96],[19.7496,45.13],[20.7702,33.97]],
     lines:[[0,1],[1,2],[3,1],[1,4]] },
-  { name:'Lyre', // Véga, Sheliak, Sulafat
+  { id:'lyr', name:'Lyre', // Véga, Sheliak, Sulafat
     stars:[[18.6156,38.78],[18.8347,33.36],[18.9824,32.69]],
     lines:[[0,1],[1,2],[2,0]] },
-  { name:'Grande Ourse', // Grand Chariot : Dubhe, Merak, Phecda, Megrez, Alioth, Mizar, Alkaid
+  { id:'uma', name:'Grande Ourse', // Grand Chariot : Dubhe, Merak, Phecda, Megrez, Alioth, Mizar, Alkaid
     stars:[[11.0621,61.75],[11.0307,56.38],[11.8972,53.69],[12.2571,57.03],[12.9005,55.96],[13.3988,54.93],[13.7923,49.31]],
     lines:[[0,1],[1,2],[2,3],[3,0],[3,4],[4,5],[5,6]] },
-  { name:'Cassiopée', // le W : Caph, Schedar, Gamma Cas, Ruchbah, Segin
+  { id:'cas', name:'Cassiopée', // le W : Caph, Schedar, Gamma Cas, Ruchbah, Segin
     stars:[[0.1530,59.15],[0.6751,56.54],[0.9451,60.72],[1.4303,60.24],[1.9066,63.67]],
     lines:[[0,1],[1,2],[2,3],[3,4]] },
 ]
