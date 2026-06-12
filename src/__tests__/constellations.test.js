@@ -44,4 +44,26 @@ describe('CONSTELLATIONS_88', () => {
       expect(CONSTELLATIONS_88.some(x => x.id === c.id), c.name).toBe(true)
     })
   })
+
+  it('sky-map figures have valid star coordinates and line indices', () => {
+    CONSTELLATIONS.forEach(c => {
+      c.stars.forEach(([ra, dec]) => {
+        expect(ra, `${c.name} ra`).toBeGreaterThanOrEqual(0)
+        expect(ra, `${c.name} ra`).toBeLessThan(24)
+        expect(Math.abs(dec), `${c.name} dec`).toBeLessThanOrEqual(90)
+      })
+      c.lines.forEach(([a, b]) => {
+        expect(c.stars[a], `${c.name} ligne ${a}`).toBeDefined()
+        expect(c.stars[b], `${c.name} ligne ${b}`).toBeDefined()
+        expect(a).not.toBe(b)
+      })
+    })
+  })
+
+  it('sky map covers all four seasons with figures', () => {
+    const seasons = new Set(
+      CONSTELLATIONS.map(c => CONSTELLATIONS_88.find(x => x.id === c.id)?.season)
+    )
+    expect([...seasons].sort()).toEqual(['Automne', 'Hiver', 'Printemps', 'Été'])
+  })
 })
