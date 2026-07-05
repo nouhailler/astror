@@ -52,7 +52,10 @@ Application mobile PWA pour astronomes amateurs, entièrement en français.
       <img src="docs/screenshots/08-assistant.png" width="185"/><br/>
       <sub><b>Assistant IA</b><br/>Chat contextuel OpenRouter</sub>
     </td>
-    <td></td>
+    <td align="center">
+      <img src="docs/screenshots/09-conquete-chapitre.png" width="185"/><br/>
+      <sub><b>Conquête — chapitre</b><br/>Lecture immersive d'un chapitre</sub>
+    </td>
     <td></td>
   </tr>
 </table>
