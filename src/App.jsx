@@ -1,9 +1,11 @@
-import { useState, useEffect, lazy, Suspense } from 'react'
+import { useState, useEffect, useRef, lazy, Suspense } from 'react'
 import { IcSky, IcMoon, IcGlobe, IcBell, IcWrench, IcSpark } from './icons'
 import { TopBar, HelpSheet, DemoSheet } from './help'
 import SettingsSheet from './settings'
 import Onboarding, { onbWasSeen, onbMarkSeen, onbLoad, onbSave } from './onboarding'
 import SkyScreen from './sky' // onglet par défaut : chargé d'emblée
+import { registerDemoHost } from './demo/bridge'
+import { startDemo, getDemoParam } from './demo'
 import './app.css'
 
 // Autres onglets chargés à la demande (code-splitting)
@@ -40,6 +42,7 @@ function TabBar({ tab, onChange }) {
     <nav className="tab-bar" role="tablist" aria-label="Navigation principale">
       {TABS.map(t => (
         <button key={t.key} onClick={() => onChange(t.key)}
+          data-demo-id={`tab-${t.key}`}
           className={'tab-btn' + (tab === t.key ? ' active' : '')}
           role="tab" aria-selected={tab === t.key} aria-label={t.label}>
           <t.Ic size={22} />
@@ -51,7 +54,8 @@ function TabBar({ tab, onChange }) {
 }
 
 export default function App() {
-  const [onboarded, setOnboarded] = useState(() => onbWasSeen())
+  const demoParam = getDemoParam()  // ?demo=<scénario> : mode démo au chargement
+  const [onboarded, setOnboarded] = useState(() => onbWasSeen() || !!demoParam)
   const [tab, setTab] = useState('sky')
   const [helpKey, setHelpKey] = useState(null)
   const [demoKey, setDemoKey] = useState(null)
@@ -60,6 +64,27 @@ export default function App() {
   const [toolDeepLink, setToolDeepLink] = useState(null)
 
   const handleProfileChange = (p) => { setProfile(p); onbSave(p) }
+
+  // Onglet courant exposé au moteur démo sans re-souscription à chaque changement.
+  const tabRef = useRef(tab)
+  tabRef.current = tab
+
+  // Hôte de navigation du mode démo (bridge). Enregistré une seule fois.
+  useEffect(() => {
+    return registerDemoHost({
+      navigate: ({ tab: t, tool }) => {
+        if (tool) { setTab('tools'); setToolDeepLink(tool) }
+        else if (t) setTab(t)
+      },
+      getTab: () => tabRef.current,
+      openSettings: () => setSettingsOpen(true),
+    })
+  }, [])
+
+  // Démarrage automatique via ?demo=<scénario>.
+  useEffect(() => {
+    if (demoParam) startDemo(demoParam)
+  }, [demoParam])
 
   useEffect(() => {
     window.openAstrorSettings = () => setSettingsOpen(true)
@@ -102,6 +127,7 @@ export default function App() {
         profile={profile}
         onChange={handleProfileChange}
         onReplay={() => { setSettingsOpen(false); setOnboarded(false) }}
+        onStartDemo={(name) => { setSettingsOpen(false); startDemo(name) }}
       />
     </div>
   )

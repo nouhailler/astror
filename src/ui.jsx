@@ -16,9 +16,9 @@ export function ScreenHeader({ eyebrow, title, right }) {
   )
 }
 
-export function IconBtn({ children, onClick, badge }) {
+export function IconBtn({ children, onClick, badge, demoId }) {
   return (
-    <button onClick={onClick} className="press" style={{
+    <button onClick={onClick} className="press" data-demo-id={demoId} style={{
       position: 'relative', width: 40, height: 40, flexShrink: 0,
       borderRadius: 999, border: '1px solid var(--line-2)',
       background: 'rgba(255,255,255,0.03)', color: 'var(--dim)',
@@ -33,7 +33,8 @@ export function IconBtn({ children, onClick, badge }) {
 
 export function SettingsBtn() {
   return (
-    <IconBtn onClick={() => window.openAstrorSettings && window.openAstrorSettings()}>
+    <IconBtn onClick={() => window.openAstrorSettings && window.openAstrorSettings()}
+      demoId="settings-btn">
       <IcSliders size={18} />
     </IconBtn>
   )
@@ -43,7 +44,7 @@ export function HeaderTools({ children }) {
   return <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>{children}</div>
 }
 
-export function ChipRow({ items, value, onChange, style }) {
+export function ChipRow({ items, value, onChange, style, demoIdPrefix }) {
   return (
     <div style={{ display: 'flex', gap: 8, overflowX: 'auto', padding: '2px 18px 2px',
                   scrollbarWidth: 'none', ...style }}>
@@ -52,6 +53,7 @@ export function ChipRow({ items, value, onChange, style }) {
         const label = typeof it === 'string' ? it : it.label
         return (
           <button key={key} className={'chip' + (value === key ? ' on' : '')}
+                  data-demo-id={demoIdPrefix ? `${demoIdPrefix}-${key}` : undefined}
                   onClick={() => onChange(key)}>{label}</button>
         )
       })}

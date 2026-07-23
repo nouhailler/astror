@@ -201,7 +201,7 @@ export default function AssistantScreen() {
 
       {/* Panel suggestions — hors de la zone de scroll, toujours visible en haut */}
       {msgs.length <= 1 && (
-        <div style={{ flexShrink: 0, overflowY: 'auto', maxHeight: '55vh',
+        <div data-demo-id="ai-suggestions" style={{ flexShrink: 0, overflowY: 'auto', maxHeight: '55vh',
           padding: '12px 18px 10px', borderBottom: '1px solid var(--line)' }}>
           <div className="meta" style={{ marginBottom: 10, textTransform: 'uppercase', letterSpacing: '.12em' }}>Suggestions</div>
           {/* Chips catégories */}
@@ -242,6 +242,7 @@ export default function AssistantScreen() {
           border: '1px solid var(--line-2)', borderRadius: 999, padding: '6px 6px 6px 18px' }}>
           <input value={input} onChange={e => setInput(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && send()}
+            data-demo-id="ai-input"
             placeholder="Posez votre question…" aria-label="Message à l'assistant"
             style={{ flex: 1, background: 'none', border: 0, outline: 'none',
               color: 'var(--text)', fontFamily: 'var(--sans)', fontSize: 14 }} />

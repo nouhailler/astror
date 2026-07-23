@@ -36,7 +36,8 @@ function ToolsHub({ onOpen }) {
         <TipBanner tipKey="tools" />
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, padding: '14px 16px calc(16px + var(--sab))' }}>
           {TOOLS.map(t => (
-            <button key={t.key} onClick={() => onOpen(t.key)} className="press" style={{ textAlign: 'left', display: 'flex', flexDirection: 'column',
+            <button key={t.key} onClick={() => onOpen(t.key)} className="press"
+              data-demo-id={`tool-${t.key}`} style={{ textAlign: 'left', display: 'flex', flexDirection: 'column',
               gap: 10, padding: 15, borderRadius: 18, cursor: 'pointer',
               background: 'linear-gradient(180deg,var(--surface-2),var(--surface-1))', border: '1px solid var(--line)' }}>
               <span style={{ width: 40, height: 40, borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center',

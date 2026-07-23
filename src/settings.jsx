@@ -2,6 +2,7 @@ import { useState, useRef } from 'react'
 import { IcPin, IcStar, IcSpark, IcChevron, IcChevDown, IcCheck, IcBulb } from './icons'
 import { Sheet, loadAiCache, saveAiCache, clearAiCache } from './ui'
 import { resetTips } from './tips'
+import { getScenarioList } from './demo'
 import {
   ONB_LEVELS, ONB_LOCATIONS, ONB_LOCATION_COORDS, ONB_INTERESTS, ONB_GEAR, ONB_ALERTS, DEFAULT_PROFILE
 } from './onboarding'
@@ -40,6 +41,39 @@ function TipsResetButton() {
       </span>
       {!done && <IcChevron size={18} className="arrow" />}
     </button>
+  )
+}
+
+function DemoSection({ onStartDemo }) {
+  const scenarios = getScenarioList()
+  if (!onStartDemo || scenarios.length === 0) return null
+  return (
+    <div style={{ marginBottom: 26 }}>
+      <SettingsSection label="Visites guidées (mode démo)" />
+      <p className="body tight" style={{ fontSize: 12.5, margin: '0 0 12px' }}>
+        Rejoue automatiquement un parcours dans l'app, comme une démonstration.
+        Sortie à tout moment avec Échap. Accessible aussi via l'adresse <code>?demo=nom</code>.
+      </p>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+        {scenarios.map(s => (
+          <button key={s.name} onClick={() => onStartDemo(s.name)} className="press"
+            style={{ width: '100%', textAlign: 'left', display: 'flex', alignItems: 'center', gap: 13,
+              padding: '13px 15px', borderRadius: 14, cursor: 'pointer',
+              background: 'rgba(255,255,255,0.02)', border: '1px solid var(--line)' }}>
+            <span style={{ width: 38, height: 38, borderRadius: 11, flexShrink: 0, display: 'flex',
+              alignItems: 'center', justifyContent: 'center', color: 'var(--gold)',
+              background: 'var(--gold-soft)', border: '1px solid var(--gold-line)' }}>
+              <IcSpark size={18} />
+            </span>
+            <span style={{ flex: 1, minWidth: 0 }}>
+              <span className="h-card" style={{ display: 'block', fontSize: 14.5 }}>{s.label}</span>
+              {s.description && <span className="body tight" style={{ fontSize: 12 }}>{s.description}</span>}
+            </span>
+            <IcChevron size={17} className="arrow" />
+          </button>
+        ))}
+      </div>
+    </div>
   )
 }
 
@@ -437,7 +471,7 @@ function AlertInfoRow({ alert, isOn, onToggle, isLast }) {
   )
 }
 
-export default function SettingsSheet({ open, onClose, profile, onChange, onReplay }) {
+export default function SettingsSheet({ open, onClose, profile, onChange, onReplay, onStartDemo }) {
   const p = profile || DEFAULT_PROFILE
   const update = (patch) => onChange({ ...p, ...patch })
   const toggleArr = (key, val) => {
@@ -481,6 +515,8 @@ export default function SettingsSheet({ open, onClose, profile, onChange, onRepl
       </button>
 
       <TipsResetButton />
+
+      <DemoSection onStartDemo={onStartDemo} />
 
       <SettingsSection label="Niveau d'expérience" />
       <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 24 }}>

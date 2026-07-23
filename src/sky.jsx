@@ -425,6 +425,7 @@ function SkyDome({ filter, objects, constellations, onPick, onPickCons }) {
 
       {/* Contrôles d'orientation */}
       <button onClick={toggleCompass} aria-pressed={compassOn} aria-label="Aligner la carte avec la boussole"
+        data-demo-id="sky-compass"
         className="press" style={{ position: 'absolute', top: 6, left: 6, zIndex: 6,
           width: 36, height: 36, borderRadius: 999, cursor: 'pointer',
           border: `1px solid ${compassOn ? 'var(--gold-line)' : 'var(--line-2)'}`,
@@ -556,7 +557,7 @@ export default function SkyScreen() {
         </span>
       </div>
 
-      <ChipRow items={chips} value={filter} onChange={setFilter} style={{ marginBottom: 4 }} />
+      <ChipRow items={chips} value={filter} onChange={setFilter} style={{ marginBottom: 4 }} demoIdPrefix="sky-filter" />
 
       <div className="pad">
         <SkyDome filter={filter} objects={objects} constellations={constellations} onPick={setPick}
@@ -567,6 +568,7 @@ export default function SkyScreen() {
           <IcClock size={15} style={{ color: simulating ? 'var(--gold)' : 'var(--faint)', flexShrink: 0 }} />
           <input type="range" min={0} max={720} step={15} value={offsetMin}
             onChange={e => setOffsetMin(+e.target.value)}
+            data-demo-id="sky-time"
             aria-label="Simuler le ciel à une heure ultérieure"
             style={{ flex: 1, accentColor: 'var(--gold)', cursor: 'pointer' }} />
           <span className="data" style={{ width: 44, textAlign: 'right', fontSize: 13,
@@ -596,7 +598,8 @@ export default function SkyScreen() {
             </div>
           )}
           {list.map((o, i) => (
-            <button key={o.id} onClick={() => setPick(o)} className="press" style={{ width: '100%',
+            <button key={o.id} onClick={() => setPick(o)} className="press"
+              data-demo-id={i === 0 ? 'sky-list-first' : undefined} style={{ width: '100%',
               display: 'flex', alignItems: 'center', gap: 13, padding: '12px 15px', background: 'none',
               border: 0, borderBottom: i < list.length - 1 ? '1px solid var(--line)' : 0,
               textAlign: 'left', cursor: 'pointer' }}>
