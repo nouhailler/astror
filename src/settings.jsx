@@ -583,6 +583,11 @@ export default function SettingsSheet({ open, onClose, profile, onChange, onRepl
 
       <DataBackupSection />
 
+      <a href="https://nouhailler.github.io/astror/" target="_blank" rel="noopener noreferrer"
+        className="chip" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, height: 40, textDecoration: 'none' }}>
+        📚 Documentation
+      </a>
+
       <div className="meta" style={{ textAlign: 'center', color: 'var(--faint)', padding: '4px 0 2px' }}>
         Astror · version 1.0 — préférences enregistrées sur cet appareil
       </div>
