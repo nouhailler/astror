@@ -70,6 +70,7 @@ export const NAV = [
       { id: 'feat-education', title: 'Outil Apprendre (quiz, XP, parcours)', path: '/features/apprendre/' },
       { id: 'feat-community', title: 'Outil Communauté', path: '/features/communaute/' },
       { id: 'feat-extras', title: 'Outil Explorations', path: '/features/explorations/' },
+      { id: 'feat-tips', title: 'Astuces contextuelles', path: '/features/astuces-contextuelles/' },
       { id: 'feat-demo', title: 'Mode démo (visites guidées)', path: '/features/mode-demo/' },
       { id: 'feat-export', title: 'Export et import des données', path: '/features/export-import/' },
       { id: 'feat-ai-keys', title: 'Clés API pour l’IA', path: '/features/cles-api-ia/' },
@@ -555,6 +556,7 @@ PAGES['features-index'] = {
   <a class="card" href="apprendre/"><div class="card-title">Apprendre</div><div class="card-sub">Quiz, XP, parcours</div></a>
   <a class="card" href="communaute/"><div class="card-title">Communauté</div><div class="card-sub">Fil & classement</div></a>
   <a class="card" href="explorations/"><div class="card-title">Explorations</div><div class="card-sub">Simulateurs</div></a>
+  <a class="card" href="astuces-contextuelles/"><div class="card-title">Astuces contextuelles</div><div class="card-sub">Bandeaux d'aide</div></a>
   <a class="card" href="mode-demo/"><div class="card-title">Mode démo</div><div class="card-sub">Visites guidées</div></a>
   <a class="card" href="export-import/"><div class="card-title">Export / import</div><div class="card-sub">Sauvegarde des données</div></a>
   <a class="card" href="cles-api-ia/"><div class="card-title">Clés API IA</div><div class="card-sub">OpenRouter, Anthropic</div></a>
@@ -978,6 +980,24 @@ PAGES['feat-extras'] = {
 <h2>FAQ</h2><p><a href="../../faq/">Voir la FAQ</a></p>
 `,
 };
+PAGES['feat-tips'] = {
+  description: "Bandeaux d'astuces contextuelles affichés sur les 16 écrans principaux d'Astror.",
+  html: `
+<div class="eyebrow">Fonctionnalités</div>
+<h1>Astuces contextuelles</h1>
+<h2>Description</h2><p>Un bandeau « Astuce » propose 3 à 6 conseils défilables par écran (gestes, fonctions faciles à manquer), complémentaire de l'aide (bouton « ? ») et de la démo (bouton « ▶ »).</p>
+<h2>Objectif</h2><p>Signaler des fonctions ou gestes utiles sans devoir ouvrir l'aide complète.</p>
+<h2>Prérequis</h2><p>Aucun.</p>
+<h2>Comment l'utiliser</h2><p>Le bandeau apparaît automatiquement en haut des 6 onglets principaux et des 10 outils, tant qu'il n'a pas été masqué sur cet écran. Bouton « Astuce suivante » pour faire défiler les conseils de l'écran ; bouton de fermeture pour masquer le bandeau de cet écran (le masquage est mémorisé par écran, pas par astuce individuelle).</p>
+<h2>Options</h2><p>Paramètres → « Réafficher les astuces » réinitialise le masquage sur tous les écrans d'un coup.</p>
+<h2>Données utilisées</h2><p><code>astror_tips_v1</code> — liste des écrans dont le bandeau a été masqué.</p>
+<h2>Résultat</h2><p>Un bandeau discret, non bloquant, qui ne réapparaît plus sur un écran une fois fermé (jusqu'à réinitialisation).</p>
+<h2>Fonctionnement hors connexion</h2><p><span class="badge ok">100 % hors ligne</span> — contenu texte statique.</p>
+<h2>Limites</h2><p>Le masquage s'applique à tout le bandeau d'un écran, pas à une astuce précise : fermer le bandeau masque l'ensemble des conseils de cet écran, pas seulement celui affiché au moment de la fermeture.</p>
+<h2>FAQ</h2><p><a href="../../faq/">Voir la FAQ</a></p>
+`,
+};
+
 PAGES['feat-demo'] = {
   description: "Visites guidées automatiques qui pilotent réellement l'interface, sans jamais toucher vos données.",
   html: `
