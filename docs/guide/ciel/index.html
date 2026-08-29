@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ciel — Documentation Astror</title>
+<meta name="description" content="Écran Ciel : carte du ciel en direct, boussole de pointage, curseur temporel, fiche d'objet.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔭</text></svg>">
+<link rel="stylesheet" href="../../assets/css/doc.css">
+</head>
+<body>
+<header class="topbar">
+  <button id="navToggle" class="tb-link" aria-label="Ouvrir le sommaire" aria-expanded="false">☰</button>
+  <a class="brand" href="../../"><span class="dot"></span> Astror <span class="small" style="font-family:var(--mono);font-weight:400;">docs</span></a>
+  <div class="sp"></div>
+  <a class="tb-link" href="../../search/">🔍 Rechercher</a>
+</header>
+<div class="shell">
+  <aside class="side"><div class="side-title">Sommaire</div><nav aria-label="Sommaire de la documentation"><details><summary><span class="chapter-icon">🚀</span><span>Bien démarrer</span><span class="count">1</span><span class="chev">›</span></summary><a href="../../getting-started/">Installer et démarrer</a></details><details><summary><span class="chapter-icon">🧭</span><span>Comprendre l'application</span><span class="count">1</span><span class="chev">›</span></summary><a href="../../about/">Qu'est-ce qu'Astror</a></details><details open><summary><span class="chapter-icon">📖</span><span>Guide utilisateur</span><span class="count">16</span><span class="chev">›</span></summary><a href="../../guide/">Vue d'ensemble</a><a href="../../guide/ciel/" aria-current="page">Ciel</a><a href="../../guide/ephemerides/">Éphémérides</a><a href="../../guide/explorer/">Explorer</a><a href="../../guide/veille/">Veille</a><a href="../../guide/assistant/">Assistant</a><div class="sub-label">Outils</div><div class="sub"><a href="../../guide/outils/observer/">Observer</a><a href="../../guide/outils/lune/">Lune</a><a href="../../guide/outils/planetes/">Planètes</a><a href="../../guide/outils/evenements/">Événements</a><a href="../../guide/outils/astrophoto/">Astrophoto</a><a href="../../guide/outils/satellites/">Satellites</a><a href="../../guide/outils/apprendre/">Apprendre</a><a href="../../guide/outils/communaute/">Communauté</a><a href="../../guide/outils/assistant-ia/">Assistant IA</a><a href="../../guide/outils/explorations/">Explorations</a></div></details><details><summary><span class="chapter-icon">🧩</span><span>Fonctionnalités</span><span class="count">22</span><span class="chev">›</span></summary><a href="../../features/">Vue d'ensemble</a><a href="../../features/profil-observateur/">Profil observateur (onboarding)</a><a href="../../features/carte-du-ciel/">Carte du ciel interactive</a><a href="../../features/constellations/">Fiches des 88 constellations</a><a href="../../features/ephemerides-alertes/">Éphémérides et alertes</a><a href="../../features/systeme-solaire/">Système solaire</a><a href="../../features/james-webb/">Galerie James Webb</a><a href="../../features/conquete-spatiale/">Conquête spatiale</a><a href="../../features/veille-spatiale/">Veille spatiale</a><a href="../../features/assistant-ia/">Assistant IA</a><a href="../../features/observer-journal/">Outil Observer (journal & conditions)</a><a href="../../features/outil-lune/">Outil Lune</a><a href="../../features/outil-planetes/">Outil Planètes</a><a href="../../features/evenements-notifications/">Outil Événements & notifications</a><a href="../../features/astrophoto/">Outil Astrophoto</a><a href="../../features/satellites/">Outil Satellites</a><a href="../../features/apprendre/">Outil Apprendre (quiz, XP, parcours)</a><a href="../../features/communaute/">Outil Communauté</a><a href="../../features/explorations/">Outil Explorations</a><a href="../../features/mode-demo/">Mode démo (visites guidées)</a><a href="../../features/export-import/">Export et import des données</a><a href="../../features/cles-api-ia/">Clés API pour l’IA</a></details><details><summary><span class="chapter-icon">⚙️</span><span>Paramètres</span><span class="count">1</span><span class="chev">›</span></summary><a href="../../settings/">Tous les paramètres</a></details><details><summary><span class="chapter-icon">🔐</span><span>Permissions</span><span class="count">1</span><span class="chev">›</span></summary><a href="../../permissions/">Permissions utilisées</a></details><details><summary><span class="chapter-icon">🗄️</span><span>Données et confidentialité</span><span class="count">1</span><span class="chev">›</span></summary><a href="../../data/">Données et confidentialité</a></details><details><summary><span class="chapter-icon">📡</span><span>Fonctionnement hors connexion</span><span class="count">1</span><span class="chev">›</span></summary><a href="../../offline/">Hors connexion</a></details><details><summary><span class="chapter-icon">🛠️</span><span>Dépannage</span><span class="count">9</span><span class="chev">›</span></summary><a href="../../troubleshooting/">Vue d'ensemble</a><a href="../../troubleshooting/localisation/">La localisation ne fonctionne pas</a><a href="../../troubleshooting/boussole/">La boussole ne fonctionne pas</a><a href="../../troubleshooting/notifications/">Les notifications n’arrivent pas</a><a href="../../troubleshooting/meteo/">Météo indisponible</a><a href="../../troubleshooting/assistant-ia/">L’assistant IA ne répond pas</a><a href="../../troubleshooting/images/">Les images ne se chargent pas</a><a href="../../troubleshooting/iss/">Passages ISS/Tiangong indisponibles</a><a href="../../troubleshooting/import/">L’import de données échoue</a></details><details><summary><span class="chapter-icon">❓</span><span>FAQ</span><span class="count">1</span><span class="chev">›</span></summary><a href="../../faq/">Questions fréquentes</a></details><details><summary><span class="chapter-icon">📘</span><span>Référence</span><span class="count">7</span><span class="chev">›</span></summary><a href="../../reference/">Vue d'ensemble</a><a href="../../reference/settings/">Tableau des paramètres</a><a href="../../reference/errors/">Codes et messages d’erreur</a><a href="../../reference/glossary/">Glossaire</a><a href="../../reference/compatibility/">Compatibilité</a><a href="../../reference/limitations/">Limites connues</a><a href="../../reference/apis/">APIs externes (technique)</a></details><details><summary><span class="chapter-icon">🔄</span><span>Versions</span><span class="count">1</span><span class="chev">›</span></summary><a href="../../versions/">Historique des versions</a></details><details><summary><span class="chapter-icon">⚖️</span><span>Informations légales</span><span class="count">1</span><span class="chev">›</span></summary><a href="../../legal/">Informations légales</a></details><details><summary><span class="chapter-icon">📩</span><span>Support</span><span class="count">1</span><span class="chev">›</span></summary><a href="../../support/">Obtenir de l’aide</a></details></nav></aside>
+  <main class="main">
+    <div class="crumbs"><a href="../../">Accueil</a><span class="sep">/</span><span>Guide utilisateur</span><span class="sep">/</span><span>Ciel</span></div>
+    
+<div class="eyebrow">Guide utilisateur</div>
+<h1>Ciel</h1>
+<p class="lede">Carte du ciel visible « ce soir » depuis votre position, avec pointage assisté par boussole.</p>
+<h2>Accès</h2><p>Premier onglet de la barre de navigation principale.</p>
+<h2>Éléments de l'interface</h2>
+<div class="table-wrap"><table>
+<tr><th>Élément</th><th>Description</th></tr>
+<tr><td>Filtres (Tout / Planètes / Étoiles / Ciel profond)</td><td>Restreignent les objets affichés sur le dôme</td></tr>
+<tr><td>Dôme SVG</td><td>Étoiles, traits de constellations, objets cliquables, une étoile filante animée</td></tr>
+<tr><td>Bouton boussole (rond, en haut à gauche)</td><td>Active/désactive le mode boussole (orientation réelle du téléphone)</td></tr>
+<tr><td>Bouton « N »</td><td>Réinitialise une rotation manuelle de la carte</td></tr>
+<tr><td>Curseur temporel</td><td>Simule le ciel jusqu'à +12 h dans le futur, par pas de 15 min</td></tr>
+<tr><td>Liste « Maintenant visible »</td><td>Objets triés par magnitude (les plus brillants d'abord)</td></tr>
+</table></div>
+<h2>Actions</h2>
+<ul>
+  <li><strong>Glisser sur le dôme</strong> → fait pivoter la carte manuellement.</li>
+  <li><strong>Toucher un objet</strong> → ouvre sa fiche (magnitude, constellation, altitude/azimut, distance, lever/coucher, bouton « Pointer vers l'objet »).</li>
+  <li><strong>Activer la boussole</strong> → demande la permission d'orientation de l'appareil (iOS), puis affiche un radar plein écran qui guide le geste jusqu'à l'alignement.</li>
+</ul>
+<h2>Cas particuliers</h2>
+<p>Si aucun objet du catalogue n'est au-dessus de l'horizon, la liste affiche un message dédié. Si le capteur d'orientation ne répond pas sous 5 secondes, un panneau de diagnostic apparaît avec des instructions (autoriser les capteurs dans le navigateur, calibrer en formant un « 8 » avec le téléphone) et un repli en orientation manuelle (cap/hauteur affichés en texte).</p>
+<h2>Pour aller plus loin</h2>
+<p><a href="../../features/carte-du-ciel/">Fonctionnalité détaillée : Carte du ciel interactive</a> · <a href="../../features/constellations/">Fiches des 88 constellations</a> · <a href="../../troubleshooting/boussole/">Dépannage boussole</a></p>
+
+    <div class="prevnext">
+        <a href="../../guide/"><span class="dir">← Précédent</span>Vue d'ensemble</a>
+        <a class="next" href="../../guide/ephemerides/"><span class="dir">Suivant →</span>Éphémérides</a>
+      </div>
+    <footer class="doc-footer">Astror v1.0.0 · Documentation v1.0.0 · mise à jour 2026-08-29<br><a href="../../legal/">Informations légales</a> · <a href="../../support/">Support</a></footer>
+  </main>
+</div>
+<script src="../../assets/js/doc.js" defer></script>
+</body>
+</html>

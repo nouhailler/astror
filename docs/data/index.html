@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Données et confidentialité — Documentation Astror</title>
+<meta name="description" content="Toutes les données stockées localement par Astror, leur origine, leur finalité et l'export/suppression.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔭</text></svg>">
+<link rel="stylesheet" href="../assets/css/doc.css">
+</head>
+<body>
+<header class="topbar">
+  <button id="navToggle" class="tb-link" aria-label="Ouvrir le sommaire" aria-expanded="false">☰</button>
+  <a class="brand" href="../"><span class="dot"></span> Astror <span class="small" style="font-family:var(--mono);font-weight:400;">docs</span></a>
+  <div class="sp"></div>
+  <a class="tb-link" href="../search/">🔍 Rechercher</a>
+</header>
+<div class="shell">
+  <aside class="side"><div class="side-title">Sommaire</div><nav aria-label="Sommaire de la documentation"><details><summary><span class="chapter-icon">🚀</span><span>Bien démarrer</span><span class="count">1</span><span class="chev">›</span></summary><a href="../getting-started/">Installer et démarrer</a></details><details><summary><span class="chapter-icon">🧭</span><span>Comprendre l'application</span><span class="count">1</span><span class="chev">›</span></summary><a href="../about/">Qu'est-ce qu'Astror</a></details><details><summary><span class="chapter-icon">📖</span><span>Guide utilisateur</span><span class="count">16</span><span class="chev">›</span></summary><a href="../guide/">Vue d'ensemble</a><a href="../guide/ciel/">Ciel</a><a href="../guide/ephemerides/">Éphémérides</a><a href="../guide/explorer/">Explorer</a><a href="../guide/veille/">Veille</a><a href="../guide/assistant/">Assistant</a><div class="sub-label">Outils</div><div class="sub"><a href="../guide/outils/observer/">Observer</a><a href="../guide/outils/lune/">Lune</a><a href="../guide/outils/planetes/">Planètes</a><a href="../guide/outils/evenements/">Événements</a><a href="../guide/outils/astrophoto/">Astrophoto</a><a href="../guide/outils/satellites/">Satellites</a><a href="../guide/outils/apprendre/">Apprendre</a><a href="../guide/outils/communaute/">Communauté</a><a href="../guide/outils/assistant-ia/">Assistant IA</a><a href="../guide/outils/explorations/">Explorations</a></div></details><details><summary><span class="chapter-icon">🧩</span><span>Fonctionnalités</span><span class="count">22</span><span class="chev">›</span></summary><a href="../features/">Vue d'ensemble</a><a href="../features/profil-observateur/">Profil observateur (onboarding)</a><a href="../features/carte-du-ciel/">Carte du ciel interactive</a><a href="../features/constellations/">Fiches des 88 constellations</a><a href="../features/ephemerides-alertes/">Éphémérides et alertes</a><a href="../features/systeme-solaire/">Système solaire</a><a href="../features/james-webb/">Galerie James Webb</a><a href="../features/conquete-spatiale/">Conquête spatiale</a><a href="../features/veille-spatiale/">Veille spatiale</a><a href="../features/assistant-ia/">Assistant IA</a><a href="../features/observer-journal/">Outil Observer (journal & conditions)</a><a href="../features/outil-lune/">Outil Lune</a><a href="../features/outil-planetes/">Outil Planètes</a><a href="../features/evenements-notifications/">Outil Événements & notifications</a><a href="../features/astrophoto/">Outil Astrophoto</a><a href="../features/satellites/">Outil Satellites</a><a href="../features/apprendre/">Outil Apprendre (quiz, XP, parcours)</a><a href="../features/communaute/">Outil Communauté</a><a href="../features/explorations/">Outil Explorations</a><a href="../features/mode-demo/">Mode démo (visites guidées)</a><a href="../features/export-import/">Export et import des données</a><a href="../features/cles-api-ia/">Clés API pour l’IA</a></details><details><summary><span class="chapter-icon">⚙️</span><span>Paramètres</span><span class="count">1</span><span class="chev">›</span></summary><a href="../settings/">Tous les paramètres</a></details><details><summary><span class="chapter-icon">🔐</span><span>Permissions</span><span class="count">1</span><span class="chev">›</span></summary><a href="../permissions/">Permissions utilisées</a></details><details open><summary><span class="chapter-icon">🗄️</span><span>Données et confidentialité</span><span class="count">1</span><span class="chev">›</span></summary><a href="../data/" aria-current="page">Données et confidentialité</a></details><details><summary><span class="chapter-icon">📡</span><span>Fonctionnement hors connexion</span><span class="count">1</span><span class="chev">›</span></summary><a href="../offline/">Hors connexion</a></details><details><summary><span class="chapter-icon">🛠️</span><span>Dépannage</span><span class="count">9</span><span class="chev">›</span></summary><a href="../troubleshooting/">Vue d'ensemble</a><a href="../troubleshooting/localisation/">La localisation ne fonctionne pas</a><a href="../troubleshooting/boussole/">La boussole ne fonctionne pas</a><a href="../troubleshooting/notifications/">Les notifications n’arrivent pas</a><a href="../troubleshooting/meteo/">Météo indisponible</a><a href="../troubleshooting/assistant-ia/">L’assistant IA ne répond pas</a><a href="../troubleshooting/images/">Les images ne se chargent pas</a><a href="../troubleshooting/iss/">Passages ISS/Tiangong indisponibles</a><a href="../troubleshooting/import/">L’import de données échoue</a></details><details><summary><span class="chapter-icon">❓</span><span>FAQ</span><span class="count">1</span><span class="chev">›</span></summary><a href="../faq/">Questions fréquentes</a></details><details><summary><span class="chapter-icon">📘</span><span>Référence</span><span class="count">7</span><span class="chev">›</span></summary><a href="../reference/">Vue d'ensemble</a><a href="../reference/settings/">Tableau des paramètres</a><a href="../reference/errors/">Codes et messages d’erreur</a><a href="../reference/glossary/">Glossaire</a><a href="../reference/compatibility/">Compatibilité</a><a href="../reference/limitations/">Limites connues</a><a href="../reference/apis/">APIs externes (technique)</a></details><details><summary><span class="chapter-icon">🔄</span><span>Versions</span><span class="count">1</span><span class="chev">›</span></summary><a href="../versions/">Historique des versions</a></details><details><summary><span class="chapter-icon">⚖️</span><span>Informations légales</span><span class="count">1</span><span class="chev">›</span></summary><a href="../legal/">Informations légales</a></details><details><summary><span class="chapter-icon">📩</span><span>Support</span><span class="count">1</span><span class="chev">›</span></summary><a href="../support/">Obtenir de l’aide</a></details></nav></aside>
+  <main class="main">
+    <div class="crumbs"><a href="../">Accueil</a><span class="sep">/</span><span>Données et confidentialité</span><span class="sep">/</span><span>Données et confidentialité</span></div>
+    
+<div class="eyebrow">Données et confidentialité</div>
+<h1>Données et confidentialité</h1>
+<p class="lede">Astror n'a pas de compte utilisateur ni de serveur applicatif propre : toutes les données personnelles restent dans le stockage local (<code>localStorage</code>) du navigateur, sur l'appareil de l'utilisateur.</p>
+
+<h2>Stockage local — toutes les clés</h2>
+<div class="table-wrap"><table>
+<tr><th>Clé</th><th>Contenu</th><th>Origine</th><th>Transmise à un tiers ?</th></tr>
+<tr><td><code>astror_profile_v1</code></td><td>Position, niveau, intérêts, matériel, préférences d'alertes</td><td>Onboarding / Paramètres</td><td>Non (sauf via le contexte envoyé à l'IA si configurée)</td></tr>
+<tr><td><code>astror_onboarded_v1</code></td><td>Indicateur « introduction déjà vue »</td><td>Onboarding</td><td>Non</td></tr>
+<tr><td><code>astror_journal_v1</code></td><td>Sessions d'observation personnelles</td><td>Outil Observer</td><td>Non</td></tr>
+<tr><td><code>astror_veille_v1</code></td><td>Entrées ajoutées par l'utilisateur (conférences, personnalités, livres…)</td><td>Onglet Veille</td><td>Non</td></tr>
+<tr><td><code>astror_quiz_v1</code></td><td>Statistiques de quiz (streak, meilleur score, total joué)</td><td>Outil Apprendre</td><td>Non</td></tr>
+<tr><td><code>astror_xp_v1</code></td><td>XP total, date du dernier défi complété</td><td>Outil Apprendre</td><td>Non</td></tr>
+<tr><td><code>astror_parcours_v2</code></td><td>Progression des leçons par parcours</td><td>Outil Apprendre</td><td>Non</td></tr>
+<tr><td><code>astror_notif_prefs_v1</code></td><td>Préférences de notification par catégorie d'événement</td><td>Éphémérides / Outil Événements</td><td>Non</td></tr>
+<tr><td><code>astror_tips_v1</code></td><td>Bandeaux d'astuces déjà masqués</td><td>Toute l'application</td><td>Non</td></tr>
+<tr><td><code>astror_api_key_v1</code></td><td><strong>Clé API Anthropic</strong> (en clair)</td><td>Paramètres</td><td>Oui — envoyée à <code>api.anthropic.com</code> à chaque requête IA</td></tr>
+<tr><td><code>astror_or_key_v1</code> / <code>astror_or_model_v1</code></td><td><strong>Clé + modèle OpenRouter</strong> (en clair)</td><td>Paramètres</td><td>Oui — envoyée à <code>openrouter.ai</code> à chaque requête IA</td></tr>
+<tr><td><code>astror_gbooks_key_v1</code></td><td>Clé Google Books (en clair)</td><td>Paramètres</td><td>Oui — envoyée à l'API Google Books lors d'une recherche de livre</td></tr>
+<tr><td><code>astror_community_sheet_v1</code></td><td>URL de la feuille Google Sheets du classement communautaire</td><td>Paramètres</td><td>L'URL est utilisée pour interroger Google Sheets directement depuis l'appareil</td></tr>
+<tr><td><code>astror_ai_cache_v1</code></td><td>Cache des réponses IA (panneaux « Analyse IA »)</td><td>Usage de l'IA</td><td>Non (copie locale des réponses déjà reçues)</td></tr>
+<tr><td><code>astror_wiki_thumbs_v1</code></td><td>Cache de vignettes Wikipédia des personnalités</td><td>Onglet Veille</td><td>Non</td></tr>
+<tr><td><code>astror_book_covers_v1</code></td><td>Cache des couvertures de livres</td><td>Onglet Veille</td><td>Non</td></tr>
+<tr><td><code>astror_conf_imgs_v1</code></td><td>Cache des images de conférences</td><td>Onglet Veille</td><td>Non</td></tr>
+<tr><td><code>astror_site_photos_v1</code></td><td>Cache de vignettes par site photo</td><td>Onglet Veille</td><td>Non</td></tr>
+</table></div>
+
+<h2>Données envoyées à des services externes</h2>
+<p>En dehors des clés API elles-mêmes, Astror interroge des API publiques sans authentification pour enrichir l'affichage : position/passages ISS, météo, actualités, images Wikimedia/NASA, résumés Wikipédia, recherche de livres. Ces requêtes contiennent les paramètres nécessaires à la demande (coordonnées de position pour la météo et les passages, terme de recherche pour les livres/Wikipédia) mais aucune donnée d'identification personnelle. Liste complète : <a href="../reference/apis/">APIs externes</a>.</p>
+<p>Lorsque l'assistant IA est utilisé, le texte de la question et le contexte du profil (position, niveau, matériel — pas de nom ni d'identifiant) sont envoyés au fournisseur d'IA choisi (Anthropic ou OpenRouter), conformément à leurs propres politiques de confidentialité respectives.</p>
+
+<h2>Durée de conservation</h2>
+<p>Les données locales sont conservées indéfiniment jusqu'à suppression manuelle (effacement des données du site dans le navigateur) ou désinstallation de l'application/du navigateur.</p>
+
+<h2>Export, suppression, portabilité</h2>
+<ul>
+  <li><strong>Export</strong> : Paramètres → « Exporter mes données » (fichier JSON complet). Voir <a href="../features/export-import/">Export et import</a>.</li>
+  <li><strong>Suppression</strong> : aucune fonction « Effacer toutes mes données » dédiée dans l'interface <div class="callout verify"><div class="callout-title">À vérifier</div><p>à confirmer : seule la suppression manuelle des données du site depuis les réglages du navigateur permet un effacement complet et certain.</p></div></li>
+  <li><strong>Partage</strong> : Astror ne partage aucune donnée avec des tiers autres que les services strictement nécessaires à la fonctionnalité demandée (IA, météo, recherche de livres, etc.), et uniquement à l'initiative de l'utilisateur.</li>
+</ul>
+
+<h2>Synchronisation</h2>
+<p>Astror ne propose pas de compte utilisateur ni de synchronisation automatique entre appareils. Le transfert de données d'un appareil à l'autre se fait uniquement par export/import manuel d'un fichier JSON.</p>
+
+<div class="callout legal"><div class="callout-title">À valider juridiquement</div><p>cette page décrit le comportement observé dans le code source. Elle ne remplace pas une politique de confidentialité formelle, qui reste à rédiger et valider (voir Informations légales).</p></div>
+
+    <div class="prevnext">
+        <a href="../permissions/"><span class="dir">← Précédent</span>Permissions utilisées</a>
+        <a class="next" href="../offline/"><span class="dir">Suivant →</span>Hors connexion</a>
+      </div>
+    <footer class="doc-footer">Astror v1.0.0 · Documentation v1.0.0 · mise à jour 2026-08-29<br><a href="../legal/">Informations légales</a> · <a href="../support/">Support</a></footer>
+  </main>
+</div>
+<script src="../assets/js/doc.js" defer></script>
+</body>
+</html>

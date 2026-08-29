@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Installer et démarrer — Documentation Astror</title>
+<meta name="description" content="Installation de la PWA Astror, compatibilité, premier lancement, onboarding et désinstallation.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔭</text></svg>">
+<link rel="stylesheet" href="../assets/css/doc.css">
+</head>
+<body>
+<header class="topbar">
+  <button id="navToggle" class="tb-link" aria-label="Ouvrir le sommaire" aria-expanded="false">☰</button>
+  <a class="brand" href="../"><span class="dot"></span> Astror <span class="small" style="font-family:var(--mono);font-weight:400;">docs</span></a>
+  <div class="sp"></div>
+  <a class="tb-link" href="../search/">🔍 Rechercher</a>
+</header>
+<div class="shell">
+  <aside class="side"><div class="side-title">Sommaire</div><nav aria-label="Sommaire de la documentation"><details open><summary><span class="chapter-icon">🚀</span><span>Bien démarrer</span><span class="count">1</span><span class="chev">›</span></summary><a href="../getting-started/" aria-current="page">Installer et démarrer</a></details><details><summary><span class="chapter-icon">🧭</span><span>Comprendre l'application</span><span class="count">1</span><span class="chev">›</span></summary><a href="../about/">Qu'est-ce qu'Astror</a></details><details><summary><span class="chapter-icon">📖</span><span>Guide utilisateur</span><span class="count">16</span><span class="chev">›</span></summary><a href="../guide/">Vue d'ensemble</a><a href="../guide/ciel/">Ciel</a><a href="../guide/ephemerides/">Éphémérides</a><a href="../guide/explorer/">Explorer</a><a href="../guide/veille/">Veille</a><a href="../guide/assistant/">Assistant</a><div class="sub-label">Outils</div><div class="sub"><a href="../guide/outils/observer/">Observer</a><a href="../guide/outils/lune/">Lune</a><a href="../guide/outils/planetes/">Planètes</a><a href="../guide/outils/evenements/">Événements</a><a href="../guide/outils/astrophoto/">Astrophoto</a><a href="../guide/outils/satellites/">Satellites</a><a href="../guide/outils/apprendre/">Apprendre</a><a href="../guide/outils/communaute/">Communauté</a><a href="../guide/outils/assistant-ia/">Assistant IA</a><a href="../guide/outils/explorations/">Explorations</a></div></details><details><summary><span class="chapter-icon">🧩</span><span>Fonctionnalités</span><span class="count">22</span><span class="chev">›</span></summary><a href="../features/">Vue d'ensemble</a><a href="../features/profil-observateur/">Profil observateur (onboarding)</a><a href="../features/carte-du-ciel/">Carte du ciel interactive</a><a href="../features/constellations/">Fiches des 88 constellations</a><a href="../features/ephemerides-alertes/">Éphémérides et alertes</a><a href="../features/systeme-solaire/">Système solaire</a><a href="../features/james-webb/">Galerie James Webb</a><a href="../features/conquete-spatiale/">Conquête spatiale</a><a href="../features/veille-spatiale/">Veille spatiale</a><a href="../features/assistant-ia/">Assistant IA</a><a href="../features/observer-journal/">Outil Observer (journal & conditions)</a><a href="../features/outil-lune/">Outil Lune</a><a href="../features/outil-planetes/">Outil Planètes</a><a href="../features/evenements-notifications/">Outil Événements & notifications</a><a href="../features/astrophoto/">Outil Astrophoto</a><a href="../features/satellites/">Outil Satellites</a><a href="../features/apprendre/">Outil Apprendre (quiz, XP, parcours)</a><a href="../features/communaute/">Outil Communauté</a><a href="../features/explorations/">Outil Explorations</a><a href="../features/mode-demo/">Mode démo (visites guidées)</a><a href="../features/export-import/">Export et import des données</a><a href="../features/cles-api-ia/">Clés API pour l’IA</a></details><details><summary><span class="chapter-icon">⚙️</span><span>Paramètres</span><span class="count">1</span><span class="chev">›</span></summary><a href="../settings/">Tous les paramètres</a></details><details><summary><span class="chapter-icon">🔐</span><span>Permissions</span><span class="count">1</span><span class="chev">›</span></summary><a href="../permissions/">Permissions utilisées</a></details><details><summary><span class="chapter-icon">🗄️</span><span>Données et confidentialité</span><span class="count">1</span><span class="chev">›</span></summary><a href="../data/">Données et confidentialité</a></details><details><summary><span class="chapter-icon">📡</span><span>Fonctionnement hors connexion</span><span class="count">1</span><span class="chev">›</span></summary><a href="../offline/">Hors connexion</a></details><details><summary><span class="chapter-icon">🛠️</span><span>Dépannage</span><span class="count">9</span><span class="chev">›</span></summary><a href="../troubleshooting/">Vue d'ensemble</a><a href="../troubleshooting/localisation/">La localisation ne fonctionne pas</a><a href="../troubleshooting/boussole/">La boussole ne fonctionne pas</a><a href="../troubleshooting/notifications/">Les notifications n’arrivent pas</a><a href="../troubleshooting/meteo/">Météo indisponible</a><a href="../troubleshooting/assistant-ia/">L’assistant IA ne répond pas</a><a href="../troubleshooting/images/">Les images ne se chargent pas</a><a href="../troubleshooting/iss/">Passages ISS/Tiangong indisponibles</a><a href="../troubleshooting/import/">L’import de données échoue</a></details><details><summary><span class="chapter-icon">❓</span><span>FAQ</span><span class="count">1</span><span class="chev">›</span></summary><a href="../faq/">Questions fréquentes</a></details><details><summary><span class="chapter-icon">📘</span><span>Référence</span><span class="count">7</span><span class="chev">›</span></summary><a href="../reference/">Vue d'ensemble</a><a href="../reference/settings/">Tableau des paramètres</a><a href="../reference/errors/">Codes et messages d’erreur</a><a href="../reference/glossary/">Glossaire</a><a href="../reference/compatibility/">Compatibilité</a><a href="../reference/limitations/">Limites connues</a><a href="../reference/apis/">APIs externes (technique)</a></details><details><summary><span class="chapter-icon">🔄</span><span>Versions</span><span class="count">1</span><span class="chev">›</span></summary><a href="../versions/">Historique des versions</a></details><details><summary><span class="chapter-icon">⚖️</span><span>Informations légales</span><span class="count">1</span><span class="chev">›</span></summary><a href="../legal/">Informations légales</a></details><details><summary><span class="chapter-icon">📩</span><span>Support</span><span class="count">1</span><span class="chev">›</span></summary><a href="../support/">Obtenir de l’aide</a></details></nav></aside>
+  <main class="main">
+    <div class="crumbs"><a href="../">Accueil</a><span class="sep">/</span><span>Bien démarrer</span><span class="sep">/</span><span>Installer et démarrer</span></div>
+    
+<div class="eyebrow">Bien démarrer</div>
+<h1>Installer et démarrer</h1>
+<p class="lede">Astror est une application web progressive (PWA) : elle s'installe depuis le navigateur, sans passer par un store.</p>
+
+<h2>Présentation</h2>
+<p>Astror est un compagnon d'observation astronomique en français : carte du ciel en direct, éphémérides, outils d'observation et d'astrophotographie, veille de l'actualité spatiale et assistant conversationnel. La plupart des calculs astronomiques (Lune, Soleil, planètes, événements) sont effectués localement sur l'appareil, sans connexion requise.</p>
+
+<h2>Installation PWA</h2>
+<h3>Android (Chrome)</h3>
+<ol>
+  <li>Ouvrir l'adresse de l'application dans Chrome.</li>
+  <li>Menu ⋮ → « Installer l'application » (ou bandeau d'installation automatique).</li>
+  <li>Astror apparaît sur l'écran d'accueil comme une application native, en plein écran (mode <code>standalone</code>).</li>
+</ol>
+<h3>iOS (Safari)</h3>
+<ol>
+  <li>Ouvrir l'adresse de l'application dans Safari (l'installation PWA depuis un autre navigateur iOS n'est pas prise en charge par iOS lui-même).</li>
+  <li>Bouton Partager → « Sur l'écran d'accueil ».</li>
+  <li>L'icône et le nom affichés viennent du manifeste de l'application (icône 512×512, nom « Astror »).</li>
+</ol>
+<div class="callout verify"><div class="callout-title">À vérifier</div><p>le comportement exact de certaines fonctionnalités (boussole, notifications) peut varier légèrement entre Safari iOS et Chrome Android ; seules les contraintes explicitement gérées dans le code sont documentées (voir Permissions).</p></div>
+<h3>Ordinateur (desktop)</h3>
+<p>Les navigateurs basés sur Chromium (Chrome, Edge) proposent une installation PWA via l'icône d'installation dans la barre d'adresse. <div class="callout verify"><div class="callout-title">À vérifier</div><p>le support d'installation PWA sur Firefox desktop et sur les autres navigateurs n'est pas vérifié spécifiquement pour Astror.</p></div></p>
+
+<h2>Premier lancement</h2>
+<p>Au tout premier lancement (ou tant que l'introduction n'a pas été vue), Astror affiche un onboarding en 7 étapes avant de laisser accéder au reste de l'application. Détail complet : <a href="../features/profil-observateur/">Profil observateur (onboarding)</a>.</p>
+<div class="table-wrap"><table><caption>Parcours du premier lancement</caption>
+<tr><th>Étape</th><th>Contenu</th><th>Permission demandée</th><th>Si refusé / ignoré</th></tr>
+<tr><td>0 — Bienvenue</td><td>Écran de présentation</td><td>Aucune</td><td>—</td></tr>
+<tr><td>1 — Localisation</td><td>Ville d'observation, via géolocalisation ou liste de 6 villes</td><td>Géolocalisation (optionnelle, au clic)</td><td>Reste sur Paris par défaut jusqu'à choix manuel</td></tr>
+<tr><td>2 — Expérience</td><td>Niveau : Débutant / Amateur / Confirmé</td><td>Aucune</td><td>Reste sur « Amateur »</td></tr>
+<tr><td>3 — Intérêts</td><td>Sélection multiple (7 choix)</td><td>Aucune</td><td>Reste sur défauts</td></tr>
+<tr><td>4 — Matériel</td><td>Sélection multiple (4 choix)</td><td>Aucune</td><td>Reste sur « Jumelles »</td></tr>
+<tr><td>5 — Alertes</td><td>4 interrupteurs de préférence (ISS, conjonctions, météores, éclipses)</td><td>Aucune à ce stade (préférence seulement)</td><td>Reste sur les valeurs par défaut</td></tr>
+<tr><td>6 — Récapitulatif</td><td>Résumé, bouton « Explorer le ciel »</td><td>Aucune</td><td>—</td></tr>
+</table></div>
+<p>Un bouton « Passer » permet de sauter l'onboarding aux étapes 0 à 5 (pas sur la dernière). L'onboarding peut être rejoué à tout moment depuis <strong>Paramètres → Revoir l'introduction</strong>.</p>
+
+<h2>Configuration initiale</h2>
+<p>Les choix de l'onboarding forment le « profil » de l'utilisateur (position, niveau, intérêts, matériel, alertes). Il est stocké localement et modifiable ensuite dans les Paramètres — voir <a href="../settings/">Paramètres</a>.</p>
+
+<h2>Permissions initiales</h2>
+<p>Aucune permission n'est demandée automatiquement à l'ouverture. La géolocalisation n'est demandée que si l'utilisateur clique explicitement sur le bouton de détection GPS. Les notifications et l'orientation de l'appareil (boussole) ne sont demandées que plus tard, au moment de l'usage réel (activation d'une alerte, activation du mode boussole). Détail : <a href="../permissions/">Permissions</a>.</p>
+
+<h2>Première utilisation</h2>
+<p>Une fois l'onboarding terminé, l'application s'ouvre sur l'onglet <strong>Ciel</strong> (carte du ciel en direct).</p>
+
+<h2>Désinstallation</h2>
+<p>La désinstallation suit le mécanisme standard du système (retirer l'icône sur Android/iOS, ou désinstaller depuis le navigateur sur desktop). <strong>Toutes les données locales (profil, journal, statistiques, clés API) sont stockées dans le stockage du navigateur associé à l'application et sont supprimées avec elle.</strong> Pensez à exporter vos données avant de désinstaller — voir <a href="../features/export-import/">Export et import des données</a>.</p>
+
+<h2>Mise à jour</h2>
+<p>Astror utilise un service worker en mode <code>autoUpdate</code> (Workbox) : les nouvelles versions de l'application sont téléchargées et appliquées automatiquement en arrière-plan, sans action requise de l'utilisateur ; les nouveaux fichiers sont utilisés dès la navigation ou le rechargement suivant.</p>
+
+    <div class="prevnext">
+        <span></span>
+        <a class="next" href="../about/"><span class="dir">Suivant →</span>Qu'est-ce qu'Astror</a>
+      </div>
+    <footer class="doc-footer">Astror v1.0.0 · Documentation v1.0.0 · mise à jour 2026-08-29<br><a href="../legal/">Informations légales</a> · <a href="../support/">Support</a></footer>
+  </main>
+</div>
+<script src="../assets/js/doc.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>APIs externes (technique) — Documentation Astror</title>
+<meta name="description" content="Détail technique (niveau 3) de toutes les APIs externes utilisées par Astror.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔭</text></svg>">
+<link rel="stylesheet" href="../../assets/css/doc.css">
+</head>
+<body>
+<header class="topbar">
+  <button id="navToggle" class="tb-link" aria-label="Ouvrir le sommaire" aria-expanded="false">☰</button>
+  <a class="brand" href="../../"><span class="dot"></span> Astror <span class="small" style="font-family:var(--mono);font-weight:400;">docs</span></a>
+  <div class="sp"></div>
+  <a class="tb-link" href="../../search/">🔍 Rechercher</a>
+</header>
+<div class="shell">
+  <aside class="side"><div class="side-title">Sommaire</div><nav aria-label="Sommaire de la documentation"><details><summary><span class="chapter-icon">🚀</span><span>Bien démarrer</span><span class="count">1</span><span class="chev">›</span></summary><a href="../../getting-started/">Installer et démarrer</a></details><details><summary><span class="chapter-icon">🧭</span><span>Comprendre l'application</span><span class="count">1</span><span class="chev">›</span></summary><a href="../../about/">Qu'est-ce qu'Astror</a></details><details><summary><span class="chapter-icon">📖</span><span>Guide utilisateur</span><span class="count">16</span><span class="chev">›</span></summary><a href="../../guide/">Vue d'ensemble</a><a href="../../guide/ciel/">Ciel</a><a href="../../guide/ephemerides/">Éphémérides</a><a href="../../guide/explorer/">Explorer</a><a href="../../guide/veille/">Veille</a><a href="../../guide/assistant/">Assistant</a><div class="sub-label">Outils</div><div class="sub"><a href="../../guide/outils/observer/">Observer</a><a href="../../guide/outils/lune/">Lune</a><a href="../../guide/outils/planetes/">Planètes</a><a href="../../guide/outils/evenements/">Événements</a><a href="../../guide/outils/astrophoto/">Astrophoto</a><a href="../../guide/outils/satellites/">Satellites</a><a href="../../guide/outils/apprendre/">Apprendre</a><a href="../../guide/outils/communaute/">Communauté</a><a href="../../guide/outils/assistant-ia/">Assistant IA</a><a href="../../guide/outils/explorations/">Explorations</a></div></details><details><summary><span class="chapter-icon">🧩</span><span>Fonctionnalités</span><span class="count">22</span><span class="chev">›</span></summary><a href="../../features/">Vue d'ensemble</a><a href="../../features/profil-observateur/">Profil observateur (onboarding)</a><a href="../../features/carte-du-ciel/">Carte du ciel interactive</a><a href="../../features/constellations/">Fiches des 88 constellations</a><a href="../../features/ephemerides-alertes/">Éphémérides et alertes</a><a href="../../features/systeme-solaire/">Système solaire</a><a href="../../features/james-webb/">Galerie James Webb</a><a href="../../features/conquete-spatiale/">Conquête spatiale</a><a href="../../features/veille-spatiale/">Veille spatiale</a><a href="../../features/assistant-ia/">Assistant IA</a><a href="../../features/observer-journal/">Outil Observer (journal & conditions)</a><a href="../../features/outil-lune/">Outil Lune</a><a href="../../features/outil-planetes/">Outil Planètes</a><a href="../../features/evenements-notifications/">Outil Événements & notifications</a><a href="../../features/astrophoto/">Outil Astrophoto</a><a href="../../features/satellites/">Outil Satellites</a><a href="../../features/apprendre/">Outil Apprendre (quiz, XP, parcours)</a><a href="../../features/communaute/">Outil Communauté</a><a href="../../features/explorations/">Outil Explorations</a><a href="../../features/mode-demo/">Mode démo (visites guidées)</a><a href="../../features/export-import/">Export et import des données</a><a href="../../features/cles-api-ia/">Clés API pour l’IA</a></details><details><summary><span class="chapter-icon">⚙️</span><span>Paramètres</span><span class="count">1</span><span class="chev">›</span></summary><a href="../../settings/">Tous les paramètres</a></details><details><summary><span class="chapter-icon">🔐</span><span>Permissions</span><span class="count">1</span><span class="chev">›</span></summary><a href="../../permissions/">Permissions utilisées</a></details><details><summary><span class="chapter-icon">🗄️</span><span>Données et confidentialité</span><span class="count">1</span><span class="chev">›</span></summary><a href="../../data/">Données et confidentialité</a></details><details><summary><span class="chapter-icon">📡</span><span>Fonctionnement hors connexion</span><span class="count">1</span><span class="chev">›</span></summary><a href="../../offline/">Hors connexion</a></details><details><summary><span class="chapter-icon">🛠️</span><span>Dépannage</span><span class="count">9</span><span class="chev">›</span></summary><a href="../../troubleshooting/">Vue d'ensemble</a><a href="../../troubleshooting/localisation/">La localisation ne fonctionne pas</a><a href="../../troubleshooting/boussole/">La boussole ne fonctionne pas</a><a href="../../troubleshooting/notifications/">Les notifications n’arrivent pas</a><a href="../../troubleshooting/meteo/">Météo indisponible</a><a href="../../troubleshooting/assistant-ia/">L’assistant IA ne répond pas</a><a href="../../troubleshooting/images/">Les images ne se chargent pas</a><a href="../../troubleshooting/iss/">Passages ISS/Tiangong indisponibles</a><a href="../../troubleshooting/import/">L’import de données échoue</a></details><details><summary><span class="chapter-icon">❓</span><span>FAQ</span><span class="count">1</span><span class="chev">›</span></summary><a href="../../faq/">Questions fréquentes</a></details><details open><summary><span class="chapter-icon">📘</span><span>Référence</span><span class="count">7</span><span class="chev">›</span></summary><a href="../../reference/">Vue d'ensemble</a><a href="../../reference/settings/">Tableau des paramètres</a><a href="../../reference/errors/">Codes et messages d’erreur</a><a href="../../reference/glossary/">Glossaire</a><a href="../../reference/compatibility/">Compatibilité</a><a href="../../reference/limitations/">Limites connues</a><a href="../../reference/apis/" aria-current="page">APIs externes (technique)</a></details><details><summary><span class="chapter-icon">🔄</span><span>Versions</span><span class="count">1</span><span class="chev">›</span></summary><a href="../../versions/">Historique des versions</a></details><details><summary><span class="chapter-icon">⚖️</span><span>Informations légales</span><span class="count">1</span><span class="chev">›</span></summary><a href="../../legal/">Informations légales</a></details><details><summary><span class="chapter-icon">📩</span><span>Support</span><span class="count">1</span><span class="chev">›</span></summary><a href="../../support/">Obtenir de l’aide</a></details></nav></aside>
+  <main class="main">
+    <div class="crumbs"><a href="../../">Accueil</a><span class="sep">/</span><span>Référence</span><span class="sep">/</span><span>APIs externes (technique)</span></div>
+    
+<div class="eyebrow">Référence — niveau technique</div>
+<h1>APIs externes</h1>
+<p class="lede">Aucune de ces API n'exige de compte pour les fonctionnalités de base d'Astror, à l'exception des clés IA et des intégrations optionnelles indiquées.</p>
+<div class="table-wrap"><table>
+<tr><th>Service</th><th>URL de base</th><th>Usage</th><th>Clé requise</th></tr>
+<tr><td>Where The ISS At</td><td><code>api.wheretheiss.at</code></td><td>Position et TLE de l'ISS</td><td>Non</td></tr>
+<tr><td>Celestrak</td><td><code>celestrak.org</code></td><td>Secours TLE ISS + TLE Tiangong</td><td>Non</td></tr>
+<tr><td>Open-Meteo</td><td><code>api.open-meteo.com</code></td><td>Météo locale</td><td>Non</td></tr>
+<tr><td>Spaceflight News API v4</td><td><code>api.spaceflightnewsapi.net</code></td><td>Actualités spatiales</td><td>Non</td></tr>
+<tr><td>The Space Devs (Launch Library 2)</td><td><code>lldev.thespacedevs.com</code></td><td>Prochains lancements</td><td>Non</td></tr>
+<tr><td>NASA APOD</td><td><code>api.nasa.gov</code></td><td>Photo astronomique du jour</td><td><code>DEMO_KEY</code> publique intégrée</td></tr>
+<tr><td>NASA Images API</td><td><code>images-api.nasa.gov</code></td><td>Secours d'images</td><td>Non</td></tr>
+<tr><td>Wikimedia Commons</td><td><code>commons.wikimedia.org</code></td><td>Galeries d'images par catégorie</td><td>Non</td></tr>
+<tr><td>Wikipédia (FR puis EN)</td><td><code>fr.wikipedia.org</code> / <code>en.wikipedia.org</code></td><td>Résumés d'articles</td><td>Non</td></tr>
+<tr><td>Open Library</td><td><code>openlibrary.org</code></td><td>Recherche de livres + couvertures</td><td>Non</td></tr>
+<tr><td>Google Books</td><td><code>www.googleapis.com/books</code></td><td>Recherche de livres (prioritaire si clé fournie)</td><td>Optionnelle, saisie par l'utilisateur</td></tr>
+<tr><td>Mastodon (mastodon.social)</td><td><code>mastodon.social</code></td><td>Fil communautaire</td><td>Non</td></tr>
+<tr><td>rss2json (proxy RSS)</td><td><code>api.rss2json.com</code></td><td>Flux RSS de clubs d'astronomie</td><td>Non</td></tr>
+<tr><td>Google Sheets (export CSV)</td><td><code>docs.google.com</code></td><td>Classement communautaire</td><td>Non (URL fournie par l'utilisateur)</td></tr>
+<tr><td>OpenStreetMap Nominatim</td><td><code>nominatim.openstreetmap.org</code></td><td>Géocodage inverse (coordonnées → ville)</td><td>Non</td></tr>
+<tr><td>Anthropic Messages API</td><td><code>api.anthropic.com</code></td><td>Assistant IA</td><td>Oui, saisie par l'utilisateur</td></tr>
+<tr><td>OpenRouter</td><td><code>openrouter.ai</code></td><td>Assistant IA (modèles alternatifs)</td><td>Oui, saisie par l'utilisateur</td></tr>
+</table></div>
+<p class="small">Détail des messages d'erreur associés à chaque service : <a href="../errors/">Codes et messages d'erreur</a>.</p>
+
+    <div class="prevnext">
+        <a href="../../reference/limitations/"><span class="dir">← Précédent</span>Limites connues</a>
+        <a class="next" href="../../versions/"><span class="dir">Suivant →</span>Historique des versions</a>
+      </div>
+    <footer class="doc-footer">Astror v1.0.0 · Documentation v1.0.0 · mise à jour 2026-08-29<br><a href="../../legal/">Informations légales</a> · <a href="../../support/">Support</a></footer>
+  </main>
+</div>
+<script src="../../assets/js/doc.js" defer></script>
+</body>
+</html>
