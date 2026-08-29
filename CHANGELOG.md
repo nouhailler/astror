@@ -6,6 +6,25 @@ entrées précédentes, non versionnées individuellement, restent groupées par
 
 ---
 
+## [1.3.0] — 2026-08-29
+
+### Ajouts
+
+- **Écran « À propos »** accessible tout en bas du menu hamburger :
+  - Version installée, SHA de commit (build) et date de publication.
+  - Développeur (Patrick Nouhailler), lien vers swinux.ch et le portfolio des applications.
+  - Contact support (`contact@swinux.ch`) et « Signaler un bug » (issue GitHub) : les deux liens
+    pré-remplissent automatiquement le message avec les informations de diagnostic (version,
+    build, plateforme, langue, navigateur).
+  - Liens dépôt GitHub, documentation, README, issues.
+  - Crédits des bibliothèques open-source utilisées (React, Vite, vite-plugin-pwa/Workbox,
+    astronomy-engine, satellite.js).
+  - Logo Swinux (réduit à 128×128, 15 Ko contre 830 Ko à l'origine).
+- SHA de commit court injecté au build (`__GIT_SHA__`, `vite.config.js`) pour identifier
+  précisément la version installée.
+
+---
+
 ## [1.2.1] — 2026-08-29
 
 ### Ajouts

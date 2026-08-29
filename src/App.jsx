@@ -3,6 +3,7 @@ import { IcSky, IcMoon, IcGlobe, IcBell, IcWrench, IcSpark } from './icons'
 import { TopBar, HelpSheet, DemoSheet } from './help'
 import SettingsSheet from './settings'
 import NavMenuSheet from './navmenu'
+import AboutSheet from './about'
 import Onboarding, { onbWasSeen, onbMarkSeen, onbLoad, onbSave } from './onboarding'
 import SkyScreen from './sky' // onglet par défaut : chargé d'emblée
 import { registerDemoHost } from './demo/bridge'
@@ -66,6 +67,7 @@ export default function App() {
   const [exploreDeepLink, setExploreDeepLink] = useState(null)
   const [feedDeepLink, setFeedDeepLink] = useState(null)
   const [menuOpen, setMenuOpen] = useState(false)
+  const [aboutOpen, setAboutOpen] = useState(false)
 
   const handleProfileChange = (p) => { setProfile(p); onbSave(p) }
 
@@ -133,7 +135,8 @@ export default function App() {
       </div>
       <TabBar tab={tab} onChange={setTab} />
 
-      <NavMenuSheet open={menuOpen} onClose={() => setMenuOpen(false)} onNavigate={handleMenuNavigate} />
+      <NavMenuSheet open={menuOpen} onClose={() => setMenuOpen(false)} onNavigate={handleMenuNavigate} onAbout={() => setAboutOpen(true)} />
+      <AboutSheet open={aboutOpen} onClose={() => setAboutOpen(false)} />
       <HelpSheet open={!!helpKey} helpKey={helpKey} onClose={() => setHelpKey(null)} />
       <DemoSheet open={!!demoKey} demoKey={demoKey} onClose={() => setDemoKey(null)} />
 

@@ -1,16 +1,23 @@
 import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
+import { execSync } from 'node:child_process'
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 
 const pkg = JSON.parse(readFileSync(fileURLToPath(new URL('./package.json', import.meta.url)), 'utf8'))
 
+function gitShortSha() {
+  try { return execSync('git rev-parse --short HEAD').toString().trim() } catch { return null }
+}
+
 export default defineConfig({
-  // Numéro de version et date de build affichés dans l'app (Paramètres) — sources uniques : package.json / heure du build.
+  // Numéro de version, SHA de commit et date de build affichés dans l'app (Paramètres, À propos)
+  // — sources uniques : package.json / git / heure du build.
   define: {
     __APP_VERSION__: JSON.stringify(pkg.version),
     __BUILD_DATE__: JSON.stringify(new Date().toISOString()),
+    __GIT_SHA__: JSON.stringify(gitShortSha()),
   },
   plugins: [
     react(),

@@ -1,7 +1,7 @@
 import { Sheet } from './ui'
 import {
   IcSky, IcMoon, IcGlobe, IcBell, IcWrench, IcSpark,
-  IcEye, IcPlanet, IcCal, IcCamera, IcSat, IcBook, IcUsers, IcOrbit, IcRocket, IcChevron,
+  IcEye, IcPlanet, IcCal, IcCamera, IcSat, IcBook, IcUsers, IcOrbit, IcRocket, IcChevron, IcInfo,
 } from './icons'
 
 // Index complet des fonctionnalités d'Astror, classées par catégorie.
@@ -108,8 +108,9 @@ function MenuRow({ item, onNavigate, onClose }) {
   )
 }
 
-export default function NavMenuSheet({ open, onClose, onNavigate }) {
+export default function NavMenuSheet({ open, onClose, onNavigate, onAbout }) {
   const go = (nav) => { onNavigate(nav); onClose() }
+  const openAbout = () => { onClose(); onAbout() }
 
   return (
     <Sheet open={open} onClose={onClose} aria-label="Toutes les fonctionnalités">
@@ -130,6 +131,22 @@ export default function NavMenuSheet({ open, onClose, onNavigate }) {
           </div>
         </div>
       ))}
+
+      <button onClick={openAbout} className="press" style={{
+        width: '100%', display: 'flex', alignItems: 'center', gap: 12, padding: '13px 12px',
+        borderRadius: 14, textAlign: 'left', cursor: 'pointer', background: 'var(--surface-1)',
+        border: '1px solid var(--line)', marginTop: 4,
+      }}>
+        <span style={{ width: 34, height: 34, borderRadius: 10, flexShrink: 0, display: 'flex', alignItems: 'center',
+          justifyContent: 'center', color: 'var(--faint)', background: 'var(--surface-2)', border: '1px solid var(--line-2)' }}>
+          <IcInfo size={17} />
+        </span>
+        <span style={{ flex: 1, minWidth: 0 }}>
+          <span className="h-card" style={{ fontSize: 14, display: 'block' }}>À propos</span>
+          <span className="meta" style={{ fontSize: 11, display: 'block', marginTop: 1 }}>Version, développeur, support, crédits</span>
+        </span>
+        <IcChevron size={16} style={{ color: 'var(--faint)', flexShrink: 0 }} />
+      </button>
     </Sheet>
   )
 }
