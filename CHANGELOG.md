@@ -6,6 +6,21 @@ entrées précédentes, non versionnées individuellement, restent groupées par
 
 ---
 
+## [1.2.0] — 2026-08-29
+
+### Ajouts
+
+- **Menu hamburger** (☰, en haut à gauche de chaque écran) listant toutes les fonctionnalités
+  de l'app classées en 8 catégories (Ciel & pointage, Éphémérides, Explorer le cosmos,
+  Astrophotographie, Veille spatiale, Apprendre & communauté, Assistant IA, Réglages) — 24
+  destinations au total. Chaque entrée navigue directement vers l'écran, le sous-onglet
+  (Explorer/Veille) ou l'outil correspondant, ou ouvre les Paramètres.
+- `ExploreScreen` et `FeedScreen` acceptent désormais un deep-link (`deepLink`/
+  `onDeepLinkConsumed`, même mécanisme que `OutilsScreen`) pour ouvrir directement un
+  sous-onglet précis (ex. Conquête spatiale, Bibliothèque) depuis l'extérieur du composant.
+
+---
+
 ## [1.1.0] — 2026-08-29
 
 ### Corrections

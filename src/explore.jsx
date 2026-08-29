@@ -1532,8 +1532,12 @@ function Segmented({ value, onChange }) {
 
 // ─── Écran principal ──────────────────────────────────────────────────────────
 
-export default function ExploreScreen() {
+export default function ExploreScreen({ deepLink, onDeepLinkConsumed }) {
   const [seg, setSeg] = useState('solar')
+
+  useEffect(() => {
+    if (deepLink) { setSeg(deepLink); onDeepLinkConsumed?.() }
+  }, [deepLink])
   const [planet, setPlanet] = useState(null)
   const [moonsFor, setMoonsFor] = useState(null)
   const [anom, setAnom] = useState(null)

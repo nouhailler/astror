@@ -833,12 +833,16 @@ function AddSheet({ seg, open, onClose, onAdd }) {
   )
 }
 
-export default function FeedScreen() {
+export default function FeedScreen({ deepLink, onDeepLinkConsumed }) {
   const [seg, setSeg] = useState('news')
   const [news, setNews] = useState(null)
   const [person, setPerson] = useState(null)
   const [adding, setAdding] = useState(false)
   const [adds, setAdds] = useState(feedLoad)
+
+  useEffect(() => {
+    if (deepLink) { setSeg(deepLink); onDeepLinkConsumed?.() }
+  }, [deepLink])
 
   const { data: liveNews, loading: newsLoading } = useLiveData(fetchSpaceNews)
 

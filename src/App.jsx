@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, lazy, Suspense } from 'react'
 import { IcSky, IcMoon, IcGlobe, IcBell, IcWrench, IcSpark } from './icons'
 import { TopBar, HelpSheet, DemoSheet } from './help'
 import SettingsSheet from './settings'
+import NavMenuSheet from './navmenu'
 import Onboarding, { onbWasSeen, onbMarkSeen, onbLoad, onbSave } from './onboarding'
 import SkyScreen from './sky' // onglet par défaut : chargé d'emblée
 import { registerDemoHost } from './demo/bridge'
@@ -62,8 +63,21 @@ export default function App() {
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [profile, setProfile] = useState(() => onbLoad())
   const [toolDeepLink, setToolDeepLink] = useState(null)
+  const [exploreDeepLink, setExploreDeepLink] = useState(null)
+  const [feedDeepLink, setFeedDeepLink] = useState(null)
+  const [menuOpen, setMenuOpen] = useState(false)
 
   const handleProfileChange = (p) => { setProfile(p); onbSave(p) }
+
+  // Navigation depuis le menu hamburger (toutes les fonctionnalités par catégorie).
+  const handleMenuNavigate = (nav) => {
+    if (nav.settings) { setSettingsOpen(true); return }
+    setTab(nav.tab)
+    if (nav.tool) setToolDeepLink(nav.tool)
+    if (nav.sub === undefined) return
+    if (nav.tab === 'explore') setExploreDeepLink(nav.sub)
+    if (nav.tab === 'feed') setFeedDeepLink(nav.sub)
+  }
 
   // Onglet courant exposé au moteur démo sans re-souscription à chaque changement.
   const tabRef = useRef(tab)
@@ -106,19 +120,20 @@ export default function App() {
   return (
     <div className="app-root">
       <div className="safe-top" />
-      <TopBar onHelp={() => setHelpKey(HELP_KEYS[tab])} onDemo={() => setDemoKey(HELP_KEYS[tab])} onHome={() => setTab('sky')} />
+      <TopBar onMenu={() => setMenuOpen(true)} onHelp={() => setHelpKey(HELP_KEYS[tab])} onDemo={() => setDemoKey(HELP_KEYS[tab])} onHome={() => setTab('sky')} />
       <div className="screen-area">
         <Suspense fallback={<ScreenLoader />}>
           {tab === 'sky' && <SkyScreen />}
           {tab === 'eph' && <EphScreen />}
-          {tab === 'explore' && <ExploreScreen />}
-          {tab === 'feed' && <FeedScreen />}
+          {tab === 'explore' && <ExploreScreen deepLink={exploreDeepLink} onDeepLinkConsumed={() => setExploreDeepLink(null)} />}
+          {tab === 'feed' && <FeedScreen deepLink={feedDeepLink} onDeepLinkConsumed={() => setFeedDeepLink(null)} />}
           {tab === 'tools' && <OutilsScreen deepLink={toolDeepLink} onDeepLinkConsumed={() => setToolDeepLink(null)} />}
           {tab === 'ai' && <AssistantScreen />}
         </Suspense>
       </div>
       <TabBar tab={tab} onChange={setTab} />
 
+      <NavMenuSheet open={menuOpen} onClose={() => setMenuOpen(false)} onNavigate={handleMenuNavigate} />
       <HelpSheet open={!!helpKey} helpKey={helpKey} onClose={() => setHelpKey(null)} />
       <DemoSheet open={!!demoKey} demoKey={demoKey} onClose={() => setDemoKey(null)} />
 

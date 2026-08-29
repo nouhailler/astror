@@ -3,7 +3,7 @@ import {
   IcSky, IcMoon, IcOrbit, IcBook, IcGrid, IcSpark, IcTele, IcComet,
   IcCamera, IcSat, IcCap, IcUsers, IcGem, IcHelp, IcCheck,
   IcPlay, IcEye, IcCompass, IcLayers, IcBell, IcPlanet, IcPlus,
-  IcSliders, IcClock, IcCloud, IcCal, IcPin, IcStar, IcRocket, IcTrophy,
+  IcSliders, IcClock, IcCloud, IcCal, IcPin, IcStar, IcRocket, IcTrophy, IcMenu,
 } from './icons'
 import { Sheet } from './ui'
 
@@ -292,14 +292,19 @@ export function DemoSheet({ open, onClose, demoKey }) {
 }
 
 
-export function TopBar({ onHome, onHelp, onDemo }) {
+export function TopBar({ onHome, onMenu, onHelp, onDemo }) {
   return (
     <div className="appbar">
-      <button className="brand" onClick={onHome} aria-label="Retour à l'accueil">
-        <span style={{ width: 24, height: 24, borderRadius: 7, display: 'flex', alignItems: 'center', justifyContent: 'center',
-          color: '#1a130a', background: 'linear-gradient(160deg,var(--gold-2),var(--gold-3))' }}><IcSpark size={15} /></span>
-        <span className="bw">Astror</span>
-      </button>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+        <button className="help-btn press" onClick={onMenu} data-demo-id="nav-menu" aria-label="Toutes les fonctionnalités">
+          <IcMenu size={19} />
+        </button>
+        <button className="brand" onClick={onHome} aria-label="Retour à l'accueil">
+          <span style={{ width: 24, height: 24, borderRadius: 7, display: 'flex', alignItems: 'center', justifyContent: 'center',
+            color: '#1a130a', background: 'linear-gradient(160deg,var(--gold-2),var(--gold-3))' }}><IcSpark size={15} /></span>
+          <span className="bw">Astror</span>
+        </button>
+      </div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
         <button className="help-btn press" onClick={onDemo} aria-label="Démonstration de cet écran"
           style={{ color: 'var(--gold)' }}>

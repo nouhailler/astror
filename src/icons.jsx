@@ -84,3 +84,4 @@ export const IcFlame = (p) => <Icon {...p}><path d="M12 3c.5 3 4.5 4.2 4.5 8.5A4
 export const IcWrench = (p) => <Icon {...p}><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76Z"/></Icon>
 export const IcPlanet = (p) => <Icon {...p}><circle cx="12" cy="12" r="5"/><ellipse cx="12" cy="12" rx="11" ry="3.8" transform="rotate(-15 12 12)"/></Icon>
 export const IcBulb = (p) => <Icon {...p}><path d="M12 3a6 6 0 0 1 3.7 10.7c-.6.5-.7 1.3-.7 2.3h-6c0-1-.1-1.8-.7-2.3A6 6 0 0 1 12 3Z"/><path d="M9.5 19h5"/><path d="M10.5 21.5h3"/></Icon>
+export const IcMenu = (p) => <Icon {...p}><path d="M4 6h16M4 12h16M4 18h16"/></Icon>
