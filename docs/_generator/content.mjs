@@ -2,8 +2,8 @@
 // Toute affirmation ici doit être vérifiable dans le code source (src/) — voir DOCUMENTATION_SPEC.md §41.
 // Ne jamais ajouter un comportement qui n'existe pas dans le code ; marquer "À vérifier" sinon.
 
-export const APP_VERSION = '1.2.1';
-export const DOC_VERSION = '1.2.1';
+export const APP_VERSION = '1.3.0';
+export const DOC_VERSION = '1.3.0';
 export const DOC_UPDATED = '2026-08-29';
 
 const verify = (text) => `<div class="callout verify"><div class="callout-title">À vérifier</div><p>${text}</p></div>`;
@@ -53,6 +53,7 @@ export const NAV = [
     pages: [
       { id: 'features-index', title: "Vue d'ensemble", path: '/features/' },
       { id: 'feat-menu', title: 'Menu hamburger', path: '/features/menu-navigation/' },
+      { id: 'feat-about-screen', title: 'Écran À propos', path: '/features/a-propos/' },
       { id: 'feat-onboarding', title: 'Profil observateur (onboarding)', path: '/features/profil-observateur/' },
       { id: 'feat-sky', title: 'Carte du ciel interactive', path: '/features/carte-du-ciel/' },
       { id: 'feat-constellations', title: 'Fiches des 88 constellations', path: '/features/constellations/' },
@@ -539,6 +540,7 @@ PAGES['features-index'] = {
 <p class="lede">Chaque fonctionnalité est documentée selon la même structure : description, prérequis, utilisation, données, fonctionnement hors connexion, limites et erreurs.</p>
 <div class="grid-cards">
   <a class="card" href="menu-navigation/"><div class="card-title">Menu hamburger</div><div class="card-sub">Toutes les fonctionnalités</div></a>
+  <a class="card" href="a-propos/"><div class="card-title">Écran À propos</div><div class="card-sub">Version, support, crédits</div></a>
   <a class="card" href="profil-observateur/"><div class="card-title">Profil observateur</div><div class="card-sub">Onboarding + édition</div></a>
   <a class="card" href="carte-du-ciel/"><div class="card-title">Carte du ciel</div><div class="card-sub">Boussole, curseur temporel</div></a>
   <a class="card" href="constellations/"><div class="card-title">Constellations</div><div class="card-sub">88 fiches</div></a>
@@ -590,6 +592,42 @@ ${tbl(`<table><tr><th>Catégorie</th><th>Fonctionnalités listées</th></tr>
 <h2>Fonctionnement hors connexion</h2><p><span class="badge ok">100 % hors ligne</span> — le menu et la navigation ne dépendent d'aucune donnée réseau.</p>
 <h2>Limites</h2><p>Le menu pointe vers le sous-onglet d'Explorer ou de Veille correspondant, mais pas vers une section précise à l'intérieur (ex. « Système solaire » ouvre le sous-onglet entier, pas directement la sous-section « Les 88 constellations » qui s'y trouve plus bas).</p>
 <h2>Erreurs possibles</h2><p>Aucune identifiée.</p>
+<h2>FAQ</h2><p><a href="../../faq/">Voir la FAQ</a></p>
+`,
+};
+
+PAGES['feat-about-screen'] = {
+  description: "Écran À propos : version, build, développeur, support avec diagnostics, crédits.",
+  html: `
+<div class="eyebrow">Fonctionnalités</div>
+<h1>Écran À propos</h1>
+<h2>Description</h2><p>Accessible tout en bas du menu hamburger, cet écran regroupe les informations d'identification de l'application, les liens du développeur et les moyens de contact.</p>
+<h2>Objectif</h2><p>Permettre à l'utilisateur de connaître la version exacte installée, de contacter le support avec les informations utiles déjà réunies, et de retrouver les liens officiels (dépôt, documentation, portfolio).</p>
+<h2>Prérequis</h2><p>Aucun pour consulter les informations. Les liens de contact ouvrent respectivement le client mail et GitHub.</p>
+<h2>Comment l'utiliser</h2><p>Menu ☰ → faire défiler jusqu'en bas → « À propos ».</p>
+<h2>Contenu</h2>
+${tbl(`<table><tr><th>Bloc</th><th>Contenu</th></tr>
+<tr><td>Version</td><td>Numéro de version (<code>package.json</code>), SHA de commit court, date de publication du build</td></tr>
+<tr><td>Développeur</td><td>Patrick Nouhailler ; lien vers swinux.ch ; lien vers le portfolio des applications</td></tr>
+<tr><td>Support</td><td>« Contacter le support » (mail) et « Signaler un bug » (issue GitHub), tous deux pré-remplis avec les informations de diagnostic</td></tr>
+<tr><td>Liens</td><td>Dépôt GitHub, Documentation, README, Issues</td></tr>
+<tr><td>Crédits open-source</td><td>React, Vite, vite-plugin-pwa/Workbox, astronomy-engine, satellite.js</td></tr>
+</table>`)}
+<h2>Informations de diagnostic incluses automatiquement</h2>
+<p>Les liens « Contacter le support » et « Signaler un bug » pré-remplissent le corps du message avec :</p>
+<ul>
+  <li>Version de l'app et SHA de commit</li>
+  <li>Date de build</li>
+  <li>Mode (application installée / navigateur)</li>
+  <li>Plateforme et langue</li>
+  <li>Chaîne <code>navigator.userAgent</code> complète (navigateur, moteur, système)</li>
+</ul>
+<h2>Données utilisées</h2><p>Aucune donnée n'est envoyée automatiquement : les liens ouvrent le client mail ou GitHub avec un message pré-rempli que l'utilisateur peut relire, modifier et envoyer lui-même (ou ne pas envoyer).</p>
+<h2>Résultat</h2><p>Un message de support ou une issue GitHub déjà structuré, sans que l'utilisateur ait à chercher lui-même sa version ou son appareil.</p>
+<h2>Fonctionnement hors connexion</h2><p>L'écran s'affiche entièrement hors ligne (aucune donnée réseau requise). Les actions « Contacter le support » et « Signaler un bug » nécessitent une application de messagerie ou une connexion Internet pour aboutir.</p>
+<h2>Limites</h2><p>Il ne s'agit pas d'un envoi automatique et silencieux de télémétrie : l'utilisateur doit valider et envoyer lui-même le message pré-rempli (mail ou issue GitHub), conformément à l'absence de collecte de données en arrière-plan (voir <a href="../../data/">Données et confidentialité</a>).</p>
+<h2>Erreurs possibles</h2><p>Aucune identifiée. Si l'appareil n'a pas de client mail configuré, le lien « Contacter le support » peut ne rien ouvrir — utiliser alors « Signaler un bug » (GitHub) ou écrire directement à <code>contact@swinux.ch</code>.</p>
+<h2>Dépannage</h2><p><a href="../../support/">Support</a></p>
 <h2>FAQ</h2><p><a href="../../faq/">Voir la FAQ</a></p>
 `,
 };
@@ -1730,6 +1768,12 @@ PAGES['versions'] = {
 <h1>Historique des versions</h1>
 <p class="lede">Depuis la version <strong>1.1.0</strong>, Astror suit un vrai numéro de version sémantique (<code>package.json</code>), incrémenté à chaque changement notable et détaillé dans <code>CHANGELOG.md</code>. Les entrées antérieures, non versionnées individuellement à l'époque, restent groupées par date de session.</p>
 
+<h2>Version 1.3.0 — 2026-08-29</h2>
+<h3>Ajouts</h3>
+<ul>
+  <li><strong>Écran « À propos »</strong> (tout en bas du menu hamburger) : version, SHA de commit, date de build, développeur, liens (GitHub, documentation, README, portfolio), contact support et signalement de bug avec diagnostics pré-remplis automatiquement, crédits open-source — voir <a href="../features/a-propos/">Écran À propos</a>.</li>
+</ul>
+
 <h2>Version 1.2.1 — 2026-08-29</h2>
 <h3>Ajouts</h3>
 <ul>
@@ -1827,12 +1871,20 @@ PAGES['support'] = {
   html: `
 <div class="eyebrow">Support</div>
 <h1>Obtenir de l'aide</h1>
-<h2>Signaler un problème</h2>
-<p>Astror est un projet open-source hébergé sur GitHub : <a href="https://github.com/nouhailler/astror">github.com/nouhailler/astror</a>. Ouvrir une « Issue » sur ce dépôt est le meilleur moyen de signaler un bug ou de proposer une amélioration.</p>
+
+<h2>Depuis l'application (recommandé)</h2>
+<p>Menu ☰ → <a href="../features/a-propos/">À propos</a> → « Contacter le support » (mail) ou « Signaler un bug » (issue GitHub) : ces deux liens pré-remplissent automatiquement le message avec la version installée, le build, l'appareil et le navigateur — il n'y a rien à recopier manuellement, seulement à décrire le problème et à envoyer.</p>
+
+<h2>Signaler un problème directement sur GitHub</h2>
+<p>Astror est un projet open-source hébergé sur GitHub : <a href="https://github.com/nouhailler/astror">github.com/nouhailler/astror</a>. Ouvrir une « Issue » sur ce dépôt (<a href="https://github.com/nouhailler/astror/issues/new">nouvelle issue</a>) est le meilleur moyen de signaler un bug ou de proposer une amélioration.</p>
+
+<h2>Contact direct</h2>
+<p>Par e-mail : <a href="mailto:contact@swinux.ch">contact@swinux.ch</a>.</p>
 
 <h2>Informations utiles à fournir</h2>
+<p>Si vous ne passez pas par le lien intégré à l'application (qui les inclut automatiquement) :</p>
 <ul>
-  <li>Version de l'application (voir en bas de l'écran Paramètres).</li>
+  <li>Version de l'application et build (voir <a href="../features/a-propos/">À propos</a> ou en bas de l'écran Paramètres).</li>
   <li>Appareil et système d'exploitation (ex. iPhone / iOS 18, Android 14…).</li>
   <li>Navigateur utilisé (Safari, Chrome…) et s'il s'agit de l'application installée (PWA) ou d'un onglet de navigateur.</li>
   <li>Message d'erreur exact affiché, le cas échéant (voir <a href="../reference/errors/">Codes et messages d'erreur</a>).</li>
