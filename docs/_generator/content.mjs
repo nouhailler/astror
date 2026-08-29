@@ -2,8 +2,8 @@
 // Toute affirmation ici doit être vérifiable dans le code source (src/) — voir DOCUMENTATION_SPEC.md §41.
 // Ne jamais ajouter un comportement qui n'existe pas dans le code ; marquer "À vérifier" sinon.
 
-export const APP_VERSION = '1.1.0';
-export const DOC_VERSION = '1.1.0';
+export const APP_VERSION = '1.2.0';
+export const DOC_VERSION = '1.2.0';
 export const DOC_UPDATED = '2026-08-29';
 
 const verify = (text) => `<div class="callout verify"><div class="callout-title">À vérifier</div><p>${text}</p></div>`;
@@ -52,6 +52,7 @@ export const NAV = [
     id: 'features', icon: '🧩', title: 'Fonctionnalités',
     pages: [
       { id: 'features-index', title: "Vue d'ensemble", path: '/features/' },
+      { id: 'feat-menu', title: 'Menu hamburger', path: '/features/menu-navigation/' },
       { id: 'feat-onboarding', title: 'Profil observateur (onboarding)', path: '/features/profil-observateur/' },
       { id: 'feat-sky', title: 'Carte du ciel interactive', path: '/features/carte-du-ciel/' },
       { id: 'feat-constellations', title: 'Fiches des 88 constellations', path: '/features/constellations/' },
@@ -201,7 +202,7 @@ ${tbl(`<table>
 <tr><td><strong>Outils</strong></td><td>10 modules spécialisés (Observer, Lune, Planètes, Événements, Astrophoto, Satellites, Apprendre, Communauté, Assistant IA, Explorations)</td></tr>
 <tr><td><strong>Assistant</strong></td><td>Chat libre avec un assistant IA spécialisé astronomie</td></tr>
 </table>`)}
-<p>Chaque écran propose une aide contextuelle (bouton « ? ») et une visite guidée statique (bouton lecture ▶) accessibles depuis la barre du haut. Voir <a href="../guide/">Guide utilisateur</a> pour le détail de chaque écran, et <a href="../features/mode-demo/">Mode démo</a> pour les visites guidées automatiques pilotées.</p>
+<p>Chaque écran propose un bouton menu (☰, <a href="../features/menu-navigation/">toutes les fonctionnalités classées par catégorie</a>), une aide contextuelle (bouton « ? ») et une visite guidée statique (bouton lecture ▶) accessibles depuis la barre du haut. Voir <a href="../guide/">Guide utilisateur</a> pour le détail de chaque écran, et <a href="../features/mode-demo/">Mode démo</a> pour les visites guidées automatiques pilotées.</p>
 `,
 };
 // ---- Guide utilisateur ----
@@ -537,6 +538,7 @@ PAGES['features-index'] = {
 <h1>Vue d'ensemble</h1>
 <p class="lede">Chaque fonctionnalité est documentée selon la même structure : description, prérequis, utilisation, données, fonctionnement hors connexion, limites et erreurs.</p>
 <div class="grid-cards">
+  <a class="card" href="menu-navigation/"><div class="card-title">Menu hamburger</div><div class="card-sub">Toutes les fonctionnalités</div></a>
   <a class="card" href="profil-observateur/"><div class="card-title">Profil observateur</div><div class="card-sub">Onboarding + édition</div></a>
   <a class="card" href="carte-du-ciel/"><div class="card-title">Carte du ciel</div><div class="card-sub">Boussole, curseur temporel</div></a>
   <a class="card" href="constellations/"><div class="card-title">Constellations</div><div class="card-sub">88 fiches</div></a>
@@ -560,6 +562,35 @@ PAGES['features-index'] = {
   <a class="card" href="export-import/"><div class="card-title">Export / import</div><div class="card-sub">Sauvegarde des données</div></a>
   <a class="card" href="cles-api-ia/"><div class="card-title">Clés API IA</div><div class="card-sub">OpenRouter, Anthropic</div></a>
 </div>
+`,
+};
+
+PAGES['feat-menu'] = {
+  description: "Menu hamburger listant toutes les fonctionnalités d'Astror, classées par catégorie.",
+  html: `
+<div class="eyebrow">Fonctionnalités</div>
+<h1>Menu hamburger</h1>
+<h2>Description</h2><p>Un bouton ☰ en haut à gauche de chaque écran ouvre un menu listant l'intégralité des fonctionnalités d'Astror, organisées en 8 catégories.</p>
+<h2>Objectif</h2><p>Accéder directement à n'importe quel écran, sous-onglet ou outil de l'application sans naviguer étape par étape (par exemple, ouvrir directement « Bibliothèque » ou « Conquête spatiale » sans passer par l'onglet parent puis choisir le sous-onglet).</p>
+<h2>Prérequis</h2><p>Aucun.</p>
+<h2>Comment l'utiliser</h2><p>Toucher le bouton ☰ (visible sur tous les écrans, à gauche du logo Astror) puis toucher une fonctionnalité dans la liste. Le menu se ferme automatiquement et l'application navigue directement vers la destination choisie.</p>
+<h2>Catégories et contenu</h2>
+${tbl(`<table><tr><th>Catégorie</th><th>Fonctionnalités listées</th></tr>
+<tr><td>Ciel & pointage</td><td>Ciel, Observer, Satellites</td></tr>
+<tr><td>Éphémérides</td><td>Éphémérides, Lune, Planètes, Événements</td></tr>
+<tr><td>Explorer le cosmos</td><td>Système solaire, James Webb, Conquête spatiale, Anomalies, Théories</td></tr>
+<tr><td>Astrophotographie</td><td>Astrophoto, Explorations</td></tr>
+<tr><td>Veille spatiale</td><td>Actualités, Conférences, Personnalités, Bibliothèque, Photos du ciel</td></tr>
+<tr><td>Apprendre & communauté</td><td>Apprendre, Communauté</td></tr>
+<tr><td>Assistant IA</td><td>Assistant, Assistant IA</td></tr>
+<tr><td>Réglages</td><td>Paramètres</td></tr>
+</table>`)}
+<h2>Données utilisées</h2><p>Aucune.</p>
+<h2>Résultat</h2><p>Navigation directe vers l'écran ou le sous-onglet choisi : change l'onglet principal, sélectionne le sous-onglet d'Explorer ou de Veille si besoin, ouvre l'outil concerné, ou ouvre les Paramètres.</p>
+<h2>Fonctionnement hors connexion</h2><p><span class="badge ok">100 % hors ligne</span> — le menu et la navigation ne dépendent d'aucune donnée réseau.</p>
+<h2>Limites</h2><p>Le menu pointe vers le sous-onglet d'Explorer ou de Veille correspondant, mais pas vers une section précise à l'intérieur (ex. « Système solaire » ouvre le sous-onglet entier, pas directement la sous-section « Les 88 constellations » qui s'y trouve plus bas).</p>
+<h2>Erreurs possibles</h2><p>Aucune identifiée.</p>
+<h2>FAQ</h2><p><a href="../../faq/">Voir la FAQ</a></p>
 `,
 };
 
@@ -1698,6 +1729,12 @@ PAGES['versions'] = {
 <div class="eyebrow">Versions</div>
 <h1>Historique des versions</h1>
 <p class="lede">Depuis la version <strong>1.1.0</strong>, Astror suit un vrai numéro de version sémantique (<code>package.json</code>), incrémenté à chaque changement notable et détaillé dans <code>CHANGELOG.md</code>. Les entrées antérieures, non versionnées individuellement à l'époque, restent groupées par date de session.</p>
+
+<h2>Version 1.2.0 — 2026-08-29</h2>
+<h3>Nouveautés</h3>
+<ul>
+  <li><strong>Menu hamburger</strong> (☰) listant toutes les fonctionnalités d'Astror classées en 8 catégories, avec navigation directe vers n'importe quel écran, sous-onglet ou outil — voir <a href="../features/menu-navigation/">Menu hamburger</a>.</li>
+</ul>
 
 <h2>Version 1.1.0 — 2026-08-29</h2>
 <h3>Corrections</h3>
