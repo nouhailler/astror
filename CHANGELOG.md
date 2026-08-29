@@ -6,6 +6,15 @@ entrées précédentes, non versionnées individuellement, restent groupées par
 
 ---
 
+## [1.2.1] — 2026-08-29
+
+### Ajouts
+
+- Lien **« Documentation »** ajouté dans le menu hamburger (catégorie Réglages, à côté de
+  Paramètres), ouvrant le site documentaire dans un nouvel onglet.
+
+---
+
 ## [1.2.0] — 2026-08-29
 
 ### Ajouts

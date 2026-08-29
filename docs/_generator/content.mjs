@@ -2,8 +2,8 @@
 // Toute affirmation ici doit être vérifiable dans le code source (src/) — voir DOCUMENTATION_SPEC.md §41.
 // Ne jamais ajouter un comportement qui n'existe pas dans le code ; marquer "À vérifier" sinon.
 
-export const APP_VERSION = '1.2.0';
-export const DOC_VERSION = '1.2.0';
+export const APP_VERSION = '1.2.1';
+export const DOC_VERSION = '1.2.1';
 export const DOC_UPDATED = '2026-08-29';
 
 const verify = (text) => `<div class="callout verify"><div class="callout-title">À vérifier</div><p>${text}</p></div>`;
@@ -583,10 +583,10 @@ ${tbl(`<table><tr><th>Catégorie</th><th>Fonctionnalités listées</th></tr>
 <tr><td>Veille spatiale</td><td>Actualités, Conférences, Personnalités, Bibliothèque, Photos du ciel</td></tr>
 <tr><td>Apprendre & communauté</td><td>Apprendre, Communauté</td></tr>
 <tr><td>Assistant IA</td><td>Assistant, Assistant IA</td></tr>
-<tr><td>Réglages</td><td>Paramètres</td></tr>
+<tr><td>Réglages</td><td>Paramètres, Documentation</td></tr>
 </table>`)}
 <h2>Données utilisées</h2><p>Aucune.</p>
-<h2>Résultat</h2><p>Navigation directe vers l'écran ou le sous-onglet choisi : change l'onglet principal, sélectionne le sous-onglet d'Explorer ou de Veille si besoin, ouvre l'outil concerné, ou ouvre les Paramètres.</p>
+<h2>Résultat</h2><p>Navigation directe vers l'écran ou le sous-onglet choisi : change l'onglet principal, sélectionne le sous-onglet d'Explorer ou de Veille si besoin, ouvre l'outil concerné, ouvre les Paramètres, ou ouvre le site de documentation dans un nouvel onglet (lien externe).</p>
 <h2>Fonctionnement hors connexion</h2><p><span class="badge ok">100 % hors ligne</span> — le menu et la navigation ne dépendent d'aucune donnée réseau.</p>
 <h2>Limites</h2><p>Le menu pointe vers le sous-onglet d'Explorer ou de Veille correspondant, mais pas vers une section précise à l'intérieur (ex. « Système solaire » ouvre le sous-onglet entier, pas directement la sous-section « Les 88 constellations » qui s'y trouve plus bas).</p>
 <h2>Erreurs possibles</h2><p>Aucune identifiée.</p>
@@ -1729,6 +1729,12 @@ PAGES['versions'] = {
 <div class="eyebrow">Versions</div>
 <h1>Historique des versions</h1>
 <p class="lede">Depuis la version <strong>1.1.0</strong>, Astror suit un vrai numéro de version sémantique (<code>package.json</code>), incrémenté à chaque changement notable et détaillé dans <code>CHANGELOG.md</code>. Les entrées antérieures, non versionnées individuellement à l'époque, restent groupées par date de session.</p>
+
+<h2>Version 1.2.1 — 2026-08-29</h2>
+<h3>Ajouts</h3>
+<ul>
+  <li>Lien « Documentation » ajouté dans le menu hamburger (catégorie Réglages), ouvrant le site documentaire dans un nouvel onglet.</li>
+</ul>
 
 <h2>Version 1.2.0 — 2026-08-29</h2>
 <h3>Nouveautés</h3>

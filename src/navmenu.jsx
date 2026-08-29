@@ -69,16 +69,14 @@ const CATEGORIES = [
     label: 'Réglages', Ic: IcWrench,
     items: [
       { label: 'Paramètres', sub: 'Profil, alertes, clés IA, sauvegarde', Ic: IcWrench, nav: { settings: true } },
+      { label: 'Documentation', sub: 'Guide complet en ligne', Ic: IcBook, nav: { href: 'https://nouhailler.github.io/astror/' } },
     ],
   },
 ]
 
-function MenuRow({ item, onNavigate }) {
-  return (
-    <button onClick={() => onNavigate(item.nav)} className="press" style={{
-      width: '100%', display: 'flex', alignItems: 'center', gap: 12, padding: '11px 12px',
-      borderRadius: 14, textAlign: 'left', cursor: 'pointer', background: 'transparent', border: 'none',
-    }}>
+function MenuRow({ item, onNavigate, onClose }) {
+  const content = (
+    <>
       <span style={{ width: 34, height: 34, borderRadius: 10, flexShrink: 0, display: 'flex', alignItems: 'center',
         justifyContent: 'center', color: 'var(--gold)', background: 'var(--gold-soft)', border: '1px solid var(--gold-line)' }}>
         <item.Ic size={17} />
@@ -88,6 +86,24 @@ function MenuRow({ item, onNavigate }) {
         <span className="meta" style={{ fontSize: 11, display: 'block', marginTop: 1 }}>{item.sub}</span>
       </span>
       <IcChevron size={16} style={{ color: 'var(--faint)', flexShrink: 0 }} />
+    </>
+  )
+  const rowStyle = {
+    width: '100%', display: 'flex', alignItems: 'center', gap: 12, padding: '11px 12px',
+    borderRadius: 14, textAlign: 'left', cursor: 'pointer', background: 'transparent', border: 'none',
+    textDecoration: 'none', color: 'inherit', boxSizing: 'border-box',
+  }
+
+  if (item.nav.href) {
+    return (
+      <a href={item.nav.href} target="_blank" rel="noopener noreferrer" className="press" style={rowStyle} onClick={onClose}>
+        {content}
+      </a>
+    )
+  }
+  return (
+    <button onClick={() => onNavigate(item.nav)} className="press" style={rowStyle}>
+      {content}
     </button>
   )
 }
@@ -108,7 +124,7 @@ export default function NavMenuSheet({ open, onClose, onNavigate }) {
           <div className="card-2" style={{ overflow: 'hidden' }}>
             {cat.items.map((item, i) => (
               <div key={item.label} style={{ borderBottom: i < cat.items.length - 1 ? '1px solid var(--line)' : 0 }}>
-                <MenuRow item={item} onNavigate={go} />
+                <MenuRow item={item} onNavigate={go} onClose={onClose} />
               </div>
             ))}
           </div>
