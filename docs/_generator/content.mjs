@@ -2,8 +2,8 @@
 // Toute affirmation ici doit être vérifiable dans le code source (src/) — voir DOCUMENTATION_SPEC.md §41.
 // Ne jamais ajouter un comportement qui n'existe pas dans le code ; marquer "À vérifier" sinon.
 
-export const APP_VERSION = '1.0.0';
-export const DOC_VERSION = '1.0.0';
+export const APP_VERSION = '1.1.0';
+export const DOC_VERSION = '1.1.0';
 export const DOC_UPDATED = '2026-08-29';
 
 const verify = (text) => `<div class="callout verify"><div class="callout-title">À vérifier</div><p>${text}</p></div>`;
@@ -74,6 +74,7 @@ export const NAV = [
       { id: 'feat-demo', title: 'Mode démo (visites guidées)', path: '/features/mode-demo/' },
       { id: 'feat-export', title: 'Export et import des données', path: '/features/export-import/' },
       { id: 'feat-ai-keys', title: 'Clés API pour l’IA', path: '/features/cles-api-ia/' },
+      { id: 'feat-updates', title: 'Mises à jour automatiques', path: '/features/mises-a-jour/' },
     ],
   },
   { id: 'settings', icon: '⚙️', title: 'Paramètres', pages: [{ id: 'settings', title: 'Tous les paramètres', path: '/settings/' }] },
@@ -393,8 +394,7 @@ ${tbl(`<table><tr><th>Segment</th><th>Contenu</th></tr>
 <tr><td>Suivi lunaire</td><td>Disque lunaire stylisé, phase, métriques, panneau IA</td></tr>
 <tr><td>Cartographie</td><td>Grand disque, zones recommandées, listes des mers et cratères avec bouton IA « Approfondir »</td></tr>
 </table>`)}
-${verify("les valeurs affichées (phase, illumination, âge, dates du calendrier) sont des constantes codées en dur dans cet outil, contrairement à la plupart des autres outils qui calculent en direct via astronomy-engine — elles ne reflètent donc pas nécessairement la phase lunaire réelle du jour de consultation.")}
-<p><a href="../../../features/outil-lune/">Détails complets de la fonctionnalité</a></p>
+<p>Depuis la version 1.1.0, la phase, l'illumination, l'âge, la distance et le diamètre apparent sont calculés en direct (astronomy-engine) et non plus figés — voir <a href="../../../features/outil-lune/">Détails complets de la fonctionnalité</a>.</p>
 `,
 };
 
@@ -406,11 +406,10 @@ PAGES['guide-tool-planets'] = {
 <p class="lede">Éphémérides planétaires et simulateur d'oculaire.</p>
 <h2>2 segments</h2>
 ${tbl(`<table><tr><th>Segment</th><th>Contenu</th></tr>
-<tr><td>Éphémérides</td><td>Liste des 7 planètes visibles, panneau IA de synthèse, conjonctions/oppositions à venir</td></tr>
+<tr><td>Éphémérides</td><td>Liste des 7 planètes visibles, panneau IA de synthèse, oppositions et élongations à venir</td></tr>
 <tr><td>Observation</td><td>Simulateur d'oculaire par planète (anneaux de Saturne, bandes de Jupiter en CSS), taille apparente, magnitude, phase, distance, barre de visibilité</td></tr>
 </table>`)}
-${verify("les données de magnitude, diamètre apparent et les dates de conjonctions/oppositions affichées sont des tableaux statiques codés en dur (dates fixes jusqu'à janvier 2027), pas un calcul en direct via astronomy-engine.")}
-<p><a href="../../../features/outil-planetes/">Détails complets de la fonctionnalité</a></p>
+<p>Depuis la version 1.1.0, ces données sont calculées en direct (astronomy-engine) et non plus figées — voir <a href="../../../features/outil-planetes/">Détails complets de la fonctionnalité</a>.</p>
 `,
 };
 
@@ -587,7 +586,7 @@ PAGES['feat-onboarding'] = {
 <h2>Fonctionnement hors connexion</h2>
 <p>Entièrement fonctionnel hors connexion, sauf : la détection GPS + conversion en nom de ville (dépend d'un service de géocodage externe — sans réseau, le profil garde des coordonnées brutes du type « 48.8°N »).</p>
 <h2>Limites</h2>
-${verify("le bouton « Revoir l'introduction » relance l'onboarding, mais il n'a pas été confirmé s'il pré-remplit les étapes avec le profil actuel ou repart des valeurs par défaut — à vérifier dans le composant App.jsx complet.")}
+<p>Aucune connue. <span class="small">(Depuis la version 1.1.0 : « Revoir l'introduction » pré-remplit désormais l'onboarding avec le profil actuel au lieu de repartir des valeurs par défaut.)</span></p>
 <h2>Erreurs possibles</h2>
 <p>Si la géolocalisation est refusée par le navigateur, aucun message d'erreur explicite n'est affiché : le bouton repasse simplement à son état initial.</p>
 <h2>Dépannage</h2>
@@ -820,34 +819,34 @@ PAGES['feat-observe'] = {
 };
 
 PAGES['feat-moon-tool'] = {
-  description: "Suivi de phase lunaire et cartographie (mers, cratères) — contenu statique.",
+  description: "Suivi de phase lunaire (calcul en direct) et cartographie (mers, cratères).",
   html: `
 <div class="eyebrow">Fonctionnalités</div>
 <h1>Outil Lune</h1>
-<h2>Description</h2><p>Suivi de la phase lunaire et cartographie des mers et cratères recommandés à l'observation.</p>
+<h2>Description</h2><p>Suivi de la phase lunaire réelle et cartographie des mers et cratères recommandés à l'observation.</p>
 <h2>Prérequis</h2><p>Aucun.</p>
-<h2>Comment l'utiliser</h2><p>Segment « Suivi lunaire » pour la phase courante ; segment « Cartographie » pour les zones recommandées, avec bouton IA « Approfondir » sur chaque mer/cratère.</p>
-<h2>Données utilisées</h2><p>Aucune.</p>
-<h2>Fonctionnement hors connexion</h2><p><span class="badge ok">100 % hors ligne</span> (données statiques). Panneaux IA : nécessitent une connexion et une clé configurée.</p>
-<h2>Limites</h2>
-${verify("les valeurs affichées (phase, illumination 73 %, âge 9,4 jours, dates du calendrier lunaire) sont des constantes codées en dur dans le code de cet outil — elles ne sont pas recalculées dynamiquement contrairement au reste de l'application, qui utilise astronomy-engine. Il s'agit probablement d'un contenu de démonstration resté en l'état ; à confirmer et corriger côté développement si un affichage dynamique est attendu.")}
+<h2>Comment l'utiliser</h2><p>Segment « Suivi lunaire » pour la phase, l'illumination, l'âge, la distance et le diamètre apparent du jour, plus le calendrier des 4 prochains quartiers ; segment « Cartographie » pour les zones recommandées, avec bouton IA « Approfondir » sur chaque mer/cratère.</p>
+<h2>Données utilisées</h2><p>Position du profil (<a href="../profil-observateur/">Profil observateur</a>), utilisée pour les heures de lever/coucher.</p>
+<h2>Résultat</h2><p>Depuis la version 1.1.0, la phase, l'illumination, l'âge, la distance Terre-Lune, le diamètre apparent et le calendrier des quartiers sont calculés en direct via <code>astronomy-engine</code> (auparavant des valeurs figées) ; les mers/cratères recommandés à l'écran « Cartographie » s'adaptent à la phase réelle du moment.</p>
+<h2>Fonctionnement hors connexion</h2><p><span class="badge ok">100 % hors ligne</span> (calcul local). Panneaux IA : nécessitent une connexion et une clé configurée.</p>
+<h2>Limites</h2><p>La liste des mers et cratères recommandés reste un contenu descriptif fixe ; seule leur pertinence (texte affiché) s'adapte à la phase courante, pas leur sélection.</p>
 <h2>Erreurs possibles</h2><p>Aucune identifiée (pas de dépendance réseau critique).</p>
 <h2>FAQ</h2><p><a href="../../faq/">Voir la FAQ</a></p>
 `,
 };
 
 PAGES['feat-planets-tool'] = {
-  description: "Éphémérides planétaires et simulateur d'oculaire — données statiques.",
+  description: "Éphémérides planétaires (calcul en direct) et simulateur d'oculaire.",
   html: `
 <div class="eyebrow">Fonctionnalités</div>
 <h1>Outil Planètes</h1>
-<h2>Description</h2><p>Fiche d'éphémérides par planète et simulateur visuel d'oculaire.</p>
+<h2>Description</h2><p>Fiche d'éphémérides par planète, calculée en direct pour la position de l'utilisateur, et simulateur visuel d'oculaire.</p>
 <h2>Prérequis</h2><p>Aucun.</p>
-<h2>Comment l'utiliser</h2><p>Segment « Éphémérides » pour la liste triée des 7 planètes observables et les prochaines conjonctions/oppositions ; segment « Observation » pour choisir une planète et voir le rendu simulé dans l'oculaire.</p>
-<h2>Données utilisées</h2><p>Aucune.</p>
-<h2>Fonctionnement hors connexion</h2><p><span class="badge ok">100 % hors ligne</span>.</p>
-<h2>Limites</h2>
-${verify("les magnitudes, diamètres apparents et dates de conjonctions/oppositions affichés sont des tableaux statiques codés en dur (dates fixes jusqu'à janvier 2027), pas un calcul dynamique via astronomy-engine — au-delà de cette période, les données affichées ne seront plus à jour tant que le code n'est pas mis à jour.")}
+<h2>Comment l'utiliser</h2><p>Segment « Éphémérides » pour la liste triée des 7 planètes observables et les prochaines oppositions/élongations ; segment « Observation » pour choisir une planète et voir le rendu simulé dans l'oculaire.</p>
+<h2>Données utilisées</h2><p>Position du profil (<a href="../profil-observateur/">Profil observateur</a>), utilisée pour l'altitude au méridien de chaque planète.</p>
+<h2>Résultat</h2><p>Depuis la version 1.1.0, magnitude, taille apparente, phase éclairée et visibilité sont calculées en direct via <code>astronomy-engine</code> (auparavant des tableaux figés valables jusqu'à janvier 2027). La liste « Oppositions & élongations » (anciennement « Conjonctions & oppositions ») provient d'un calcul réel des prochaines oppositions (planètes externes) et plus grandes élongations (Mercure, Vénus) sur les 12 prochains mois ; les conjonctions planète-planète, qui n'étaient pas réellement calculées, ont été retirées plutôt que laissées inexactes.</p>
+<h2>Fonctionnement hors connexion</h2><p><span class="badge ok">100 % hors ligne</span> (calcul local).</p>
+<h2>Limites</h2><p>Le classement de « visibilité » (Difficile/Visible/Bonne/Excellente) est un repère de confort basé sur la hauteur au méridien, pas une norme astronomique.</p>
 <h2>Erreurs possibles</h2><p>Aucune identifiée.</p>
 <h2>FAQ</h2><p><a href="../../faq/">Voir la FAQ</a></p>
 `,
@@ -998,6 +997,31 @@ PAGES['feat-tips'] = {
 `,
 };
 
+PAGES['feat-updates'] = {
+  description: "Mise à jour automatique de l'app en arrière-plan, avec vérification manuelle possible.",
+  html: `
+<div class="eyebrow">Fonctionnalités</div>
+<h1>Mises à jour automatiques</h1>
+<h2>Description</h2><p>Astror vérifie périodiquement si une nouvelle version est disponible et l'applique automatiquement, sans action requise.</p>
+<h2>Objectif</h2><p>Garantir que l'utilisateur dispose toujours de la dernière version, sans étape d'installation manuelle (pas de store d'applications).</p>
+<h2>Prérequis</h2><p>Aucun. Nécessite une connexion au moment de la vérification pour détecter une nouvelle version.</p>
+<h2>Comment l'utiliser</h2>
+<p>Rien à faire : la vérification se fait automatiquement toutes les heures en arrière-plan. Depuis Paramètres → Mises à jour, un bouton « Vérifier les mises à jour » permet de forcer une vérification immédiate.</p>
+<h2>Options</h2><p>Aucun réglage on/off — la vérification automatique est toujours active.</p>
+<h2>Données utilisées</h2>
+${tbl(`<table><tr><th>Clé</th><th>Contenu</th></tr>
+<tr><td><code>astror_pwa_last_check_v1</code></td><td>Date/heure de la dernière vérification (auto ou manuelle)</td></tr>
+<tr><td><code>astror_pwa_last_update_v1</code></td><td>Date/heure de la dernière mise à jour effectivement appliquée</td></tr>
+</table>`)}
+<h2>Résultat</h2><p>Si une nouvelle version est trouvée, elle est téléchargée puis appliquée automatiquement : l'application se recharge seule avec la nouvelle version, sans invite de confirmation. Paramètres affiche la version installée et sa date de publication (date de build).</p>
+<h2>Fonctionnement hors connexion</h2><p>La vérification échoue silencieusement sans réseau (aucune erreur affichée) ; l'application continue de fonctionner normalement avec la version déjà installée, précachée par le service worker — voir <a href="../../offline/">Hors connexion</a>.</p>
+<h2>Fonctionnement en ligne</h2><p>Vérification automatique toutes les heures ; vérification immédiate possible via le bouton dédié.</p>
+<h2>Limites</h2><p>La mise à jour se recharge sans avertissement préalable : un rechargement en pleine saisie (ex. formulaire d'ajout dans Veille) pourrait interrompre l'utilisateur. Aucune confirmation n'est demandée avant application.</p>
+<h2>Erreurs possibles</h2><p>Aucun message d'erreur dédié n'est affiché en cas d'échec de vérification (réseau indisponible, etc.) — le bouton affiche simplement « ✓ À jour » après le délai standard, que la vérification ait réussi ou échoué silencieusement.</p>
+<h2>FAQ</h2><p><a href="../../faq/">Voir la FAQ</a></p>
+`,
+};
+
 PAGES['feat-demo'] = {
   description: "Visites guidées automatiques qui pilotent réellement l'interface, sans jamais toucher vos données.",
   html: `
@@ -1080,8 +1104,8 @@ ${tbl(`<table><tr><th>Clé</th><th>Contenu</th></tr>
 <ul>
   <li><strong>Stockage en clair, non chiffré</strong>, dans le stockage local du navigateur — n'importe quel script exécuté dans ce même navigateur pourrait théoriquement y accéder.</li>
   <li>Ces clés sont incluses en clair dans le fichier d'export de données (voir <a href="../export-import/">Export et import</a>) — ne partagez jamais ce fichier.</li>
-  <li>Il n'existe pas de bouton dédié pour effacer la clé OpenRouter une fois enregistrée depuis l'interface (elle n'est sauvegardée qu'au clic sur « Modèles gratuits », qui exige un champ non vide) — pour la retirer, effacer manuellement les données du site dans le navigateur, ou importer une sauvegarde qui ne la contient pas.</li>
 </ul>
+<p class="small">Depuis la version 1.1.0, chacune des 3 clés dispose d'un bouton « Effacer » dédié dans Paramètres (visible dès qu'une valeur est saisie ou enregistrée).</p>
 <h2>Erreurs possibles</h2><p>« Clé invalide » — aucune distinction affichée entre clé erronée, réseau indisponible ou quota dépassé, tous les cas remontant le même message générique.</p>
 <h2>Dépannage</h2><p><a href="../../troubleshooting/assistant-ia/">L'assistant IA ne répond pas</a></p>
 <h2>FAQ</h2><p><a href="../../faq/">Voir la FAQ</a></p>
@@ -1108,30 +1132,38 @@ ${tbl(`<table>
 <h2>Intelligence artificielle</h2>
 ${tbl(`<table>
 <tr><th>Paramètre</th><th>Type</th><th>Défaut</th><th>Application</th></tr>
-<tr><td>Clé API OpenRouter</td><td>Texte masqué</td><td>Vide</td><td>Enregistrée dès le clic sur « Modèles gratuits » (avant même la validation)</td></tr>
+<tr><td>Clé API OpenRouter</td><td>Texte masqué</td><td>Vide</td><td>Enregistrée dès le clic sur « Modèles gratuits » (avant même la validation) ; bouton « Effacer » pour la retirer</td></tr>
 <tr><td>Modèle OpenRouter</td><td>Sélection dans une liste dynamique (modèles « :free »)</td><td>Aucun</td><td>Immédiate au clic sur un modèle</td></tr>
-<tr><td>Clé API Anthropic</td><td>Texte masqué</td><td>Vide</td><td>Bouton « Enregistrer » explicite ; bouton « Tester » ne sauvegarde pas</td></tr>
+<tr><td>Clé API Anthropic</td><td>Texte masqué</td><td>Vide</td><td>Bouton « Enregistrer » explicite ; bouton « Tester » ne sauvegarde pas ; bouton « Effacer » pour la retirer</td></tr>
 </table>`)}
 <p class="small">Priorité d'utilisation : OpenRouter (si clé + modèle) → Anthropic (si clé) → sinon fonctionnalités IA indisponibles. Détail : <a href="../features/cles-api-ia/">Clés API pour l'IA</a>.</p>
 
 <h2>Intégrations optionnelles</h2>
 ${tbl(`<table>
 <tr><th>Paramètre</th><th>Type</th><th>Défaut</th><th>Effet</th></tr>
-<tr><td>Clé API Google Books</td><td>Texte masqué</td><td>Vide</td><td>Si renseignée, priorise Google Books sur Open Library pour la recherche de livres (Veille → Bibliothèque)</td></tr>
+<tr><td>Clé API Google Books</td><td>Texte masqué</td><td>Vide</td><td>Si renseignée, priorise Google Books sur Open Library pour la recherche de livres (Veille → Bibliothèque) ; bouton « Effacer » pour la retirer</td></tr>
 <tr><td>URL Google Sheets communauté</td><td>Texte (URL)</td><td>Vide</td><td>Active le vrai classement communautaire (Outils → Communauté) à la place des données de démonstration</td></tr>
 </table>`)}
+
+<h2>Mises à jour</h2>
+<p>Depuis la version 1.1.0, un bloc dédié affiche la version installée, la date de publication du build et la date de dernière vérification, avec un bouton « Vérifier les mises à jour ».</p>
+${tbl(`<table>
+<tr><th>Élément</th><th>Comportement</th></tr>
+<tr><td>Vérification automatique</td><td>Toutes les heures en arrière-plan ; toute mise à jour trouvée est appliquée automatiquement (rechargement de l'app), sans invite</td></tr>
+<tr><td>Bouton « Vérifier les mises à jour »</td><td>Force une vérification immédiate ; affiche « ✓ À jour » si rien de nouveau</td></tr>
+</table>`)}
+<p class="small">Détail technique : <a href="../reference/apis/">APIs externes</a> ne couvre pas ce mécanisme — voir directement <code>src/pwaUpdate.js</code>.</p>
 
 <h2>Actions</h2>
 ${tbl(`<table>
 <tr><th>Action</th><th>Effet</th></tr>
-<tr><td>Revoir l'introduction</td><td>Relance l'onboarding en 7 étapes</td></tr>
+<tr><td>Revoir l'introduction</td><td>Relance l'onboarding en 7 étapes, pré-rempli avec le profil actuel</td></tr>
 <tr><td>Réafficher les astuces</td><td>Réinitialise les bandeaux d'astuces masqués sur tous les écrans</td></tr>
 <tr><td>Visites guidées (mode démo)</td><td>Lance une visite guidée automatique pilotée — voir <a href="../features/mode-demo/">Mode démo</a></td></tr>
 <tr><td>Exporter mes données</td><td>Télécharge un fichier JSON de sauvegarde — voir <a href="../features/export-import/">Export/Import</a></td></tr>
 <tr><td>Importer</td><td>Restaure des données depuis un fichier JSON (écrase les valeurs existantes, sans confirmation)</td></tr>
 </table>`)}
 
-${verify("aucun bouton dédié ne permet d'effacer isolément une clé API déjà enregistrée (voir Limites dans « Clés API pour l'IA ») ; il n'a pas non plus été confirmé si « Revoir l'introduction » pré-remplit les étapes avec le profil actuel ou repart des valeurs par défaut.")}
 <p>Référence complète, y compris le stockage exact de chaque paramètre : <a href="../reference/settings/">Tableau des paramètres</a>.</p>
 `,
 };
@@ -1208,6 +1240,8 @@ ${tbl(`<table>
 <tr><td><code>astror_book_covers_v1</code></td><td>Cache des couvertures de livres</td><td>Onglet Veille</td><td>Non</td></tr>
 <tr><td><code>astror_conf_imgs_v1</code></td><td>Cache des images de conférences</td><td>Onglet Veille</td><td>Non</td></tr>
 <tr><td><code>astror_site_photos_v1</code></td><td>Cache de vignettes par site photo</td><td>Onglet Veille</td><td>Non</td></tr>
+<tr><td><code>astror_pwa_last_check_v1</code></td><td>Date/heure de la dernière vérification de mise à jour</td><td>Mécanisme de mise à jour (Paramètres)</td><td>Non</td></tr>
+<tr><td><code>astror_pwa_last_update_v1</code></td><td>Date/heure de la dernière mise à jour appliquée</td><td>Mécanisme de mise à jour (Paramètres)</td><td>Non</td></tr>
 </table>`)}
 
 <h2>Données envoyées à des services externes</h2>
@@ -1539,6 +1573,8 @@ ${tbl(`<table>
 <tr><td>URL Google Sheets communauté</td><td>chaîne (URL)</td><td>vide</td><td><code>astror_community_sheet_v1</code></td></tr>
 <tr><td>Préférences de notification (événements)</td><td>objet de booléens</td><td>selon type</td><td><code>astror_notif_prefs_v1</code></td></tr>
 <tr><td>Astuces masquées</td><td>liste</td><td>vide</td><td><code>astror_tips_v1</code></td></tr>
+<tr><td>Dernière vérification de mise à jour</td><td>date ISO</td><td>vide</td><td><code>astror_pwa_last_check_v1</code></td></tr>
+<tr><td>Dernière mise à jour appliquée</td><td>date ISO</td><td>vide</td><td><code>astror_pwa_last_update_v1</code></td></tr>
 </table>`)}
 `,
 };
@@ -1661,7 +1697,21 @@ PAGES['versions'] = {
   html: `
 <div class="eyebrow">Versions</div>
 <h1>Historique des versions</h1>
-${verify("le projet ne pratique pas de versionnage sémantique par changement — package.json reste à la version 1.0.0 depuis l'origine. L'historique ci-dessous reprend les sessions de développement telles que documentées dans CHANGELOG.md, sans numéro de version distinct par entrée.")}
+<p class="lede">Depuis la version <strong>1.1.0</strong>, Astror suit un vrai numéro de version sémantique (<code>package.json</code>), incrémenté à chaque changement notable et détaillé dans <code>CHANGELOG.md</code>. Les entrées antérieures, non versionnées individuellement à l'époque, restent groupées par date de session.</p>
+
+<h2>Version 1.1.0 — 2026-08-29</h2>
+<h3>Corrections</h3>
+<ul>
+  <li><strong>Outil Lune</strong> : phase, illumination, âge, distance et diamètre apparent étaient des constantes figées ; calculés en direct désormais (<code>astronomy-engine</code>). Calendrier des phases affichant 4 dates réelles à venir.</li>
+  <li><strong>Outil Planètes</strong> : magnitude, taille apparente, phase et visibilité étaient des tableaux figés (valables jusqu'à janvier 2027) ; calculés en direct désormais. La liste « Oppositions & élongations » provient d'un calcul réel (les conjonctions planète-planète, non calculées, ont été retirées du libellé).</li>
+  <li><strong>Onboarding rejoué</strong> (« Revoir l'introduction ») repartait des valeurs par défaut au lieu du profil actuel ; corrigé.</li>
+</ul>
+<h3>Ajouts</h3>
+<ul>
+  <li>Bouton « Effacer » pour retirer isolément une clé API (OpenRouter, Anthropic, Google Books).</li>
+  <li>Bloc « Mises à jour » dans Paramètres : version installée, date de publication, date de dernière vérification, bouton « Vérifier les mises à jour ». Vérification automatique en arrière-plan (toutes les heures), application silencieuse dès qu'une mise à jour est prête.</li>
+  <li>Site de documentation complet publié sur GitHub Pages, avec lien depuis Paramètres.</li>
+</ul>
 
 <h2>Session — 2026-06-10 (3) — Conquête spatiale : annexes interactives</h2>
 <ul>
