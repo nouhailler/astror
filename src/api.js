@@ -3,6 +3,7 @@ import * as satellite from 'satellite.js'
 
 export function getGBooksKey() { return localStorage.getItem('astror_gbooks_key_v1') || '' }
 export function saveGBooksKey(k) { localStorage.setItem('astror_gbooks_key_v1', k.trim()) }
+export function clearGBooksKey() { localStorage.removeItem('astror_gbooks_key_v1') }
 
 export async function searchBooks(query) {
   const key = getGBooksKey()

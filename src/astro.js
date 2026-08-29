@@ -31,6 +31,7 @@ export function getMoonData(date = new Date(), lat = 48.8566, lng = 2.3522) {
   const illuminationPct = Math.round((1 - Math.cos(phase * Math.PI / 180)) / 2 * 100)
   const age = ((phase / 360) * 29.5305).toFixed(1)
   const distKm = Math.round(illum.geo_dist * 149597870.7)
+  const angularDiameter = ((3474.8 / distKm) * 3437.75).toFixed(1) // diamètre réel 3 474,8 km, résultat en arcminutes
 
   return {
     phase: phaseName(phase),
@@ -39,7 +40,24 @@ export function getMoonData(date = new Date(), lat = 48.8566, lng = 2.3522) {
     moonrise: fmtTime(rise),
     moonset:  fmtTime(set),
     distance: distKm.toLocaleString('fr-FR') + ' km',
+    distanceKm: distKm,
+    angularDiameter,
   }
+}
+
+/** Les 4 prochains quartiers de Lune (nouvelle, premier quartier, pleine, dernier quartier), dates réelles. */
+export function getUpcomingMoonPhases(date = new Date(), count = 4) {
+  const NAMES = ['Nouvelle Lune', 'Premier quartier', 'Pleine Lune', 'Dernier quartier']
+  const ILLUM = [0, 50, 100, 50]
+  const out = []
+  try {
+    let mq = Astronomy.SearchMoonQuarter(date)
+    for (let i = 0; i < count; i++) {
+      out.push({ name: NAMES[mq.quarter], date: mq.time.date, illum: ILLUM[mq.quarter] })
+      mq = Astronomy.NextMoonQuarter(mq)
+    }
+  } catch {}
+  return out
 }
 
 export function getSunData(date = new Date(), lat = 48.8566, lng = 2.3522) {
@@ -677,4 +695,89 @@ export function getPlanetPositions(date = new Date(), lat = 48.8566, lng = 2.352
       return { id, name, alt: null, az: null, mag: null, rise: '--:--', set: '--:--', visible: false }
     }
   })
+}
+
+// Diamètres équatoriaux réels (km) — mêmes valeurs que data.js (PLANETS[].diam), utilisées ici pour calculer la taille apparente.
+const PLANET_PHYSICAL = {
+  mercure: { body: Astronomy.Body.Mercury, diamKm: 4879 },
+  venus:   { body: Astronomy.Body.Venus,   diamKm: 12104 },
+  mars:    { body: Astronomy.Body.Mars,    diamKm: 6779 },
+  jupiter: { body: Astronomy.Body.Jupiter, diamKm: 139820 },
+  saturne: { body: Astronomy.Body.Saturn,  diamKm: 116460 },
+  uranus:  { body: Astronomy.Body.Uranus,  diamKm: 50724 },
+  neptune: { body: Astronomy.Body.Neptune, diamKm: 49244 },
+}
+
+/**
+ * Données d'observation par planète (taille apparente, phase, visibilité, heure de culmination),
+ * calculées en direct via astronomy-engine — remplace les tableaux statiques précédemment codés en dur.
+ */
+export function getPlanetObservationData(date = new Date(), lat = 48.8566, lng = 2.3522) {
+  const obs = new Astronomy.Observer(lat, lng, 0)
+  const out = {}
+  for (const [id, { body, diamKm }] of Object.entries(PLANET_PHYSICAL)) {
+    try {
+      const illum = Astronomy.Illumination(body, date)
+      const distKm = illum.geo_dist * 149597870.7
+      const angSec = (diamKm / distKm) * 206264.8
+      const transit = Astronomy.SearchHourAngle(body, obs, 0, date, 1)
+      const peakAlt = transit.hor.altitude
+      // Seuils de hauteur au méridien : simple repère de confort d'observation, pas une norme astronomique.
+      const visVal = peakAlt >= 50 ? 4 : peakAlt >= 30 ? 3 : peakAlt >= 10 ? 2 : 1
+      out[id] = {
+        ang: Math.round(angSec * 10) / 10,
+        mag: illum.mag.toFixed(1).replace('.', ',').replace('-', '−'),
+        phase: Math.round(illum.phase_fraction * 100) + '%',
+        vis: ['Difficile', 'Visible', 'Bonne', 'Excellente'][visVal - 1],
+        visVal,
+        when: `Culmine à ${fmtTime(transit.time)} · ${Math.round(peakAlt)}° au plus haut`,
+      }
+    } catch {
+      out[id] = { ang: 0, mag: '—', phase: '—', vis: 'Indisponible', visVal: 0, when: 'Données indisponibles pour le moment' }
+    }
+  }
+  return out
+}
+
+/**
+ * Prochaines oppositions (planètes externes) et plus grandes élongations (Mercure, Vénus),
+ * calculées en direct via astronomy-engine.
+ */
+export function getPlanetEvents(monthsAhead = 12) {
+  const now = new Date()
+  const end = new Date(now)
+  end.setMonth(end.getMonth() + monthsAhead)
+  const events = []
+
+  for (const [body, name] of [
+    [Astronomy.Body.Mars, 'Mars'], [Astronomy.Body.Jupiter, 'Jupiter'],
+    [Astronomy.Body.Saturn, 'Saturne'], [Astronomy.Body.Uranus, 'Uranus'],
+    [Astronomy.Body.Neptune, 'Neptune'],
+  ]) {
+    try {
+      const opp = Astronomy.SearchRelativeLongitude(body, 180, now)
+      if (opp && opp.date <= end) {
+        const illum = Astronomy.Illumination(body, opp.date)
+        events.push({
+          type: 'Opposition', title: name, date: opp.date,
+          detail: `Diamètre apparent maximal · magnitude ${illum.mag.toFixed(1).replace('.', ',').replace('-', '−')}`,
+        })
+      }
+    } catch {}
+  }
+
+  for (const [body, name] of [[Astronomy.Body.Mercury, 'Mercure'], [Astronomy.Body.Venus, 'Vénus']]) {
+    try {
+      const el = Astronomy.SearchMaxElongation(body, now)
+      if (el && el.time.date <= end) {
+        const soir = el.visibility === 'evening'
+        events.push({
+          type: 'Élongation', title: `${name} — ${soir ? 'Est' : 'Ouest'}`, date: el.time.date,
+          detail: `${el.elongation.toFixed(0)}° du Soleil · étoile du ${soir ? 'soir' : 'matin'}`,
+        })
+      }
+    } catch {}
+  }
+
+  return events.sort((a, b) => a.date - b.date)
 }

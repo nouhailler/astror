@@ -10,6 +10,9 @@ export function getApiKey() {
 export function saveApiKey(key) {
   try { localStorage.setItem('astror_api_key_v1', key.trim()) } catch {}
 }
+export function clearApiKey() {
+  try { localStorage.removeItem('astror_api_key_v1') } catch {}
+}
 
 export async function callClaude(messages, apiKey) {
   const key = apiKey ?? getApiKey()
@@ -57,6 +60,9 @@ export function getOpenRouterKey() {
 }
 export function saveOpenRouterKey(key) {
   try { localStorage.setItem('astror_or_key_v1', key.trim()) } catch {}
+}
+export function clearOpenRouterKey() {
+  try { localStorage.removeItem('astror_or_key_v1'); localStorage.removeItem('astror_or_model_v1') } catch {}
 }
 export function getSelectedModel() {
   try { return localStorage.getItem('astror_or_model_v1') || '' } catch { return '' }

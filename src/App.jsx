@@ -96,6 +96,7 @@ export default function App() {
   if (!onboarded) {
     return (
       <Onboarding
+        initial={profile}
         onFinish={(p) => { onbSave(p); setProfile(p); onbMarkSeen(); setOnboarded(true) }}
         onSkip={() => { onbMarkSeen(); setOnboarded(true) }}
       />

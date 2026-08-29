@@ -1,6 +1,8 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { ToolPage, ToolSection, ToolSeg, Metric, MetricGrid } from './tool-ui'
 import { AiInfoPanel } from './ui'
+import { onbLoad } from './onboarding'
+import { getMoonData, getUpcomingMoonPhases } from './astro'
 
 function MoonDisc({ size = 124, illum = 73 }) {
   const off = Math.round(size * (1 - illum / 100) * 0.9)
@@ -25,13 +27,6 @@ function PhaseGlyph({ illum, size = 30 }) {
   )
 }
 
-const MOON_PHASES = [
-  { name: 'Nouvelle Lune', date: '16 juin', illum: 0 },
-  { name: 'Premier quartier', date: '23 juin', illum: 50 },
-  { name: 'Pleine Lune', date: '30 juin', illum: 100 },
-  { name: 'Dernier quartier', date: '8 juil.', illum: 50 },
-]
-
 const MOON_SEAS = [
   { name: 'Mer de la Tranquillité', lat: 'Mare Tranquillitatis', note: 'Site d\'Apollo 11. Visible dès le premier quartier.' },
   { name: 'Mer des Crises', lat: 'Mare Crisium', note: 'Bassin isolé près du limbe est, frappant à la Lune croissante.' },
@@ -48,7 +43,11 @@ const MOON_CRATERS = [
 
 export default function MoonPage({ onBack }) {
   const [seg, setSeg] = useState('suivi')
-  const illum = 73, age = 9.4
+  const profile = useMemo(() => onbLoad(), [])
+  const { lat, lng } = profile.location
+  const moon = useMemo(() => getMoonData(new Date(), lat, lng), [lat, lng])
+  const upcomingPhases = useMemo(() => getUpcomingMoonPhases(new Date(), 4), [])
+  const { illumination: illum, age } = moon
 
   return (
     <ToolPage title="Lune" onBack={onBack} demoKey="tool_moon">
@@ -62,7 +61,7 @@ export default function MoonPage({ onBack }) {
               <MoonDisc size={118} illum={illum} />
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div className="eyebrow" style={{ marginBottom: 6 }}>Phase actuelle</div>
-                <div className="h-sec" style={{ fontSize: 21, lineHeight: 1.1 }}>Gibbeuse croissante</div>
+                <div className="h-sec" style={{ fontSize: 21, lineHeight: 1.1 }}>{moon.phase}</div>
                 <div className="data" style={{ fontSize: 13, color: 'var(--gold)', marginTop: 8 }}>{illum}% illuminée</div>
                 <div className="meta" style={{ marginTop: 3 }}>Âge : {age} jours</div>
               </div>
@@ -72,22 +71,24 @@ export default function MoonPage({ onBack }) {
           <MetricGrid cols={2} style={{ marginTop: 16 }}>
             <Metric k="Illumination" v={illum} u="%" accent />
             <Metric k="Âge lunaire" v={age} u="j" />
-            <Metric k="Distance Terre-Lune" v="389 400" u="km" />
-            <Metric k="Diamètre apparent" v="30,7" u="′" />
+            <Metric k="Distance Terre-Lune" v={moon.distanceKm.toLocaleString('fr-FR')} u="km" />
+            <Metric k="Diamètre apparent" v={moon.angularDiameter.replace('.', ',')} u="′" />
           </MetricGrid>
           <div className="pad" style={{ marginTop: 4 }}>
-            <AiInfoPanel cacheKey="moon_suivi" buildPrompt={`Phase lunaire ce soir : Gibbeuse croissante, ${illum}% illuminée, âge ${age} jours, distance 389 400 km.
+            <AiInfoPanel cacheKey="moon_suivi" buildPrompt={`Phase lunaire ce soir : ${moon.phase}, ${illum}% illuminée, âge ${age} jours, distance ${moon.distance}.
 En 4 phrases, que recommandes-tu d'observer sur la Lune ce soir ? Quelles zones sont bien éclairées par le terminateur et méritent d'être observées avec un télescope amateur de 100 à 200 mm ?`} />
           </div>
 
           <ToolSection title="Calendrier des phases">
             <div className="card-2" style={{ overflow: 'hidden' }}>
-              {MOON_PHASES.map((ph, i) => (
-                <div key={ph.name} style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '13px 15px',
-                  borderBottom: i < MOON_PHASES.length - 1 ? '1px solid var(--line)' : 0 }}>
+              {upcomingPhases.map((ph, i) => (
+                <div key={ph.name + ph.date} style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '13px 15px',
+                  borderBottom: i < upcomingPhases.length - 1 ? '1px solid var(--line)' : 0 }}>
                   <PhaseGlyph illum={ph.illum} size={32} />
                   <span className="h-card" style={{ flex: 1, fontSize: 14 }}>{ph.name}</span>
-                  <span className="data" style={{ fontSize: 13, color: 'var(--gold)' }}>{ph.date}</span>
+                  <span className="data" style={{ fontSize: 13, color: 'var(--gold)' }}>
+                    {ph.date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })}
+                  </span>
                 </div>
               ))}
             </div>
@@ -100,7 +101,7 @@ En 4 phrases, que recommandes-tu d'observer sur la Lune ce soir ? Quelles zones 
           <div className="pad" style={{ paddingTop: 14 }}>
             <div style={{ display: 'flex', justifyContent: 'center', padding: '14px 0 18px',
               background: 'radial-gradient(100% 80% at 50% 30%, #101733, #0a1020)', borderRadius: 20, border: '1px solid var(--line)' }}>
-              <MoonDisc size={210} illum={73} />
+              <MoonDisc size={210} illum={illum} />
             </div>
             <p className="meta" style={{ textAlign: 'center', marginTop: 12, color: 'var(--faint)' }}>
               Le terminateur révèle le relief en ce moment — le meilleur endroit où observer le contraste.
@@ -109,10 +110,15 @@ En 4 phrases, que recommandes-tu d'observer sur la Lune ce soir ? Quelles zones 
 
           <div className="pad" style={{ marginTop: 8 }}>
             <div style={{ padding: 15, borderRadius: 16, background: 'linear-gradient(180deg, rgba(217,179,108,.1), var(--surface-1))', border: '1px solid var(--gold-line)' }}>
-              <div className="eyebrow" style={{ marginBottom: 8 }}>Zones recommandées · gibbeuse croissante</div>
+              <div className="eyebrow" style={{ marginBottom: 8 }}>Zones recommandées · {moon.phase.toLowerCase()}</div>
               <div className="body tight serif-body" style={{ fontSize: 13.5 }}>
-                Pointez le terminateur entre la <strong style={{ color: 'var(--text)' }}>Mer de la Sérénité</strong> et le cratère
-                <strong style={{ color: 'var(--text)' }}> Copernic</strong> : l'éclairage rasant fait ressortir remparts et pics centraux.
+                {moon.phase === 'Gibbeuse croissante' ? (
+                  <>Pointez le terminateur entre la <strong style={{ color: 'var(--text)' }}>Mer de la Sérénité</strong> et le cratère
+                  <strong style={{ color: 'var(--text)' }}> Copernic</strong> : l'éclairage rasant fait ressortir remparts et pics centraux.</>
+                ) : (
+                  <>Pointez le long du terminateur (la limite jour/nuit visible sur le disque ci-dessus) : c'est là que le relief lunaire
+                  ressort le mieux, quelle que soit la phase.</>
+                )}
               </div>
             </div>
           </div>

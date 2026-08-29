@@ -1,12 +1,24 @@
+import { readFileSync } from 'node:fs'
+import { fileURLToPath } from 'node:url'
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 
+const pkg = JSON.parse(readFileSync(fileURLToPath(new URL('./package.json', import.meta.url)), 'utf8'))
+
 export default defineConfig({
+  // Numéro de version et date de build affichés dans l'app (Paramètres) — sources uniques : package.json / heure du build.
+  define: {
+    __APP_VERSION__: JSON.stringify(pkg.version),
+    __BUILD_DATE__: JSON.stringify(new Date().toISOString()),
+  },
   plugins: [
     react(),
     VitePWA({
       registerType: 'autoUpdate',
+      // Enregistrement manuel via virtual:pwa-register (src/pwaUpdate.js) : permet un contrôle
+      // explicite du cycle de mise à jour (vérification périodique + bouton "Vérifier les mises à jour").
+      injectRegister: false,
       includeAssets: ['favicon.svg', 'icon-192.png', 'icon-512.png'],
       manifest: {
         name: 'Astror',

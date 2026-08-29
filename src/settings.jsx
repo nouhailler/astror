@@ -7,11 +7,12 @@ import {
   ONB_LEVELS, ONB_LOCATIONS, ONB_LOCATION_COORDS, ONB_INTERESTS, ONB_GEAR, ONB_ALERTS, DEFAULT_PROFILE
 } from './onboarding'
 import {
-  getApiKey, saveApiKey, testApiKey,
-  getOpenRouterKey, saveOpenRouterKey, fetchFreeModels, getSelectedModel, saveSelectedModel,
+  getApiKey, saveApiKey, clearApiKey, testApiKey,
+  getOpenRouterKey, saveOpenRouterKey, clearOpenRouterKey, fetchFreeModels, getSelectedModel, saveSelectedModel,
   callAI,
 } from './claudeApi'
-import { getGBooksKey, saveGBooksKey, getCommunitySheetUrl, saveCommunitySheetUrl } from './api'
+import { getGBooksKey, saveGBooksKey, clearGBooksKey, getCommunitySheetUrl, saveCommunitySheetUrl } from './api'
+import { checkForUpdate, getLastCheck } from './pwaUpdate'
 
 function SettingsSection({ label }) {
   return (
@@ -213,6 +214,11 @@ function OpenRouterSection() {
     saveSelectedModel(modelId)
   }
 
+  const clear = () => {
+    clearOpenRouterKey()
+    setKey(''); setSelected(''); setModels(null); setStatus('')
+  }
+
   return (
     <div style={{ marginBottom: 24 }}>
       <SettingsSection label="Assistant IA · OpenRouter (prioritaire)" />
@@ -226,11 +232,14 @@ function OpenRouterSection() {
           aria-label="Clé API OpenRouter"
         />
       </div>
-      <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 12 }}>
+      <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 12, flexWrap: 'wrap' }}>
         <button className="chip" style={{ height: 34, fontSize: 12.5 }} onClick={load}
           disabled={!key.trim() || loading}>
           {loading ? 'Chargement…' : 'Modèles gratuits'}
         </button>
+        {(key || selected) && (
+          <button className="chip" style={{ height: 34, fontSize: 12.5, color: 'var(--bad)' }} onClick={clear}>Effacer</button>
+        )}
         {status === 'ok' && <span style={{ fontSize: 12, color: 'var(--good)' }}>✓ {models?.length} modèles</span>}
         {status === 'error' && <span style={{ fontSize: 12, color: 'var(--bad)' }}>Clé invalide</span>}
       </div>
@@ -290,6 +299,7 @@ function ApiKeySection() {
       setStatus('error')
     }
   }
+  const clear = () => { clearApiKey(); setKey(''); setStatus('') }
 
   return (
     <div style={{ marginBottom: 24 }}>
@@ -304,12 +314,13 @@ function ApiKeySection() {
           aria-label="Clé API Anthropic"
         />
       </div>
-      <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+      <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
         <button className="chip" style={{ height: 34, fontSize: 12.5 }} onClick={save}>Enregistrer</button>
         <button className="chip" style={{ height: 34, fontSize: 12.5 }} onClick={test}
           disabled={!key.trim() || status === 'testing'}>
           {status === 'testing' ? 'Test…' : 'Tester'}
         </button>
+        {key && <button className="chip" style={{ height: 34, fontSize: 12.5, color: 'var(--bad)' }} onClick={clear}>Effacer</button>}
         {status === 'ok' && <span style={{ fontSize: 12, color: 'var(--good)' }}>✓ Clé valide</span>}
         {status === 'error' && <span style={{ fontSize: 12, color: 'var(--bad)' }}>Clé invalide</span>}
         {status === 'saved' && <span style={{ fontSize: 12, color: 'var(--good)' }}>Enregistrée</span>}
@@ -326,6 +337,7 @@ function GBooksKeySection() {
   const [status, setStatus] = useState('')
 
   const save = () => { saveGBooksKey(key); setStatus('saved') }
+  const clear = () => { clearGBooksKey(); setKey(''); setStatus('') }
 
   return (
     <div style={{ marginBottom: 24 }}>
@@ -342,10 +354,63 @@ function GBooksKeySection() {
       </div>
       <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
         <button className="chip" style={{ height: 34, fontSize: 12.5 }} onClick={save}>Enregistrer</button>
+        {key && <button className="chip" style={{ height: 34, fontSize: 12.5, color: 'var(--bad)' }} onClick={clear}>Effacer</button>}
         {status === 'saved' && <span style={{ fontSize: 12, color: 'var(--good)' }}>Enregistrée</span>}
       </div>
       <div className="body tight" style={{ fontSize: 11.5, marginTop: 9, color: 'var(--faint)', lineHeight: 1.5 }}>
         Clé optionnelle pour la recherche Google Books. Sans clé, Open Library est utilisé automatiquement.
+      </div>
+    </div>
+  )
+}
+
+function fmtDateTime(iso) {
+  if (!iso) return '—'
+  try {
+    return new Date(iso).toLocaleString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+  } catch { return '—' }
+}
+
+function UpdateSection() {
+  const [checking, setChecking] = useState(false)
+  const [checked, setChecked] = useState(false)
+  const [lastCheck, setLastCheck] = useState(() => getLastCheck())
+
+  const check = async () => {
+    setChecking(true); setChecked(false)
+    await checkForUpdate()
+    setLastCheck(getLastCheck())
+    // Si une mise à jour est trouvée, l'app se recharge automatiquement (voir pwaUpdate.js) ;
+    // sinon on retombe ici après un court délai pour confirmer "à jour".
+    setTimeout(() => { setChecking(false); setChecked(true) }, 2500)
+  }
+
+  return (
+    <div style={{ marginBottom: 24 }}>
+      <SettingsSection label="Mises à jour" />
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 7, padding: '13px 15px',
+        borderRadius: 14, background: 'var(--surface-1)', border: '1px solid var(--line)' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <span className="meta">Version installée</span>
+          <span className="data" style={{ color: 'var(--gold)' }}>{__APP_VERSION__}</span>
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <span className="meta">Publiée le</span>
+          <span className="data">{fmtDateTime(__BUILD_DATE__)}</span>
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <span className="meta">Dernière vérification</span>
+          <span className="data">{fmtDateTime(lastCheck)}</span>
+        </div>
+      </div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 10 }}>
+        <button className="chip" style={{ height: 34, fontSize: 12.5 }} onClick={check} disabled={checking}>
+          {checking ? 'Vérification…' : 'Vérifier les mises à jour'}
+        </button>
+        {checked && !checking && <span style={{ fontSize: 12, color: 'var(--good)' }}>✓ À jour</span>}
+      </div>
+      <div className="body tight" style={{ fontSize: 11.5, marginTop: 9, color: 'var(--faint)', lineHeight: 1.5 }}>
+        Astror vérifie automatiquement les mises à jour en arrière-plan (toutes les heures) et les applique dès qu'elles sont prêtes. Ce bouton force une vérification immédiate.
       </div>
     </div>
   )
@@ -583,13 +648,15 @@ export default function SettingsSheet({ open, onClose, profile, onChange, onRepl
 
       <DataBackupSection />
 
+      <UpdateSection />
+
       <a href="https://nouhailler.github.io/astror/" target="_blank" rel="noopener noreferrer"
         className="chip" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, height: 40, textDecoration: 'none' }}>
         📚 Documentation
       </a>
 
       <div className="meta" style={{ textAlign: 'center', color: 'var(--faint)', padding: '4px 0 2px' }}>
-        Astror · version 1.0 — préférences enregistrées sur cet appareil
+        Préférences enregistrées sur cet appareil
       </div>
     </Sheet>
   )

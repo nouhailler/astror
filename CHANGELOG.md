@@ -1,6 +1,36 @@
 # Changelog — Astror
 
-Toutes les modifications notables du projet sont documentées ici.
+Toutes les modifications notables du projet sont documentées ici. À partir de la version **1.1.0**,
+chaque changement notable incrémente le numéro de version (`package.json`, suivi de semver) — les
+entrées précédentes, non versionnées individuellement, restent groupées par date de session.
+
+---
+
+## [1.1.0] — 2026-08-29
+
+### Corrections
+
+- **Outil Lune** : la phase, l'illumination, l'âge, la distance et le diamètre apparent étaient des
+  constantes codées en dur ; ils sont désormais calculés en direct via `astronomy-engine`
+  (`getMoonData`). Le calendrier des phases affiche les 4 prochains quartiers réels
+  (`getUpcomingMoonPhases`) au lieu de dates figées.
+- **Outil Planètes** : magnitude, taille apparente, phase et visibilité étaient des tableaux
+  statiques valables jusqu'à janvier 2027 ; ils sont désormais calculés en direct
+  (`getPlanetObservationData`). La liste « Oppositions & élongations » (anciennement
+  « Conjonctions & oppositions ») provient d'un calcul réel des prochaines oppositions et plus
+  grandes élongations (`getPlanetEvents`) — les conjonctions planète-planète, non calculées, ont
+  été retirées du libellé plutôt que laissées inexactes.
+- **Onboarding rejoué** (« Revoir l'introduction » dans Paramètres) repartait toujours des valeurs
+  par défaut au lieu du profil actuel. `App.jsx` transmet maintenant `initial={profile}`.
+
+### Ajouts
+
+- Bouton **« Effacer »** pour retirer isolément une clé API déjà enregistrée (OpenRouter,
+  Anthropic, Google Books), sans devoir vider les données du navigateur.
+- Numéro de version affiché dans Paramètres désormais lu directement depuis `package.json`
+  (`__APP_VERSION__`, injecté au build par `vite.config.js`) — il ne peut plus se désynchroniser.
+- Site de documentation complet publié sur [GitHub Pages](https://nouhailler.github.io/astror/)
+  (voir `docs/`), avec lien « 📚 Documentation » dans Paramètres.
 
 ---
 
