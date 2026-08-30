@@ -1,8 +1,8 @@
 # Astror
 
+[![CI](https://github.com/nouhailler/astror/actions/workflows/ci.yml/badge.svg)](https://github.com/nouhailler/astror/actions/workflows/ci.yml)
 [![Licence: MIT](https://img.shields.io/badge/licence-MIT-blue.svg)](LICENSE)
 ![Version](https://img.shields.io/badge/version-1.3.0-d9b36c)
-![Tests](https://img.shields.io/badge/tests-39%20passing-1f7a4d)
 
 Compagnon d'observation astronomique — application mobile PWA pour astronomes amateurs, entièrement en français.
 
@@ -219,7 +219,7 @@ Détail complet (origine, transmission, finalité) : [données et confidentialit
 
 ## Contribuer
 
-Projet personnel, mais les retours et suggestions sont bienvenus via les [issues GitHub](https://github.com/nouhailler/astror/issues). Voir [CLAUDE.md](CLAUDE.md) pour les conventions de développement et [DOCUMENTATION_SPEC.md](DOCUMENTATION_SPEC.md) pour les conventions de documentation.
+Projet personnel, mais les retours et suggestions sont bienvenus via les [issues GitHub](https://github.com/nouhailler/astror/issues). Voir [CONTRIBUTING.md](CONTRIBUTING.md) pour la mise en place de l'environnement et les conventions, et [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) pour les règles de conduite. Signaler une vulnérabilité : [SECURITY.md](SECURITY.md).
 
 ## Licence
 

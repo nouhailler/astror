@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Documentation & FAQ
+    url: https://nouhailler.github.io/astror/faq/
+    about: Consultez la FAQ et le dépannage avant d'ouvrir une issue — la réponse s'y trouve peut-être déjà.
+  - name: Support / question privée
+    url: mailto:contact@swinux.ch
+    about: Pour une question qui ne concerne pas un bug ou une fonctionnalité (ou pour signaler une vulnérabilité — voir SECURITY.md).
