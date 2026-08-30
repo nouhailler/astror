@@ -20,7 +20,8 @@ Stack : **Vite + React 18 + vite-plugin-pwa** (Workbox). Déployable sur Netlify
 | Prototype de référence | `/home/patrick/Documents/Claude/Projects/Astror/design_handoff_astror/prototype/` |
 | Build | `npm run build` → `dist/` |
 | Dev local | `npm run dev` → http://localhost:5173 |
-| Netlify | Connecter le repo GitHub, détecte `netlify.toml` automatiquement |
+| Netlify | https://astror.swinux.ch (connecté au repo GitHub, détecte `netlify.toml` automatiquement) |
+| Documentation | https://nouhailler.github.io/astror/ (GitHub Pages, source `main`/`docs`) |
 
 ---
 

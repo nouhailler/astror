@@ -3,6 +3,25 @@
   "private": true,
   "version": "1.3.0",
   "type": "module",
+  "description": "Compagnon d'observation astronomique — PWA en français pour astronomes amateurs (carte du ciel, éphémérides, outils d'observation et d'astrophoto, veille spatiale, assistant IA).",
+  "author": "Patrick Nouhailler <contact@swinux.ch> (https://swinux.ch)",
+  "license": "MIT",
+  "homepage": "https://astror.swinux.ch",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nouhailler/astror.git"
+  },
+  "bugs": {
+    "url": "https://github.com/nouhailler/astror/issues"
+  },
+  "keywords": [
+    "astronomy",
+    "pwa",
+    "react",
+    "vite",
+    "stargazing",
+    "astrophotography"
+  ],
   "scripts": {
     "dev": "vite",
     "build": "vite build",
