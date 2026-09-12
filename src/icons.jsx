@@ -89,3 +89,4 @@ export const IcMail = (p) => <Icon {...p}><rect x="3.5" y="5.5" width="17" heigh
 export const IcGithub = (p) => <Icon {...p}><circle cx="12" cy="12" r="9"/><path d="M9.5 18v-2c-2-.5-3-1.5-3-3.5 0-1 .3-1.7.9-2.3-.2-.6-.4-1.6.1-2.7 0 0 .8-.2 2.5 1a8.3 8.3 0 0 1 4 0c1.7-1.2 2.5-1 2.5-1 .5 1.1.3 2.1.1 2.7.6.6.9 1.3.9 2.3 0 2-1 3-3 3.5v2"/></Icon>
 export const IcAlert = (p) => <Icon {...p}><path d="M12 4 3 19h18Z"/><path d="M12 10v4"/><circle cx="12" cy="16.7" r=".6" fill="currentColor" stroke="none"/></Icon>
 export const IcInfo = (p) => <Icon {...p}><circle cx="12" cy="12" r="9"/><path d="M12 11v5.5"/><circle cx="12" cy="7.8" r=".6" fill="currentColor" stroke="none"/></Icon>
+export const IcMegaphone = (p) => <Icon {...p}><path d="M3 10v4a1 1 0 0 0 1 1h2l2.5 5.5 1.8-.8L8.6 15H10l8 4V5l-8 4H6a1 1 0 0 0-1 1Z"/><path d="M19 9.5a4 4 0 0 1 0 5"/></Icon>

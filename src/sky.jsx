@@ -2,6 +2,7 @@ import { useState, useMemo, useEffect, useRef } from 'react'
 import { IcPin, IcSearch, IcCompass, IcClose } from './icons'
 import { ScreenHeader, IconBtn, SettingsBtn, HeaderTools, ChipRow, SectionTitle, DataRow, Sheet, AiInfoPanel } from './ui'
 import { TipBanner } from './tips'
+import { AnnouncementBanner } from './announcements'
 import { SKY_OBJECTS, CONSTELLATIONS } from './data'
 import { CONSTELLATIONS_88, findConstellation } from './constellations'
 import ConstellationSheet from './constellation-sheet'
@@ -545,6 +546,7 @@ export default function SkyScreen() {
       <ScreenHeader eyebrow="Ciel en direct" title="Ce soir"
         right={<HeaderTools><IconBtn><IcSearch size={19} /></IconBtn><SettingsBtn /></HeaderTools>} />
 
+      <AnnouncementBanner />
       <TipBanner tipKey="sky" />
 
       <div className="pad" style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 8 }}>

@@ -6,6 +6,18 @@ entrées précédentes, non versionnées individuellement, restent groupées par
 
 ---
 
+## [1.4.0] — 2026-09-12
+
+### Ajouts
+
+- **Bandeau d'annonces** sur l'écran Ciel : messages ponctuels de l'équipe (nouveauté, actualité du
+  projet), affichés une seule fois par appareil puis mémorisés comme masqués (`astror_announcements_v1`).
+  Contenu codé en dur dans `src/announcements.jsx` — publier une nouvelle annonce se fait par déploiement
+  (commit + push), sans backend.
+  - Première annonce : vidéo YouTube de présentation d'Astror.
+
+---
+
 ## [1.3.0] — 2026-08-29
 
 ### Ajouts
