@@ -2,9 +2,9 @@
 // Toute affirmation ici doit être vérifiable dans le code source (src/) — voir DOCUMENTATION_SPEC.md §41.
 // Ne jamais ajouter un comportement qui n'existe pas dans le code ; marquer "À vérifier" sinon.
 
-export const APP_VERSION = '1.3.0';
-export const DOC_VERSION = '1.3.0';
-export const DOC_UPDATED = '2026-08-29';
+export const APP_VERSION = '1.4.0';
+export const DOC_VERSION = '1.4.0';
+export const DOC_UPDATED = '2026-09-12';
 
 const verify = (text) => `<div class="callout verify"><div class="callout-title">À vérifier</div><p>${text}</p></div>`;
 const legalNote = (text) => `<div class="callout legal"><div class="callout-title">À valider juridiquement</div><p>${text}</p></div>`;
@@ -73,6 +73,7 @@ export const NAV = [
       { id: 'feat-community', title: 'Outil Communauté', path: '/features/communaute/' },
       { id: 'feat-extras', title: 'Outil Explorations', path: '/features/explorations/' },
       { id: 'feat-tips', title: 'Astuces contextuelles', path: '/features/astuces-contextuelles/' },
+      { id: 'feat-announcements', title: "Bandeau d'annonces", path: '/features/annonces/' },
       { id: 'feat-demo', title: 'Mode démo (visites guidées)', path: '/features/mode-demo/' },
       { id: 'feat-export', title: 'Export et import des données', path: '/features/export-import/' },
       { id: 'feat-ai-keys', title: 'Clés API pour l’IA', path: '/features/cles-api-ia/' },
@@ -262,7 +263,7 @@ ${tbl(`<table>
 <h2>Cas particuliers</h2>
 <p>Si aucun objet du catalogue n'est au-dessus de l'horizon, la liste affiche un message dédié. Si le capteur d'orientation ne répond pas sous 5 secondes, un panneau de diagnostic apparaît avec des instructions (autoriser les capteurs dans le navigateur, calibrer en formant un « 8 » avec le téléphone) et un repli en orientation manuelle (cap/hauteur affichés en texte).</p>
 <h2>Pour aller plus loin</h2>
-<p><a href="../../features/carte-du-ciel/">Fonctionnalité détaillée : Carte du ciel interactive</a> · <a href="../../features/constellations/">Fiches des 88 constellations</a> · <a href="../../troubleshooting/boussole/">Dépannage boussole</a></p>
+<p><a href="../../features/carte-du-ciel/">Fonctionnalité détaillée : Carte du ciel interactive</a> · <a href="../../features/constellations/">Fiches des 88 constellations</a> · <a href="../../features/annonces/">Bandeau d'annonces</a> · <a href="../../troubleshooting/boussole/">Dépannage boussole</a></p>
 `,
 };
 
@@ -560,6 +561,7 @@ PAGES['features-index'] = {
   <a class="card" href="communaute/"><div class="card-title">Communauté</div><div class="card-sub">Fil & classement</div></a>
   <a class="card" href="explorations/"><div class="card-title">Explorations</div><div class="card-sub">Simulateurs</div></a>
   <a class="card" href="astuces-contextuelles/"><div class="card-title">Astuces contextuelles</div><div class="card-sub">Bandeaux d'aide</div></a>
+  <a class="card" href="annonces/"><div class="card-title">Bandeau d'annonces</div><div class="card-sub">Messages ponctuels de l'équipe</div></a>
   <a class="card" href="mode-demo/"><div class="card-title">Mode démo</div><div class="card-sub">Visites guidées</div></a>
   <a class="card" href="export-import/"><div class="card-title">Export / import</div><div class="card-sub">Sauvegarde des données</div></a>
   <a class="card" href="cles-api-ia/"><div class="card-title">Clés API IA</div><div class="card-sub">OpenRouter, Anthropic</div></a>
@@ -1048,6 +1050,27 @@ PAGES['feat-extras'] = {
 <h2>FAQ</h2><p><a href="../../faq/">Voir la FAQ</a></p>
 `,
 };
+
+PAGES['feat-announcements'] = {
+  description: "Bandeau d'annonces sur l'écran Ciel : messages ponctuels de l'équipe, affichés une fois.",
+  html: `
+<div class="eyebrow">Fonctionnalités</div>
+<h1>Bandeau d'annonces</h1>
+<h2>Description</h2><p>Un bandeau ponctuel affiché en haut de l'écran Ciel pour relayer un message de l'équipe (nouveauté, actualité du projet) — par exemple une vidéo de présentation. Distinct des <a href="../astuces-contextuelles/">astuces contextuelles</a> : une astuce explique une fonction existante, une annonce signale quelque chose de nouveau ou d'externe à l'app.</p>
+<h2>Objectif</h2><p>Faire passer un message ponctuel à tous les utilisateurs sans devoir republier l'application store par store ni construire un système de notifications push.</p>
+<h2>Prérequis</h2><p>Aucun pour l'affichage. Le lien de l'annonce peut pointer vers une ressource externe (ex. une vidéo YouTube) qui nécessite une connexion pour s'ouvrir.</p>
+<h2>Comment l'utiliser</h2><p>Le bandeau le plus ancien non encore vu s'affiche automatiquement en haut de l'écran Ciel, au-dessus du bandeau d'astuce. Bouton de fermeture pour le masquer définitivement sur cet appareil ; le bouton d'action (ex. « Regarder la vidéo ») ouvre le lien dans un nouvel onglet.</p>
+<h2>Options</h2><p>Aucune option utilisateur — chaque annonce n'est montrée qu'une fois par appareil, dans l'ordre où elle a été ajoutée au code.</p>
+<h2>Paramètres associés</h2><p>Aucun (contrairement aux astuces, il n'existe pas de bouton « Réafficher les annonces » dans Paramètres).</p>
+<h2>Données utilisées</h2><p><code>astror_announcements_v1</code> — liste des identifiants d'annonces déjà masquées sur cet appareil.</p>
+<h2>Résultat</h2><p>Un bandeau discret et non bloquant, qui ne réapparaît plus une fois fermé.</p>
+<h2>Fonctionnement hors connexion</h2><p><span class="badge ok">Affichage 100 % hors ligne</span> — le contenu de l'annonce est codé en dur dans l'application, aucune requête réseau n'est nécessaire pour l'afficher. Le lien de l'annonce (ex. vidéo YouTube) nécessite en revanche une connexion pour s'ouvrir.</p>
+<h2>Limites</h2><p>Le contenu des annonces est codé en dur dans le code source de l'application (<code>src/announcements.jsx</code>) : publier une nouvelle annonce nécessite un déploiement complet (commit, push, build Netlify), il n'y a pas de mécanisme pour la piloter à distance sans redéployer.</p>
+<h2>Erreurs possibles</h2><p>Aucune identifiée.</p>
+<h2>FAQ</h2><p><a href="../../faq/">Voir la FAQ</a></p>
+`,
+};
+
 PAGES['feat-tips'] = {
   description: "Bandeaux d'astuces contextuelles affichés sur les 16 écrans principaux d'Astror.",
   html: `
@@ -1300,6 +1323,7 @@ ${tbl(`<table>
 <tr><td><code>astror_parcours_v2</code></td><td>Progression des leçons par parcours</td><td>Outil Apprendre</td><td>Non</td></tr>
 <tr><td><code>astror_notif_prefs_v1</code></td><td>Préférences de notification par catégorie d'événement</td><td>Éphémérides / Outil Événements</td><td>Non</td></tr>
 <tr><td><code>astror_tips_v1</code></td><td>Bandeaux d'astuces déjà masqués</td><td>Toute l'application</td><td>Non</td></tr>
+<tr><td><code>astror_announcements_v1</code></td><td>Identifiants des annonces déjà masquées</td><td>Écran Ciel (bandeau d'annonces)</td><td>Non</td></tr>
 <tr><td><code>astror_api_key_v1</code></td><td><strong>Clé API Anthropic</strong> (en clair)</td><td>Paramètres</td><td>Oui — envoyée à <code>api.anthropic.com</code> à chaque requête IA</td></tr>
 <tr><td><code>astror_or_key_v1</code> / <code>astror_or_model_v1</code></td><td><strong>Clé + modèle OpenRouter</strong> (en clair)</td><td>Paramètres</td><td>Oui — envoyée à <code>openrouter.ai</code> à chaque requête IA</td></tr>
 <tr><td><code>astror_gbooks_key_v1</code></td><td>Clé Google Books (en clair)</td><td>Paramètres</td><td>Oui — envoyée à l'API Google Books lors d'une recherche de livre</td></tr>
@@ -1767,6 +1791,14 @@ PAGES['versions'] = {
 <div class="eyebrow">Versions</div>
 <h1>Historique des versions</h1>
 <p class="lede">Depuis la version <strong>1.1.0</strong>, Astror suit un vrai numéro de version sémantique (<code>package.json</code>), incrémenté à chaque changement notable et détaillé dans <code>CHANGELOG.md</code>. Les entrées antérieures, non versionnées individuellement à l'époque, restent groupées par date de session.</p>
+
+<h2>Version 1.4.0 — 2026-09-12</h2>
+<h3>Ajouts</h3>
+<ul>
+  <li><strong>Bandeau d'annonces</strong> sur l'écran Ciel : messages ponctuels de l'équipe, affichés une
+  seule fois par appareil — voir <a href="../features/annonces/">Bandeau d'annonces</a>. Première annonce :
+  vidéo YouTube de présentation d'Astror.</li>
+</ul>
 
 <h2>Version 1.3.0 — 2026-08-29</h2>
 <h3>Ajouts</h3>
