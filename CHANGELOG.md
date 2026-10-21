@@ -6,6 +6,19 @@ entrées précédentes, non versionnées individuellement, restent groupées par
 
 ---
 
+## [1.5.0] — 2026-10-21
+
+### Ajouts
+
+- **Vitrine publique** (`landing/`) : page de présentation statique d'Astror, séparée de l'application
+  (aucun changement dans `src/`, `public/`, le manifeste ou le service worker). Hero, soirée type,
+  fonctionnalités illustrées par des captures réelles (v1.4.0), galerie, avantages, installation par
+  plateforme (mise en avant automatique de l'appareil du visiteur), FAQ, appel à l'action final.
+  Prête à publier sur Cloudflare Pages — paramètres et étapes dans [`LANDING.md`](LANDING.md).
+- Image de partage social 1200×630 générée à partir de captures réelles (`scripts/landing/`).
+
+---
+
 ## [1.4.0] — 2026-09-12
 
 ### Ajouts

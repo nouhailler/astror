@@ -8,6 +8,12 @@
       "port": 8089
     },
     {
+      "name": "landing-preview",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "http.server", "8090", "--directory", "landing"],
+      "port": 8090
+    },
+    {
       "name": "app-dev",
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "dev"],

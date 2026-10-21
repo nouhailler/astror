@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<!-- Source de assets/og-image.png (1200×630). Régénérer : node scripts/landing/build-og.mjs. -->
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;1,400&family=IBM+Plex+Sans:wght@500&family=IBM+Plex+Mono:wght@500&display=block" />
+<style>
+  html, body { margin: 0; width: 1200px; height: 630px; overflow: hidden; }
+  body {
+    background: radial-gradient(120% 100% at 75% 10%, #0e1838 0%, #070c1c 50%, #04060e 100%);
+    color: #eef2fb; font-family: 'IBM Plex Sans', sans-serif; position: relative;
+  }
+  .copy { position: absolute; left: 72px; top: 0; bottom: 0; width: 600px; display: flex; flex-direction: column; justify-content: center; }
+  .brand { display: flex; align-items: center; gap: 14px; font: 500 34px/1 'Spectral', serif; margin-bottom: 40px; }
+  .brand img { width: 52px; height: 52px; border-radius: 12px; }
+  h1 { font: 400 64px/1.05 'Spectral', serif; margin: 0 0 24px; letter-spacing: -0.01em; }
+  h1 em { color: #efce8c; }
+  p { font-size: 24px; line-height: 1.45; color: #b4bdd9; margin: 0 0 28px; }
+  .tags { font: 500 16px/1 'IBM Plex Mono', monospace; letter-spacing: .14em; text-transform: uppercase; color: #d9b36c; }
+  .glow { position: absolute; right: 60px; top: 50%; width: 520px; height: 520px; transform: translateY(-50%); border-radius: 50%; border: 1px solid rgba(150,180,235,.2); background: radial-gradient(closest-side, rgba(217,179,108,.18), rgba(126,166,230,.06) 55%, transparent 72%); }
+  .phone { position: absolute; padding: 7px; border-radius: 34px; background: linear-gradient(160deg, #26324f, #0b1222 45%, #1b2540); box-shadow: 0 30px 60px -20px rgba(0,0,0,.8); }
+  .phone img { display: block; width: 100%; border-radius: 28px; }
+  .p1 { width: 250px; right: 110px; top: 60px; z-index: 2; }
+  .p2 { width: 220px; right: 300px; top: 110px; transform: rotate(-6deg); opacity: .8; }
+</style>
+</head>
+<body>
+  <div class="glow"></div>
+  <div class="phone p2"><img src="../../landing/assets/screens/ephemerides.webp" alt="" /></div>
+  <div class="phone p1"><img src="../../landing/assets/screens/ciel.webp" alt="" /></div>
+  <div class="copy">
+    <div class="brand"><img src="../../landing/favicon.svg" alt="" />Astror</div>
+    <h1>Le ciel de ce soir,<br /><em>calculé pour vous.</em></h1>
+    <p>Carte du ciel en direct, Lune, planètes,<br />événements et conditions d'observation.</p>
+    <div class="tags">Gratuit · Sans compte · En français</div>
+  </div>
+</body>
+</html>

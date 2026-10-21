@@ -2,8 +2,8 @@
 // Toute affirmation ici doit être vérifiable dans le code source (src/) — voir DOCUMENTATION_SPEC.md §41.
 // Ne jamais ajouter un comportement qui n'existe pas dans le code ; marquer "À vérifier" sinon.
 
-export const APP_VERSION = '1.4.0';
-export const DOC_VERSION = '1.4.0';
+export const APP_VERSION = '1.5.0';
+export const DOC_VERSION = '1.5.0';
 export const DOC_UPDATED = '2026-09-12';
 
 const verify = (text) => `<div class="callout verify"><div class="callout-title">À vérifier</div><p>${text}</p></div>`;
@@ -1791,6 +1791,14 @@ PAGES['versions'] = {
 <div class="eyebrow">Versions</div>
 <h1>Historique des versions</h1>
 <p class="lede">Depuis la version <strong>1.1.0</strong>, Astror suit un vrai numéro de version sémantique (<code>package.json</code>), incrémenté à chaque changement notable et détaillé dans <code>CHANGELOG.md</code>. Les entrées antérieures, non versionnées individuellement à l'époque, restent groupées par date de session.</p>
+
+<h2>Version 1.5.0 — 2026-10-21</h2>
+<h3>Ajouts</h3>
+<ul>
+  <li><strong>Page de présentation publique</strong> d'Astror (vitrine), distincte de l'application : elle
+  décrit les fonctionnalités à l'aide de captures réelles et renvoie vers l'application. Aucun changement
+  dans l'application elle-même.</li>
+</ul>
 
 <h2>Version 1.4.0 — 2026-09-12</h2>
 <h3>Ajouts</h3>

@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/nouhailler/astror/actions/workflows/ci.yml/badge.svg)](https://github.com/nouhailler/astror/actions/workflows/ci.yml)
 [![Licence: MIT](https://img.shields.io/badge/licence-MIT-blue.svg)](LICENSE)
-![Version](https://img.shields.io/badge/version-1.3.0-d9b36c)
+![Version](https://img.shields.io/badge/version-1.5.0-d9b36c)
 
 Compagnon d'observation astronomique — application mobile PWA pour astronomes amateurs, entièrement en français.
 
@@ -150,6 +150,11 @@ Les annexes Chronologie/Glossaire/Missions sont interactives : chaque entrée es
 | Communauté | `tool-community.jsx` | Fil (Mastodon), classement (Google Sheets), sorties (RSS) |
 | Assistant IA | `tool-ai.jsx` | Chat contextuel avec profil utilisateur |
 | Explorations | `tool-extras.jsx` | ScaleExplorer + ImpactSim + Top10 + Voyages |
+
+## Vitrine
+
+Une page de présentation publique, indépendante de l'application, vit dans [`landing/`](landing/) (HTML/CSS
+statique, sans build). Déploiement prévu sur Cloudflare Pages : voir [LANDING.md](LANDING.md).
 
 ## Mode démo
 
