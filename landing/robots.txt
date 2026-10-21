@@ -1,2 +1,4 @@
 User-agent: *
 Allow: /
+
+Sitemap: https://decouvrir-astror.swinux.ch/sitemap.xml

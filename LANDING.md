@@ -27,7 +27,7 @@ JavaScript, sans dépendance ni étape de build. Elle renvoie vers l'application
 | `landing/assets/screens/*.webp` | Captures **réelles** de l'application v1.4.0 (390×844 @2x, réduites à 600 px de large) |
 | `landing/assets/og-image.jpg` | Image de partage social 1200×630 |
 | `landing/_headers` | En-têtes HTTP Cloudflare Pages (sécurité, cache des images) |
-| `landing/404.html`, `landing/robots.txt` | Page d'erreur et règles d'indexation |
+| `landing/404.html`, `landing/robots.txt`, `landing/sitemap.xml` | Page d'erreur, règles d'indexation et plan du site |
 | `scripts/landing/og-image.html`, `build-og.mjs` | Source et générateur de l'image de partage |
 
 Prévisualiser localement :
@@ -77,21 +77,21 @@ npx wrangler pages deploy landing --project-name astror-vitrine
 
 ### Domaine
 
-Le projet sera d'abord servi sur `<projet>.pages.dev`. Pour un domaine personnalisé, ajouter un
-sous-domaine distinct de l'application (par exemple `decouvrir.swinux.ch` ou `www.astror.swinux.ch`)
-dans Pages → Custom domains. **Ne pas** pointer `astror.swinux.ch` vers Cloudflare Pages : ce domaine sert
-l'application (Netlify) et son service worker.
+La vitrine est publiée sur le projet Cloudflare Pages `astrorlanding` :
 
-Une fois le domaine définitif connu, ajouter dans `landing/index.html` :
+| | |
+|---|---|
+| Domaine principal | <https://decouvrir-astror.swinux.ch/> |
+| Adresse Cloudflare | <https://astrorlanding.pages.dev/> |
+| DNS | `CNAME decouvrir-astror → astrorlanding.pages.dev` (chez l'hébergeur DNS de `swinux.ch`) |
 
-```html
-<link rel="canonical" href="https://DOMAINE/" />
-<meta property="og:url" content="https://DOMAINE/" />
-```
+Convention : `decouvrir-<app>.swinux.ch` pour la vitrine, `<app>.swinux.ch` pour l'application.
+**Ne pas** pointer `astror.swinux.ch` vers Cloudflare Pages : ce domaine sert l'application (Netlify) et
+son service worker.
 
-et rendre absolue l'URL de `og:image` (`https://DOMAINE/assets/og-image.jpg`) : la plupart des réseaux
-sociaux ignorent une image de partage en chemin relatif. Ajouter alors `Sitemap: https://DOMAINE/sitemap.xml`
-dans `robots.txt` si un sitemap est créé.
+La balise canonique, `og:url`, `og:image` (URL absolue) et `sitemap.xml` utilisent le domaine principal ;
+l'adresse `pages.dev` est ainsi traitée comme un doublon par les moteurs de recherche. En cas de
+changement de domaine, mettre à jour `landing/index.html`, `landing/robots.txt` et `landing/sitemap.xml`.
 
 ## Points à réactiver plus tard
 
