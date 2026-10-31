@@ -6,6 +6,20 @@ entrées précédentes, non versionnées individuellement, restent groupées par
 
 ---
 
+## [1.5.1] — 2026-10-29
+
+### Ajouts
+
+- Écran **À propos** : lien « Découvrir Astror » vers la page de présentation
+  (<https://decouvrir-astror.swinux.ch/>), en tête de la section Liens.
+
+### Corrections
+
+- Crédits de l'écran À propos : le lien satellite.js pointait vers `shashwatak/satellite.js` (404) au lieu
+  de `shashwatak/satellite-js`.
+
+---
+
 ## [1.5.0] — 2026-10-21
 
 ### Ajouts

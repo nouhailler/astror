@@ -1,7 +1,7 @@
 {
   "name": "astror",
   "private": true,
-  "version": "1.5.0",
+  "version": "1.5.1",
   "type": "module",
   "description": "Compagnon d'observation astronomique — PWA en français pour astronomes amateurs (carte du ciel, éphémérides, outils d'observation et d'astrophoto, veille spatiale, assistant IA).",
   "author": "Patrick Nouhailler <contact@swinux.ch> (https://swinux.ch)",

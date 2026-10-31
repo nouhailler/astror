@@ -2,8 +2,8 @@
 // Toute affirmation ici doit être vérifiable dans le code source (src/) — voir DOCUMENTATION_SPEC.md §41.
 // Ne jamais ajouter un comportement qui n'existe pas dans le code ; marquer "À vérifier" sinon.
 
-export const APP_VERSION = '1.5.0';
-export const DOC_VERSION = '1.5.0';
+export const APP_VERSION = '1.5.1';
+export const DOC_VERSION = '1.5.1';
 export const DOC_UPDATED = '2026-09-12';
 
 const verify = (text) => `<div class="callout verify"><div class="callout-title">À vérifier</div><p>${text}</p></div>`;
@@ -604,7 +604,7 @@ PAGES['feat-about-screen'] = {
 <div class="eyebrow">Fonctionnalités</div>
 <h1>Écran À propos</h1>
 <h2>Description</h2><p>Accessible tout en bas du menu hamburger, cet écran regroupe les informations d'identification de l'application, les liens du développeur et les moyens de contact.</p>
-<h2>Objectif</h2><p>Permettre à l'utilisateur de connaître la version exacte installée, de contacter le support avec les informations utiles déjà réunies, et de retrouver les liens officiels (dépôt, documentation, portfolio).</p>
+<h2>Objectif</h2><p>Permettre à l'utilisateur de connaître la version exacte installée, de contacter le support avec les informations utiles déjà réunies, et de retrouver les liens officiels (page de présentation, dépôt, documentation, portfolio).</p>
 <h2>Prérequis</h2><p>Aucun pour consulter les informations. Les liens de contact ouvrent respectivement le client mail et GitHub.</p>
 <h2>Comment l'utiliser</h2><p>Menu ☰ → faire défiler jusqu'en bas → « À propos ».</p>
 <h2>Contenu</h2>
@@ -612,7 +612,7 @@ ${tbl(`<table><tr><th>Bloc</th><th>Contenu</th></tr>
 <tr><td>Version</td><td>Numéro de version (<code>package.json</code>), SHA de commit court, date de publication du build</td></tr>
 <tr><td>Développeur</td><td>Patrick Nouhailler ; lien vers swinux.ch ; lien vers le portfolio des applications</td></tr>
 <tr><td>Support</td><td>« Contacter le support » (mail) et « Signaler un bug » (issue GitHub), tous deux pré-remplis avec les informations de diagnostic</td></tr>
-<tr><td>Liens</td><td>Dépôt GitHub, Documentation, README, Issues</td></tr>
+<tr><td>Liens</td><td>Découvrir Astror (page de présentation <code>decouvrir-astror.swinux.ch</code>), Dépôt GitHub, Documentation, README, Issues</td></tr>
 <tr><td>Crédits open-source</td><td>React, Vite, vite-plugin-pwa/Workbox, astronomy-engine, satellite.js</td></tr>
 </table>`)}
 <h2>Informations de diagnostic incluses automatiquement</h2>
@@ -1791,6 +1791,16 @@ PAGES['versions'] = {
 <div class="eyebrow">Versions</div>
 <h1>Historique des versions</h1>
 <p class="lede">Depuis la version <strong>1.1.0</strong>, Astror suit un vrai numéro de version sémantique (<code>package.json</code>), incrémenté à chaque changement notable et détaillé dans <code>CHANGELOG.md</code>. Les entrées antérieures, non versionnées individuellement à l'époque, restent groupées par date de session.</p>
+
+<h2>Version 1.5.1 — 2026-10-29</h2>
+<h3>Ajouts</h3>
+<ul>
+  <li>Lien <strong>« Découvrir Astror »</strong> vers la page de présentation (<a href="https://decouvrir-astror.swinux.ch/">decouvrir-astror.swinux.ch</a>) dans la section Liens de l'<a href="../features/a-propos/">écran À propos</a>.</li>
+</ul>
+<h3>Corrections</h3>
+<ul>
+  <li>Crédits de l'écran À propos : le lien vers satellite.js pointait vers une adresse inexistante.</li>
+</ul>
 
 <h2>Version 1.5.0 — 2026-10-21</h2>
 <h3>Ajouts</h3>

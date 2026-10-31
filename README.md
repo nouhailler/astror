@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/nouhailler/astror/actions/workflows/ci.yml/badge.svg)](https://github.com/nouhailler/astror/actions/workflows/ci.yml)
 [![Licence: MIT](https://img.shields.io/badge/licence-MIT-blue.svg)](LICENSE)
-![Version](https://img.shields.io/badge/version-1.5.0-d9b36c)
+![Version](https://img.shields.io/badge/version-1.5.1-d9b36c)
 
 Compagnon d'observation astronomique — application mobile PWA pour astronomes amateurs, entièrement en français.
 

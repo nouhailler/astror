@@ -5,6 +5,7 @@ import {
 
 const REPO_URL = 'https://github.com/nouhailler/astror'
 const DOCS_URL = 'https://nouhailler.github.io/astror/'
+const LANDING_URL = 'https://decouvrir-astror.swinux.ch/'
 const PORTFOLIO_URL = 'https://swinux.ch/applications/'
 const WEBSITE_URL = 'https://swinux.ch'
 const SUPPORT_EMAIL = 'contact@swinux.ch'
@@ -14,7 +15,7 @@ const CREDITS = [
   { name: 'Vite', role: 'Outil de build et serveur de développement', url: 'https://vitejs.dev' },
   { name: 'vite-plugin-pwa / Workbox', role: 'Application web progressive & mise à jour automatique', url: 'https://vite-pwa-org.netlify.app' },
   { name: 'astronomy-engine', role: 'Calculs astronomiques (Lune, Soleil, planètes, événements)', url: 'https://github.com/cosinekitty/astronomy' },
-  { name: 'satellite.js', role: 'Calcul des passages de satellites (ISS…) à partir de TLE', url: 'https://github.com/shashwatak/satellite.js' },
+  { name: 'satellite.js', role: 'Calcul des passages de satellites (ISS…) à partir de TLE', url: 'https://github.com/shashwatak/satellite-js' },
 ]
 
 function diagnostics() {
@@ -111,7 +112,10 @@ export default function AboutSheet({ open, onClose }) {
 
       <div className="eyebrow dim" style={{ color: 'var(--faint)', marginBottom: 6, letterSpacing: '.14em' }}>Liens</div>
       <div className="card-2" style={{ overflow: 'hidden', marginBottom: 20 }}>
-        <Row Ic={IcGithub} label="Dépôt source (GitHub)" sub={REPO_URL} href={REPO_URL} />
+        <Row Ic={IcGlobe} label="Découvrir Astror" sub="Page de présentation" href={LANDING_URL} />
+        <div style={{ borderTop: '1px solid var(--line)' }}>
+          <Row Ic={IcGithub} label="Dépôt source (GitHub)" sub={REPO_URL} href={REPO_URL} />
+        </div>
         <div style={{ borderTop: '1px solid var(--line)' }}>
           <Row Ic={IcBook} label="Documentation" sub={DOCS_URL} href={DOCS_URL} />
         </div>
