@@ -6,6 +6,21 @@ entrées précédentes, non versionnées individuellement, restent groupées par
 
 ---
 
+## [1.6.1] — 2026-11-16
+
+### Modifications
+
+- **Astror Video Studio extrait dans un paquet réutilisable**,
+  [`video-studio`](https://github.com/nouhailler/video-studio), pour produire les tutoriels de toutes
+  les applications. `video/` ne garde que ce qui est propre à Astror : `video.config.ts`, scénarios,
+  données simulées, logo. Les commandes `npm run video:*` sont inchangées. Les voix et Piper sont
+  désormais partagés par machine (`~/.cache/video-studio`, via `npm run video:setup`).
+- Dépendances de développement : Remotion, tsx et les polices Fontsource sont maintenant apportés par
+  le paquet. Aucun changement dans l'application ni dans son bundle.
+- La vidéo `astror-presentation-fr` a été regénérée avec le paquet pour vérifier qu'elle reste identique.
+
+---
+
 ## [1.6.0] — 2026-11-16
 
 ### Ajouts

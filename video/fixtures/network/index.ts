@@ -9,16 +9,9 @@
 // Les calculs astronomiques locaux (astronomy-engine : Lune, Soleil, planètes,
 // événements, carte du ciel) ne passent pas par le réseau : ils sont exécutés
 // réellement, pour la date simulée du scénario.
+// Les APIs d'IA payantes sont toujours bloquées par video-studio.
+import type { NetworkFixture } from '@nouhailler/video-studio'
 
-export interface NetworkFixture {
-  id: string
-  /** Expression testée sur l'URL complète. */
-  match: RegExp
-  file: string
-  contentType: string
-  nature: 'simulé' | 'réel figé'
-  note: string
-}
 
 export const NETWORK_FIXTURES: NetworkFixture[] = [
   { id: 'open-meteo', match: /^https:\/\/api\.open-meteo\.com\/v1\/forecast/, file: 'open-meteo.json',
@@ -31,12 +24,4 @@ export const NETWORK_FIXTURES: NetworkFixture[] = [
     contentType: 'text/plain', nature: 'réel figé', note: 'TLE ISS du 16/11/2026 (CelesTrak).' },
   { id: 'celestrak-tiangong', match: /^https:\/\/celestrak\.org\/NORAD\/elements\/gp\.php\?CATNR=48274/, file: 'celestrak-48274.txt',
     contentType: 'text/plain', nature: 'réel figé', note: 'TLE Tiangong du 15/11/2026 (CelesTrak).' },
-]
-
-/** Services d'IA payants : toujours bloqués pendant une capture (aucune clé, aucun appel). */
-export const BLOCKED_HOSTS: RegExp[] = [
-  /^https:\/\/openrouter\.ai\//,
-  /^https:\/\/api\.anthropic\.com\//,
-  /^https:\/\/api\.openai\.com\//,
-  /^https:\/\/generativelanguage\.googleapis\.com\//,
 ]

@@ -8,10 +8,9 @@
 // simulée). Les valeurs citées (Lune à 82 %, Saturne seule planète affichée,
 // Géminides…) sont celles calculées par Astror pour cette date : elles ont été
 // vérifiées sur la capture. Changer `clock` impose de relire ces narrations.
-import type { VideoScenario } from '../types/video.types'
-import { DEFAULT_VIDEO } from './from-demo'
+import { DEFAULT_VIDEO, type AstrorVideoScenario } from './from-demo'
 
-const presentation: VideoScenario = {
+const presentation: AstrorVideoScenario = {
   id: 'astror-presentation-fr',
   video: {
     ...DEFAULT_VIDEO,

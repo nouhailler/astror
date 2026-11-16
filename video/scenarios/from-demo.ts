@@ -1,8 +1,12 @@
 // Migration sans réécriture : transforme un scénario de démo existant
 // (src/demo/scenarios) en scénario vidéo, sans modifier ses étapes.
 // Les textes `narrate` / `text` déjà présents deviennent la narration parlée.
-import type { Scenario } from '../../src/demo/types'
-import type { VideoMetadata, VideoScenario } from '../types/video.types'
+import type { VideoMetadata, VideoScenario, VideoStepMetadata } from '@nouhailler/video-studio'
+import type { DemoStep, Scenario } from '../../src/demo/types'
+
+/** Étape du moteur de démo d'Astror + métadonnées vidéo optionnelles. */
+export type AstrorVideoStep = DemoStep & { video?: VideoStepMetadata }
+export type AstrorVideoScenario = VideoScenario<AstrorVideoStep>
 
 export const DEFAULT_VIDEO: Omit<VideoMetadata, 'title'> = {
   language: 'fr',
@@ -21,7 +25,7 @@ export const DEFAULT_VIDEO: Omit<VideoMetadata, 'title'> = {
 export function fromDemoScenario(
   scenario: Scenario,
   overrides: Partial<VideoMetadata> & { id?: string } = {},
-): VideoScenario {
+): AstrorVideoScenario {
   const { id, ...video } = overrides
   return {
     id: id ?? `demo-${scenario.name}`,
