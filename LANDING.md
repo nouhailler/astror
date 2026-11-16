@@ -99,7 +99,5 @@ Le dépôt GitHub est **public** depuis le 2026-11-16 : la vitrine annonce « op
 « Pourquoi Astror », FAQ « Astror est-il gratuit ? ») et le pied de page renvoie vers le code source,
 les nouveautés (`CHANGELOG.md`) et la licence MIT.
 
-Reste en attente : les liens **Documentation** et **Données et confidentialité**, prêts en commentaire HTML
-dans le pied de page de `landing/index.html`. Ils pointent vers <https://nouhailler.github.io/astror/>,
-qui ne sera en ligne qu'après activation de GitHub Pages (dépôt → Settings → Pages → branche `main`,
-dossier `/docs`). Décommenter ces deux liens une fois la documentation accessible.
+La documentation est publiée sur GitHub Pages (<https://nouhailler.github.io/astror/>, branche `main`,
+dossier `/docs`) : le pied de page y renvoie (Documentation, Données et confidentialité).
