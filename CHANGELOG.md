@@ -6,6 +6,31 @@ entrées précédentes, non versionnées individuellement, restent groupées par
 
 ---
 
+## [1.6.0] — 2026-11-16
+
+### Ajouts
+
+- **Astror Video Studio** (`video/`, outillage local, hors bundle) : génération automatique de tutoriels
+  vidéo à partir des scénarios du mode démo. Validation des scénarios, narration par TTS local (Piper)
+  avec cache par empreinte, capture Playwright + screencast CDP dans un environnement déterministe
+  (horloge, position et réseau figés, APIs d'IA bloquées), composition Remotion (intro, maquette de
+  téléphone, encadrés synchronisés, chapitres, conclusion), export MP4 H.264/AAC vérifié, sous-titres
+  SRT/WebVTT et chapitrage YouTube. Commandes `npm run video:*` — voir [`video/README.md`](video/README.md).
+- Premier tutoriel : `astror-presentation-fr` (« Découvrez ASTROR, votre compagnon d'observation astronomique »).
+- Moteur de démo (`src/demo/`) : bus d'événements typés horodatés et **mode capture** optionnel
+  (`new DemoEngine(s, { mode: 'capture' })`), activable seulement par l'outil d'enregistrement
+  (`?capture=1` + injection préalable). Le mode interactif est inchangé.
+- Attributs `data-demo-id` inertes sur quelques éléments (Éphémérides, Explorer, segments des outils)
+  et `data-demo-loading` sur les indicateurs de chargement.
+- Tests : non-régression du moteur de démo (13 tests) et tests du pipeline vidéo (`npm run video:test`).
+
+### Corrections
+
+- Mode démo : sous React.StrictMode (dev), le double effet pouvait lancer deux visites superposées
+  (jeton de démarrage dans `startDemo`).
+
+---
+
 ## [1.5.1] — 2026-10-29
 
 ### Ajouts

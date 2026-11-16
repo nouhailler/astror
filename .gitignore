@@ -5,3 +5,12 @@ dist/
 .DS_Store
 
 screenshot*.mjs
+
+# Astror Video Studio — fichiers générés (jamais versionnés)
+video/.venv/
+video/models/
+video/cache/
+video/audio/
+video/recordings/
+video/build/
+video/output/

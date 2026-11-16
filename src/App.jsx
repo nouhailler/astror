@@ -7,7 +7,7 @@ import AboutSheet from './about'
 import Onboarding, { onbWasSeen, onbMarkSeen, onbLoad, onbSave } from './onboarding'
 import SkyScreen from './sky' // onglet par défaut : chargé d'emblée
 import { registerDemoHost } from './demo/bridge'
-import { startDemo, getDemoParam } from './demo'
+import { startDemo, getDemoParam, getCaptureRequest, startCapture } from './demo'
 import './app.css'
 
 // Autres onglets chargés à la demande (code-splitting)
@@ -19,7 +19,7 @@ const AssistantScreen = lazy(() => import('./assistant'))
 
 function ScreenLoader() {
   return (
-    <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+    <div data-demo-loading style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
       {[0, 1, 2].map(i => (
         <span key={i} style={{ width: 7, height: 7, borderRadius: '50%', background: 'var(--gold)',
           animation: 'pulse 1.2s ease-in-out infinite', animationDelay: `${i * 0.18}s` }} />
@@ -57,7 +57,8 @@ function TabBar({ tab, onChange }) {
 
 export default function App() {
   const demoParam = getDemoParam()  // ?demo=<scénario> : mode démo au chargement
-  const [onboarded, setOnboarded] = useState(() => onbWasSeen() || !!demoParam)
+  const [captureReq] = useState(() => getCaptureRequest())  // capture vidéo (outil local uniquement)
+  const [onboarded, setOnboarded] = useState(() => onbWasSeen() || !!demoParam || !!captureReq)
   const [tab, setTab] = useState('sky')
   const [helpKey, setHelpKey] = useState(null)
   const [demoKey, setDemoKey] = useState(null)
@@ -100,7 +101,8 @@ export default function App() {
   // Démarrage automatique via ?demo=<scénario>.
   useEffect(() => {
     if (demoParam) startDemo(demoParam)
-  }, [demoParam])
+    else if (captureReq) startCapture(captureReq)
+  }, [demoParam, captureReq])
 
   useEffect(() => {
     window.openAstrorSettings = () => setSettingsOpen(true)

@@ -169,7 +169,7 @@ export default function EphScreen() {
       <TipBanner tipKey="eph" />
 
       <div className="pad">
-        <div className="card enter" style={{ padding: 18, display: 'flex', gap: 18, alignItems: 'center' }}>
+        <div className="card enter" data-demo-id="eph-moon" style={{ padding: 18, display: 'flex', gap: 18, alignItems: 'center' }}>
           <Moon illum={moon.illumination} />
           <div style={{ flex: 1 }}>
             <div className="eyebrow" style={{ marginBottom: 6 }}>Lune</div>
@@ -192,7 +192,7 @@ export default function EphScreen() {
           </div>
         </div>
 
-        <div className="card-2" style={{ marginTop: 12, padding: '4px 16px' }}>
+        <div className="card-2" data-demo-id="eph-sun" style={{ marginTop: 12, padding: '4px 16px' }}>
           <DataRow k="Lever du Soleil" v={sun.sunrise} accent />
           <DataRow k="Coucher du Soleil" v={sun.sunset} accent />
           <DataRow k="Aube astronomique" v={sun.dawnAstro} />
@@ -243,7 +243,7 @@ export default function EphScreen() {
           }).join('\n')
           return `Voici les prochains événements du calendrier astronomique :\n${lines}\n\nEn 4 à 5 phrases, explique quels sont les plus spectaculaires, lesquels nécessitent un équipement particulier, et donne une astuce pratique pour préparer l'observation du prochain événement.`
         }} />
-        <div className="card-2" style={{ overflow: 'hidden' }}>
+        <div className="card-2" data-demo-id="eph-calendar" style={{ overflow: 'hidden' }}>
           {events.map(e => (
             <EventRow key={e.id} e={e} onClick={() => setEvt(e)} />
           ))}
@@ -264,7 +264,7 @@ export default function EphScreen() {
 
 En 4 à 5 phrases, analyse ces conditions pour la nuit : qu'est-il raisonnable d'observer avec un télescope amateur ? Quels types d'objets sont favorisés ou défavorisés ? Y a-t-il des précautions à prendre ?`
         }} />
-        <div className="card" style={{ padding: 18 }}>
+        <div className="card" data-demo-id="eph-conditions" style={{ padding: 18 }}>
           {wLoading ? (
             <div style={{ textAlign: 'center', color: 'var(--faint)', fontSize: 13, padding: '12px 0' }}>Chargement météo…</div>
           ) : weather ? (

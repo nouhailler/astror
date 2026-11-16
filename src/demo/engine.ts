@@ -11,10 +11,31 @@
 // Le moteur est volontairement en DOM pur : son overlay survit aux re-rendus
 // React et reste indépendant de l'écran affiché. La navigation passe par
 // l'hôte enregistré (bridge), le ciblage par [data-demo-id].
+//
+// Mode capture (Astror Video Studio, optionnel — `new DemoEngine(s, { mode: 'capture' })`) :
+//   - pas de barre de contrôle, bulle de narration masquable, curseur toujours animé ;
+//   - chaque étape est tenue au moins `capture.holdMs[i]` ms (durée de la voix) ;
+//   - navigation confirmée (écran monté) au lieu d'une attente aveugle ;
+//   - erreurs strictes : élément introuvable → `action:error` + arrêt + onFinish({ ok: false }).
+// Dans les deux modes, le moteur émet des événements horodatés (onEvent + CustomEvent
+// `astror:demo-event` sur window). Le mode interactif reste strictement identique.
 
-import type { DemoStep, Scenario, TabKey } from './types'
+import type {
+  DemoStep, Scenario, TabKey, DemoEngineOptions, DemoEvent, DemoEventType, DemoMode,
+} from './types'
 import { getDemoHost, prefersReducedMotion } from './bridge'
 import { snapshotStore, applySeed, restoreStore } from './seed'
+
+/** Horloge réelle, même si l'horloge de la page est simulée (enregistrement vidéo). */
+type RealClock = { now: () => number; origin: number }
+function realClock(): RealClock {
+  const w = (typeof window !== 'undefined' ? window : {}) as { __ASTROR_REAL_CLOCK__?: RealClock }
+  if (w.__ASTROR_REAL_CLOCK__) return w.__ASTROR_REAL_CLOCK__
+  const p = typeof performance !== 'undefined' ? performance : null
+  return { now: () => (p ? p.now() : Date.now()), origin: p?.timeOrigin ?? 0 }
+}
+
+class CaptureError extends Error {}
 
 const SPEEDS = [0.5, 1, 2] as const
 
@@ -63,11 +84,32 @@ export class DemoEngine {
   private hlTarget: HTMLElement | null = null
   private startTab: TabKey = 'sky'
 
-  constructor(scenario: Scenario) {
+  // Mode capture / événements
+  private readonly mode: DemoMode
+  private readonly opts: DemoEngineOptions
+  private readonly clock = realClock()
+  private narrShown = false
+  private narrAt: number | null = null
+  private finished = false
+
+  constructor(scenario: Scenario, options: DemoEngineOptions = {}) {
     this.scenario = scenario
     this.steps = scenario.steps
+    this.opts = options
+    this.mode = options.mode ?? 'interactive'
+    if (this.capturing) this.reduced = false   // curseur et surbrillance toujours animés
     this.onKey = (e) => { if (e.key === 'Escape') { e.preventDefault(); this.stop() } }
     this.onScroll = () => this.repositionHighlight()
+  }
+
+  private get capturing(): boolean { return this.mode === 'capture' }
+
+  // ── Événements ──────────────────────────────────────────────────────────
+  private emit(type: DemoEventType, data?: Record<string, unknown>, step: number | undefined = this.i): void {
+    const t = this.clock.now()
+    const ev: DemoEvent = { type, t, epoch: this.clock.origin + t, step, data }
+    try { this.opts.onEvent?.(ev) } catch { /* un écouteur ne doit pas casser la démo */ }
+    try { window.dispatchEvent(new CustomEvent('astror:demo-event', { detail: ev })) } catch { /* ignore */ }
   }
 
   // ── Cycle de vie ────────────────────────────────────────────────────────
@@ -76,7 +118,7 @@ export class DemoEngine {
     this.startTab = (getDemoHost()?.getTab?.() ?? 'sky') as TabKey
     // Isolation des données : capture → graine de démo.
     snapshotStore()
-    applySeed()
+    applySeed(this.opts.seed)
     this.buildOverlay()
     window.addEventListener('keydown', this.onKey, true)
     window.addEventListener('scroll', this.onScroll, true)
@@ -85,11 +127,17 @@ export class DemoEngine {
     this.cursorX = window.innerWidth / 2
     this.cursorY = window.innerHeight - 120
     this.placeCursor(true)
-    this.run()
+    void this.run()
   }
 
   stop(): void {
     if (this.aborted) return
+    if (this.hlTarget) this.emit('highlight:hide')
+    if (this.narrShown) this.emit('narration:hide')
+    if (!this.finished) {
+      this.finished = true
+      this.opts.onFinish?.({ ok: false, error: 'Démo interrompue', step: this.i })
+    }
     this.aborted = true
     this.wake?.()
     window.removeEventListener('keydown', this.onKey, true)
@@ -103,23 +151,72 @@ export class DemoEngine {
 
   // ── Boucle d'exécution ──────────────────────────────────────────────────
   private async run(): Promise<void> {
+    if (this.capturing && this.opts.capture?.syncMark !== false) await this.showSyncMark()
+    this.emit('scenario:start', { name: this.scenario.name, steps: this.steps.length, mode: this.mode }, undefined)
     while (this.i < this.steps.length && !this.aborted) {
       await this.gate()
       if (this.aborted) break
       const forced = this.forceStep
       this.forceStep = false
 
-      try { await this.exec(this.steps[this.i]) } catch { /* étape résiliente */ }
+      const step = this.steps[this.i]
+      const t0 = this.clock.now()
+      this.narrAt = null
+      this.emit('step:start', { type: step.type })
+      try {
+        await this.exec(step)
+        if (this.capturing) await this.hold(t0)
+      } catch (err) {
+        if (this.capturing && !this.aborted) { this.fail(err); return }
+        /* mode interactif : étape résiliente */
+      }
       if (this.aborted) break
+      this.emit('step:end', { type: step.type })
 
       this.i++
       this.updateProgress()
 
       if (forced) { this.paused = true; continue }   // pas à pas : on se re-fige
       if (this.paused) continue
-      await this.sleep(this.scaled(850))              // respiration entre étapes
+      await this.sleep(this.scaled(this.opts.capture?.breathMs ?? 850))   // respiration entre étapes
     }
     if (!this.aborted) this.finish()
+  }
+
+  /** Mode capture : maintient l'étape jusqu'à la fin de la voix (holdMs). */
+  private async hold(stepStart: number): Promise<void> {
+    const h = this.opts.capture?.holdMs?.[this.i]
+    if (!h) return
+    const ref = this.narrAt ?? stepStart
+    const remain = h - (this.clock.now() - ref)
+    if (remain > 0) await this.sleep(remain)
+  }
+
+  /** Mode capture : erreur bloquante → événement, arrêt propre, restauration. */
+  private fail(err: unknown): void {
+    const message = err instanceof Error ? err.message : String(err)
+    this.emit('action:error', { message, type: this.steps[this.i]?.type })
+    this.finished = true
+    this.opts.onFinish?.({ ok: false, error: message, step: this.i })
+    this.stop()
+  }
+
+  /**
+   * Mire de synchronisation (mode capture) : un aplat magenta plein écran,
+   * repérable image par image dans l'enregistrement, horodaté au moment où il
+   * est peint. Permet d'aligner événements et vidéo à une image près.
+   */
+  private async showSyncMark(): Promise<void> {
+    const mark = el('div', 'demo-sync-mark')
+    Object.assign(mark.style, { position: 'fixed', inset: '0', zIndex: '99999', background: '#ff00ff' })
+    document.body.appendChild(mark)
+    await new Promise<void>((resolve) => {
+      const raf = window.requestAnimationFrame ?? ((cb: FrameRequestCallback) => setTimeout(() => cb(0), 16))
+      raf(() => { this.emit('sync:mark', { color: '#ff00ff' }, undefined); resolve() })
+    })
+    await this.sleep(500)
+    mark.remove()
+    await this.sleep(400)
   }
 
   /** Attend tant que la démo est en pause (le pas-à-pas la débloque un cran). */
@@ -130,9 +227,20 @@ export class DemoEngine {
   }
 
   private finish(): void {
+    if (this.capturing) {
+      // Capture : l'image reste figée sur le dernier écran ; l'enregistreur
+      // coupe la vidéo puis appelle stopDemo() (restauration du store).
+      this.finished = true
+      this.emit('scenario:end', { ok: true }, undefined)
+      this.opts.onFinish?.({ ok: true })
+      return
+    }
     this.setNarration('Visite terminée.', 'Fin')
     this.setPlaying(false)
     this.paused = true
+    this.finished = true
+    this.emit('scenario:end', { ok: true }, undefined)
+    this.opts.onFinish?.({ ok: true })
     // La barre reste : l'utilisateur quitte quand il veut (✕ ou Échap).
   }
 
@@ -142,9 +250,12 @@ export class DemoEngine {
       case 'navigate': {
         this.clearHighlight()
         const host = getDemoHost()
+        if (!host && this.capturing) throw new CaptureError('Hôte de navigation absent (App non montée)')
         host?.navigate({ tab: step.to, tool: step.tool })
         if (step.narrate) this.setNarration(step.narrate)
-        await this.sleep(this.scaled(700))   // laisse l'écran (lazy) se monter
+        if (this.capturing) await this.waitForScreen(step.to ?? 'tools')
+        else await this.sleep(this.scaled(700))   // laisse l'écran (lazy) se monter
+        this.emit('navigation:complete', { to: step.to, tool: step.tool })
         break
       }
       case 'wait':
@@ -152,6 +263,8 @@ export class DemoEngine {
         break
       case 'narrate':
         this.setNarration(step.text, step.title)
+        // Capture avec voix : la durée vient de l'audio réel (hold), pas d'une estimation.
+        if (this.capturing && this.opts.capture?.holdMs?.[this.i]) break
         await this.sleep(step.ms != null ? this.scaled(step.ms) : this.readingTime(step.text))
         break
       case 'highlight': {
@@ -169,6 +282,7 @@ export class DemoEngine {
           await this.sleep(this.scaled(260))
           this.pressCursor()
           this.rippleAt(this.cursorX, this.cursorY)
+          this.emit('action:click', { target: step.target, x: this.cursorX, y: this.cursorY })
           this.dispatchClick(el)
           await this.sleep(this.scaled(260))
         }
@@ -181,7 +295,10 @@ export class DemoEngine {
           await this.moveCursorTo(el)
           this.showHighlight(el)
           el.focus()
+          this.emit('action:type', { target: step.target, text: step.text })
           await this.typeInto(el, step.text)
+        } else if (el && this.capturing) {
+          throw new CaptureError(`Élément « ${step.target} » non saisissable`)
         }
         break
       }
@@ -195,18 +312,60 @@ export class DemoEngine {
 
   /** Attend qu'un élément ciblé apparaisse (écrans chargés à la demande). */
   private async waitForEl(id: string, timeout = 4500): Promise<HTMLElement | null> {
-    const t0 = Date.now()
+    if (this.capturing) timeout = this.opts.capture?.stepTimeoutMs ?? 8000
+    const t0 = this.clock.now()
     while (!this.aborted) {
       const el = this.find(id)
       if (el && el.offsetParent !== null) {
         el.scrollIntoView({ block: 'center', behavior: this.reduced ? 'auto' : 'smooth' })
-        await this.sleep(this.reduced ? 0 : 220)   // laisse le scroll se stabiliser
+        if (this.capturing) await this.waitStable(id)
+        else await this.sleep(this.reduced ? 0 : 220)   // laisse le scroll se stabiliser
         return this.find(id)
       }
-      if (Date.now() - t0 > timeout) return null
+      if (this.clock.now() - t0 > timeout) {
+        if (this.capturing) throw new CaptureError(`Élément introuvable : [data-demo-id="${id}"] (après ${timeout} ms)`)
+        return null
+      }
       await this.sleep(120)
     }
     return null
+  }
+
+  /** Capture : attend que la position de l'élément ne bouge plus (fin du scroll). */
+  private async waitStable(id: string): Promise<void> {
+    let last = ''
+    let same = 0
+    const t0 = this.clock.now()
+    while (!this.aborted && this.clock.now() - t0 < 1500) {
+      await this.sleep(60)
+      const r = this.find(id)?.getBoundingClientRect()
+      const sig = r ? `${Math.round(r.left)},${Math.round(r.top)},${Math.round(r.width)}` : ''
+      same = sig === last ? same + 1 : 0
+      last = sig
+      if (same >= 3) return
+    }
+  }
+
+  /**
+   * Capture : attend que l'écran demandé soit réellement monté — onglet actif,
+   * plus aucun indicateur de chargement (Suspense) — puis laisse les animations
+   * d'entrée se jouer.
+   */
+  private async waitForScreen(tab: TabKey): Promise<void> {
+    const timeout = this.opts.capture?.stepTimeoutMs ?? 8000
+    const t0 = this.clock.now()
+    while (!this.aborted) {
+      const tabBtn = this.find(`tab-${tab}`)
+      const tabOk = !tabBtn || tabBtn.getAttribute('aria-selected') === 'true'
+      const loading = document.querySelector('[data-demo-loading]')
+      const screen = document.querySelector('.screen-area')?.firstElementChild
+      if (tabOk && !loading && screen) break
+      if (this.clock.now() - t0 > timeout) {
+        throw new CaptureError(`Navigation non confirmée vers « ${tab} » (après ${timeout} ms)`)
+      }
+      await this.sleep(60)
+    }
+    await this.sleep(this.scaled(450))   // animations d'entrée (.enter)
   }
 
   private dispatchClick(el: HTMLElement): void {
@@ -243,8 +402,13 @@ export class DemoEngine {
 
   private async moveCursorTo(el: HTMLElement): Promise<void> {
     const r = el.getBoundingClientRect()
+    const from = { x: this.cursorX, y: this.cursorY }
     this.cursorX = r.left + r.width / 2
     this.cursorY = r.top + r.height / 2
+    this.emit('cursor:move', {
+      from, to: { x: this.cursorX, y: this.cursorY },
+      durationMs: this.reduced ? 0 : this.scaled(560),
+    })
     if (this.reduced) { this.placeCursor(true); return }
     this.cursor.classList.remove('reduced')
     // Durée du trajet proportionnelle à la distance, plafonnée.
@@ -279,6 +443,12 @@ export class DemoEngine {
     } else {
       this.hlLabel.style.display = 'none'
     }
+    const r = el.getBoundingClientRect()
+    this.emit('highlight:show', {
+      target: el.getAttribute('data-demo-id'), label: label ?? null,
+      rect: { x: r.left, y: r.top, width: r.width, height: r.height },
+      viewport: { width: window.innerWidth, height: window.innerHeight },
+    })
   }
 
   private repositionHighlight(): void {
@@ -292,6 +462,7 @@ export class DemoEngine {
   }
 
   private clearHighlight(): void {
+    if (this.hlTarget) this.emit('highlight:hide')
     this.hlTarget = null
     this.highlight.style.opacity = '0'
     this.hlLabel.style.display = 'none'
@@ -299,10 +470,15 @@ export class DemoEngine {
 
   // ── Narration ───────────────────────────────────────────────────────────
   private setNarration(text: string, title?: string): void {
+    if (this.narrShown) this.emit('narration:hide')
     this.narration.innerHTML =
       (title ? `<div class="demo-narr-title">${title}</div>` : '') +
       `<div class="demo-narr-body">${slug(text)}</div>`
-    this.narration.style.opacity = '1'
+    const visible = !this.capturing || this.opts.capture?.showNarration === true
+    this.narration.style.opacity = visible ? '1' : '0'
+    this.narrShown = true
+    this.narrAt = this.clock.now()
+    this.emit('narration:show', { text, title: title ?? null })
   }
 
   private readingTime(text: string): number {
@@ -341,6 +517,8 @@ export class DemoEngine {
     btnQuit.classList.add('demo-bar-quit')
 
     this.bar.append(title, this.progressEl, this.btnPlay, btnNext, this.btnSpeed, btnQuit)
+    // Capture vidéo : aucun contrôle destiné à l'utilisateur à l'image.
+    if (this.capturing) this.bar.style.display = 'none'
 
     document.body.append(
       this.shield, this.highlight, this.cursor, this.narration, this.bar,
@@ -389,7 +567,8 @@ export class DemoEngine {
 
   // ── Temporisation ───────────────────────────────────────────────────────
   private scaled(ms: number): number {
-    return Math.round(ms / SPEEDS[this.speedIdx])
+    const speed = this.capturing ? (this.opts.capture?.speed || 1) : SPEEDS[this.speedIdx]
+    return Math.round(ms / speed)
   }
 
   /** Sleep interruptible : next()/togglePlay()/stop() peuvent l'écourter. */
