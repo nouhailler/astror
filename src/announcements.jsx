@@ -4,7 +4,7 @@ import { IcMegaphone, IcPlay, IcClose } from './icons'
 // ─── Annonces ─────────────────────────────────────────────────────────────────
 // Messages ponctuels de l'équipe (nouveauté, vidéo, actualité du projet).
 // Codées en dur : publier une nouvelle annonce = ajouter une entrée ici puis
-// déployer (commit + push → Netlify). Chaque annonce n'est montrée qu'une fois
+// déployer (commit + push → Cloudflare Pages). Chaque annonce n'est montrée qu'une fois
 // par appareil ; l'utilisateur voit toujours la plus ancienne non vue, une à la fois.
 
 export const ANNOUNCEMENTS = [

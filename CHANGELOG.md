@@ -6,6 +6,21 @@ entrées précédentes, non versionnées individuellement, restent groupées par
 
 ---
 
+## [1.6.2] — 2026-11-16
+
+### Modifications
+
+- **Hébergement : préparation du passage à Cloudflare Pages.**
+  - `public/_headers` reprend la `Permissions-Policy` de Netlify (boussole) et ajoute `nosniff`,
+    `Referrer-Policy`, `no-cache` sur `index.html`, `sw.js` et le manifeste (mises à jour PWA immédiates),
+    et un cache long sur les fichiers avec empreinte.
+  - `.node-version` fixe Node 22.
+  - `vite.config.js` lit le SHA du commit dans `CF_PAGES_COMMIT_SHA` (et `COMMIT_REF` sur Netlify).
+  - Procédure complète dans [`CLOUDFLARE.md`](CLOUDFLARE.md) : création du projet, vérifications,
+    bascule du domaine, arrêt de Netlify. `netlify.toml` est conservé pour un éventuel retour arrière.
+
+---
+
 ## [1.6.1] — 2026-11-16
 
 ### Modifications

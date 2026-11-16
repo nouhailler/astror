@@ -7,7 +7,7 @@
 ## Ce qu'est le projet
 
 Application mobile PWA pour astronomes amateurs, entièrement en français.
-Stack : **Vite + React 18 + vite-plugin-pwa** (Workbox). Déployable sur Netlify via `netlify.toml`.
+Stack : **Vite + React 18 + vite-plugin-pwa** (Workbox). Déployé sur Cloudflare Pages (voir `CLOUDFLARE.md` ; `netlify.toml` conservé pour un éventuel retour arrière).
 
 ---
 
@@ -20,7 +20,7 @@ Stack : **Vite + React 18 + vite-plugin-pwa** (Workbox). Déployable sur Netlify
 | Prototype de référence | `/home/patrick/Documents/Claude/Projects/Astror/design_handoff_astror/prototype/` |
 | Build | `npm run build` → `dist/` |
 | Dev local | `npm run dev` → http://localhost:5173 |
-| Netlify | https://astror.swinux.ch (connecté au repo GitHub, détecte `netlify.toml` automatiquement) |
+| Cloudflare Pages | https://astror.swinux.ch (projet `astror`, connecté au repo GitHub ; en-têtes dans `public/_headers`) — anciennement Netlify |
 | Documentation | https://nouhailler.github.io/astror/ (GitHub Pages, source `main`/`docs`) |
 
 ---
@@ -133,7 +133,7 @@ src/
 - **Dev server** : ✅ fonctionnel (`npm run dev`)
 - **Tests** : ✅ 21 tests Vitest (`npm test`)
 - **Git** : 40+ commits — branche `main` à jour sur GitHub
-- **Netlify** : prêt à connecter (le `netlify.toml` est en place)
+- **Cloudflare Pages** : configuration prête (`public/_headers`, `.node-version`), procédure dans `CLOUDFLARE.md`
 
 ---
 

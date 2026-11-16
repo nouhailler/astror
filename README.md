@@ -75,7 +75,7 @@ Compagnon d'observation astronomique — application mobile PWA pour astronomes 
 | Calculs astronomiques | astronomy-engine (local, sans API) |
 | Prédictions satellites | satellite.js + TLE en direct |
 | Tests | Vitest (39 tests) |
-| Déploiement | Netlify ([astror.swinux.ch](https://astror.swinux.ch)) + GitHub Pages pour la documentation |
+| Déploiement | Cloudflare Pages ([astror.swinux.ch](https://astror.swinux.ch), voir [CLOUDFLARE.md](CLOUDFLARE.md)) + GitHub Pages pour la documentation |
 | Licence | [MIT](LICENSE) |
 
 ## Liens

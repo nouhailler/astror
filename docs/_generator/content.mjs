@@ -2,8 +2,8 @@
 // Toute affirmation ici doit être vérifiable dans le code source (src/) — voir DOCUMENTATION_SPEC.md §41.
 // Ne jamais ajouter un comportement qui n'existe pas dans le code ; marquer "À vérifier" sinon.
 
-export const APP_VERSION = '1.6.1';
-export const DOC_VERSION = '1.6.1';
+export const APP_VERSION = '1.6.2';
+export const DOC_VERSION = '1.6.2';
 export const DOC_UPDATED = '2026-09-12';
 
 const verify = (text) => `<div class="callout verify"><div class="callout-title">À vérifier</div><p>${text}</p></div>`;
@@ -1793,6 +1793,12 @@ PAGES['versions'] = {
 <h1>Historique des versions</h1>
 <p class="lede">Depuis la version <strong>1.1.0</strong>, Astror suit un vrai numéro de version sémantique (<code>package.json</code>), incrémenté à chaque changement notable et détaillé dans <code>CHANGELOG.md</code>. Les entrées antérieures, non versionnées individuellement à l'époque, restent groupées par date de session.</p>
 
+<h2>Version 1.6.2 — 2026-11-16</h2>
+<h3>Modifications</h3>
+<ul>
+  <li>Hébergement de l'application : préparation du passage de Netlify à Cloudflare Pages (même adresse, astror.swinux.ch). Aucun changement de fonctionnement ; les données enregistrées sur l'appareil sont conservées.</li>
+</ul>
+
 <h2>Version 1.6.1 — 2026-11-16</h2>
 <h3>Modifications</h3>
 <ul>
@@ -1922,7 +1928,7 @@ ${legalNote("cette page ne contient aucun contenu juridique définitif. Le code 
 
 <h2>Ce qui devrait être couvert (structure à valider par un professionnel du droit)</h2>
 <ul>
-  <li><strong>Mentions légales</strong> — éditeur de l'application, hébergement (Netlify), contact.</li>
+  <li><strong>Mentions légales</strong> — éditeur de l'application, hébergement (Cloudflare Pages), contact.</li>
   <li><strong>Politique de confidentialité</strong> — voir les faits vérifiés dans <a href="../data/">Données et confidentialité</a>, qui peuvent servir de base factuelle à la rédaction juridique (aucune collecte serveur, stockage local uniquement, transmission à des API tierces sur action de l'utilisateur).</li>
   <li><strong>Conditions d'utilisation</strong> — notamment le fait que les fonctionnalités IA dépendent de clés API tierces fournies par l'utilisateur, sous la responsabilité de ces fournisseurs (OpenRouter, Anthropic, Google).</li>
   <li><strong>Licences et crédits</strong> — dépendances open-source utilisées (React, Vite, astronomy-engine, satellite.js — voir <a href="../reference/apis/">APIs externes</a> pour les services tiers, et le dépôt GitHub pour les licences des bibliothèques).</li>

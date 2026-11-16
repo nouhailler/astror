@@ -6,7 +6,7 @@ JavaScript, sans dépendance ni étape de build. Elle renvoie vers l'application
 
 ## Pourquoi un site séparé
 
-- L'application (Vite + vite-plugin-pwa) est hébergée sur **Netlify** (`netlify.toml`) et la
+- L'application (Vite + vite-plugin-pwa) est hébergée sur **Cloudflare Pages**, projet distinct (voir [CLOUDFLARE.md](CLOUDFLARE.md)), et la
   documentation sur GitHub Pages (`docs/`). Ni l'une ni l'autre n'est modifiée par la vitrine.
 - `landing/` est hors de `public/` : rien n'est copié dans `dist/` ni précaché par le service worker
   de l'application (`dist/sw.js` identique avant/après).
@@ -86,8 +86,8 @@ La vitrine est publiée sur le projet Cloudflare Pages `astrorlanding` :
 | DNS | `CNAME decouvrir-astror → astrorlanding.pages.dev` (chez l'hébergeur DNS de `swinux.ch`) |
 
 Convention : `decouvrir-<app>.swinux.ch` pour la vitrine, `<app>.swinux.ch` pour l'application.
-**Ne pas** pointer `astror.swinux.ch` vers Cloudflare Pages : ce domaine sert l'application (Netlify) et
-son service worker.
+`astror.swinux.ch` sert l'application et son service worker : il pointe vers le projet Pages **de
+l'application** (`astror`, voir [CLOUDFLARE.md](CLOUDFLARE.md)), jamais vers `astrorlanding`.
 
 La balise canonique, `og:url`, `og:image` (URL absolue) et `sitemap.xml` utilisent le domaine principal ;
 l'adresse `pages.dev` est ainsi traitée comme un doublon par les moteurs de recherche. En cas de

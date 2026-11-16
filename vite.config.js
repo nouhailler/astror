@@ -8,6 +8,9 @@ import { VitePWA } from 'vite-plugin-pwa'
 const pkg = JSON.parse(readFileSync(fileURLToPath(new URL('./package.json', import.meta.url)), 'utf8'))
 
 function gitShortSha() {
+  // Hébergeurs : variables fournies au build (Cloudflare Pages, Netlify), sinon git.
+  const fromEnv = process.env.CF_PAGES_COMMIT_SHA || process.env.COMMIT_REF
+  if (fromEnv) return fromEnv.slice(0, 7)
   try { return execSync('git rev-parse --short HEAD').toString().trim() } catch { return null }
 }
 
