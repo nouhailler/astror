@@ -95,8 +95,11 @@ changement de domaine, mettre à jour `landing/index.html`, `landing/robots.txt`
 
 ## Points à réactiver plus tard
 
-Le dépôt GitHub est actuellement **privé** et la documentation GitHub Pages n'est pas publiée : la vitrine
-n'annonce donc ni « open source » ni lien GitHub / documentation. Les liens correspondants (documentation,
-données et confidentialité, code source, nouveautés, licence MIT) sont prêts, en commentaire HTML, dans le
-pied de page de `landing/index.html`. Une fois le dépôt rendu public : décommenter ces blocs, et remettre la
-mention « open source » dans le hero, la section « Pourquoi Astror » et la FAQ « Astror est-il gratuit ? ».
+Le dépôt GitHub est **public** depuis le 2026-11-16 : la vitrine annonce « open source » (hero,
+« Pourquoi Astror », FAQ « Astror est-il gratuit ? ») et le pied de page renvoie vers le code source,
+les nouveautés (`CHANGELOG.md`) et la licence MIT.
+
+Reste en attente : les liens **Documentation** et **Données et confidentialité**, prêts en commentaire HTML
+dans le pied de page de `landing/index.html`. Ils pointent vers <https://nouhailler.github.io/astror/>,
+qui ne sera en ligne qu'après activation de GitHub Pages (dépôt → Settings → Pages → branche `main`,
+dossier `/docs`). Décommenter ces deux liens une fois la documentation accessible.
