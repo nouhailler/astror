@@ -60,7 +60,7 @@ export function ToolSeg({ items, value, onChange }) {
         {items.map(it => {
           const k = typeof it === 'string' ? it : it.key
           const l = typeof it === 'string' ? it : it.label
-          return <button key={k} className={'chip' + (value === k ? ' on' : '')} onClick={() => onChange(k)}>{l}</button>
+          return <button key={k} className={'chip' + (value === k ? ' on' : '')} data-demo-id={`seg-${k}`} onClick={() => onChange(k)}>{l}</button>
         })}
       </div>
     </div>

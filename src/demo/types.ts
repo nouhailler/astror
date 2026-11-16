@@ -74,3 +74,67 @@ export interface Scenario {
   description?: string
   steps: DemoStep[]
 }
+
+// ── Mode capture & événements (Astror Video Studio) ─────────────────────────
+// Ajouts rétrocompatibles : un scénario existant s'exécute sans changement.
+
+/** Mode d'exécution du moteur. `interactive` = comportement historique. */
+export type DemoMode = 'interactive' | 'capture'
+
+/** Événements émis par le moteur, dans les deux modes. */
+export type DemoEventType =
+  | 'scenario:start' | 'scenario:end'
+  | 'step:start' | 'step:end'
+  | 'navigation:complete'
+  | 'cursor:move'
+  | 'action:click' | 'action:type'
+  | 'highlight:show' | 'highlight:hide'
+  | 'narration:show' | 'narration:hide'
+  | 'action:error'
+  | 'sync:mark'
+
+export interface DemoEvent {
+  type: DemoEventType
+  /** Horloge réelle de la page (ms, performance.now non simulé). */
+  t: number
+  /** Même instant en temps Unix (ms) — timeOrigin réel + t. */
+  epoch: number
+  /** Index de l'étape concernée, s'il y a lieu. */
+  step?: number
+  data?: Record<string, unknown>
+}
+
+/** Réglages du mode capture vidéo (ignorés en mode interactif). */
+export interface CaptureOptions {
+  /**
+   * Durée minimale (ms) de chaque étape, par index. Mesurée à partir de
+   * l'apparition de la narration de l'étape (ou de son début s'il n'y en a pas).
+   * Sert à caler l'image sur la durée réelle de la voix générée.
+   */
+  holdMs?: Record<number, number>
+  /** Affiche la bulle de narration dans l'app (défaut : false). */
+  showNarration?: boolean
+  /** Multiplicateur de vitesse des animations du moteur (défaut : 1). */
+  speed?: number
+  /** Affiche une mire de synchronisation avant le scénario (défaut : true). */
+  syncMark?: boolean
+  /** Délai max d'attente d'un élément / d'un écran (défaut : 8000 ms). */
+  stepTimeoutMs?: number
+  /** Respiration entre deux étapes (défaut : 850 ms, avant vitesse). */
+  breathMs?: number
+}
+
+export interface DemoRunResult {
+  ok: boolean
+  error?: string
+  step?: number
+}
+
+export interface DemoEngineOptions {
+  mode?: DemoMode
+  capture?: CaptureOptions
+  /** Clés astror_ supplémentaires posées après la graine de démo. */
+  seed?: Record<string, string>
+  onEvent?: (e: DemoEvent) => void
+  onFinish?: (r: DemoRunResult) => void
+}

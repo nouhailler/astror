@@ -2,8 +2,8 @@
 // Toute affirmation ici doit être vérifiable dans le code source (src/) — voir DOCUMENTATION_SPEC.md §41.
 // Ne jamais ajouter un comportement qui n'existe pas dans le code ; marquer "À vérifier" sinon.
 
-export const APP_VERSION = '1.5.1';
-export const DOC_VERSION = '1.5.1';
+export const APP_VERSION = '1.6.0';
+export const DOC_VERSION = '1.6.0';
 export const DOC_UPDATED = '2026-09-12';
 
 const verify = (text) => `<div class="callout verify"><div class="callout-title">À vérifier</div><p>${text}</p></div>`;
@@ -594,6 +594,7 @@ ${tbl(`<table><tr><th>Catégorie</th><th>Fonctionnalités listées</th></tr>
 <h2>Fonctionnement hors connexion</h2><p><span class="badge ok">100 % hors ligne</span> — le menu et la navigation ne dépendent d'aucune donnée réseau.</p>
 <h2>Limites</h2><p>Le menu pointe vers le sous-onglet d'Explorer ou de Veille correspondant, mais pas vers une section précise à l'intérieur (ex. « Système solaire » ouvre le sous-onglet entier, pas directement la sous-section « Les 88 constellations » qui s'y trouve plus bas).</p>
 <h2>Erreurs possibles</h2><p>Aucune identifiée.</p>
+<h2>Tutoriels vidéo (contributeurs)</h2><p>Les mêmes scénarios servent à produire les tutoriels vidéo d'Astror (YouTube) grâce à l'outil local <strong>Astror Video Studio</strong> (dossier <code>video/</code> du dépôt) : le moteur de démo est joué automatiquement dans un navigateur piloté, filmé, doublé par une voix de synthèse locale et sous-titré. Ce mode « capture » ne peut pas être déclenché depuis l'application : il exige l'outil d'enregistrement. Rien ne change pour l'utilisateur. Mode d'emploi : <a href="https://github.com/nouhailler/astror/blob/main/video/README.md">video/README.md</a>.</p>
 <h2>FAQ</h2><p><a href="../../faq/">Voir la FAQ</a></p>
 `,
 };
@@ -1791,6 +1792,17 @@ PAGES['versions'] = {
 <div class="eyebrow">Versions</div>
 <h1>Historique des versions</h1>
 <p class="lede">Depuis la version <strong>1.1.0</strong>, Astror suit un vrai numéro de version sémantique (<code>package.json</code>), incrémenté à chaque changement notable et détaillé dans <code>CHANGELOG.md</code>. Les entrées antérieures, non versionnées individuellement à l'époque, restent groupées par date de session.</p>
+
+<h2>Version 1.6.0 — 2026-11-16</h2>
+<h3>Ajouts</h3>
+<ul>
+  <li><strong>Astror Video Studio</strong> (outil de développement, dossier <code>video/</code>) : production automatique de tutoriels vidéo à partir des scénarios du <a href="../features/mode-demo/">mode démo</a> — capture de la vraie interface, narration par synthèse vocale locale, sous-titres SRT/WebVTT, chapitres, export MP4. Premier tutoriel : « Découvrez ASTROR ».</li>
+  <li>Moteur de démo : événements horodatés et mode capture (inactifs pour l'utilisateur ; les visites guidées existantes sont inchangées).</li>
+</ul>
+<h3>Corrections</h3>
+<ul>
+  <li>Mode démo : un double démarrage pouvait lancer deux visites superposées en environnement de développement.</li>
+</ul>
 
 <h2>Version 1.5.1 — 2026-10-29</h2>
 <h3>Ajouts</h3>

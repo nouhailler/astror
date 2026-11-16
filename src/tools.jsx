@@ -67,7 +67,7 @@ export default function OutilsScreen({ deepLink, onDeepLinkConsumed }) {
     const { Page } = tool
     return (
       <Suspense fallback={
-        <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+        <div data-demo-loading style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
           {[0, 1, 2].map(i => (
             <span key={i} style={{ width: 7, height: 7, borderRadius: '50%', background: 'var(--gold)',
               animation: 'pulse 1.2s ease-in-out infinite', animationDelay: `${i * 0.18}s` }} />

@@ -740,7 +740,7 @@ function SolarView({ onPick, onSun, onMoons, planetPositions }) {
       <p className="body" style={{ padding: '6px 18px 4px', fontSize: 12.5 }}>
         Huit planètes en orbite autour du Soleil. Touchez pour les caractéristiques et les photos.
       </p>
-      <div style={{ display: 'flex', gap: 14, overflowX: 'auto', padding: '12px 18px 18px', scrollbarWidth: 'none' }}>
+      <div data-demo-id="explore-planets" style={{ display: 'flex', gap: 14, overflowX: 'auto', padding: '12px 18px 18px', scrollbarWidth: 'none' }}>
         {PLANETS.map(p => {
           const astroId = ASTRO_ID[p.id] ?? p.id
           const pos = planetPositions.find(x => x.id === astroId)
@@ -1524,7 +1524,7 @@ function Segmented({ value, onChange }) {
   return (
     <div style={{ display: 'flex', gap: 7, overflowX: 'auto', padding: '2px 18px 4px', scrollbarWidth: 'none' }}>
       {SEGMENTS.map(s => (
-        <button key={s.key} className={'chip' + (value === s.key ? ' on' : '')} onClick={() => onChange(s.key)}>{s.label}</button>
+        <button key={s.key} className={'chip' + (value === s.key ? ' on' : '')} data-demo-id={`explore-seg-${s.key}`} onClick={() => onChange(s.key)}>{s.label}</button>
       ))}
     </div>
   )

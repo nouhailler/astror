@@ -67,9 +67,14 @@ const DEMO_PROFILE = {
  * - marque l'app comme « déjà vue » pour éviter l'onboarding pendant la démo ;
  * - pose un profil de démonstration lisible.
  */
-export function applySeed(): void {
+export function applySeed(extra?: Record<string, string>): void {
   try {
     localStorage.setItem('astror_onboarded_v1', '1')
     localStorage.setItem('astror_profile_v1', JSON.stringify(DEMO_PROFILE))
+    // Graine complémentaire (mode capture vidéo) : uniquement des clés astror_,
+    // donc couvertes par snapshot/restore.
+    for (const [k, v] of Object.entries(extra ?? {})) {
+      if (k.startsWith(PREFIX)) localStorage.setItem(k, v)
+    }
   } catch { /* ignore */ }
 }

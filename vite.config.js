@@ -51,5 +51,7 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: ['./src/test-setup.js'],
     globals: true,
+    // Les tests d'Astror Video Studio (outillage local) ont leur propre config : npm run video:test
+    exclude: ['**/node_modules/**', 'video/**'],
   },
 })
